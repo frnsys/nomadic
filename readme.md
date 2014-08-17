@@ -31,6 +31,8 @@ Here are some useful tools to go with Nomad:
     * my fork of the [instant-markdown-d](https://github.com/ftzeng/instant-markdown-d) backend for
     vim-instant-markdown (supports MathJax and relative image references)
 
+---
+
 ## Setup
 ```bash
 $ git clone https://github.com/ftzeng/nomad.git
@@ -53,6 +55,8 @@ the dependencies for `vim-instant-markdown`.
 ```bash
 $ ./setup.sh
 ```
+
+---
 
 ## Usage
 Run the `nomad` daemon.
@@ -88,8 +92,10 @@ Commands:
 The Nomad daemon compiles your notes into a browsable local
 HTML structure as they change.
 
-It compiles only HTML and Markdown notes and keeps references
-to local files relative to the build directory so that no
+It compiles only HTML and Markdown notes.
+
+References to local files are made relative
+to the build directory, so no
 extra files are redundantly copied over.
 
 You can browse this structure by running:
@@ -109,7 +115,7 @@ If the specified name matches multiple notebooks,
 you'll be given the option to select the right one.
 
 ### Searching notes
-The Nomad daemon will maintain the search index
+The Nomad daemon will maintain a search index
 for your notes as you update them.
 
 You can search through your notes by running:
@@ -123,6 +129,7 @@ keyword was found, for you to choose from.
 The search feature can search through HTML, Markdown, txt, and pdf
 files.
 
+---
 
 ## Development
 ```bash
@@ -140,8 +147,13 @@ $ pip install nose
 $ nosetests test
 ```
 
+---
+
 ## To Do
 * setup daemon to start on startup in osx/ubuntu
+* better css stylesheet
+
+---
 
 ## Acknowledgements
 The CSS stylesheet used for the compiled notes is from [here](https://gist.github.com/tuzz/3331384).
