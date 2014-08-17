@@ -7,7 +7,7 @@ Nomad leverages other tools I use daily to create a replacement
 for my Evernote usage.
 
 Nomad supports a simple directory structure of HTML, Markdown, txt, and
-pdf notes and any other files which may need to be referenced. It just
+pdf notes and any other files which may need to be referenced. Nomad
 provides an easier way of searching through and browsing those files.
 
 For example:
@@ -15,7 +15,9 @@ For example:
 notes
 ├── economics
 │   ├── more economics notes.pdf
-│   └── my economics notes.md
+│   ├── my economics notes.md
+│   └── my economics notes.resources
+│       └── some image.png
 ├── programming
 │   └── scala guide.html
 └── some note.md
@@ -46,7 +48,8 @@ For example:
 If you don't create this config file, `nomad` will create one for
 you.
 
-To install additional tools, run
+There's also an additional script which will setup
+the dependencies for `vim-instant-markdown`.
 ```bash
 $ ./setup.sh
 ```
