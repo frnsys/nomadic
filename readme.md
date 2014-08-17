@@ -31,6 +31,10 @@ Here are some useful tools to go with Nomad:
     * my fork of the [instant-markdown-d](https://github.com/ftzeng/instant-markdown-d) backend for
     vim-instant-markdown (supports MathJax and relative image references)
 
+With these tools, Nomad becomes a decentralized, simplified alternative to Evernote.
+
+Powerusers of Evernote might find it lacking but it's not for them :)
+
 ---
 
 ## Setup
@@ -126,7 +130,7 @@ $ nomad search <query>
 This will present a list of results, along with snippets where the
 keyword was found, for you to choose from.
 
-The search feature can search through HTML, Markdown, txt, and pdf
+Nomad can search through HTML, Markdown, txt, and pdf
 files.
 
 ---
