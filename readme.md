@@ -189,6 +189,8 @@ release platform-specific distributions:
 * OSX => [Homebrew](https://github.com/Homebrew/homebrew/wiki/Formula-Cookbook)
 * Debian-based distros => `.deb` package
 
+These will handle the setting up of the daemon for you.
+
 ---
 
 ## Acknowledgements
