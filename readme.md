@@ -38,12 +38,16 @@ Powerusers of Evernote might find it lacking but it's not for them :)
 ---
 
 ## Setup
+
+### Installation
 ```bash
 $ git clone https://github.com/ftzeng/nomadic.git
 $ cd nomadic
 $ pip install .
 ```
 
+
+### Installation
 Create a config file (optional) at `~/.nomadic` in JSON format.
 For example:
 ```json
@@ -54,13 +58,18 @@ For example:
 If you don't create this config file, `nomadic` will create one for
 you.
 
+
+### The Daemon
 To get the `nomadic` daemon to run automatically on startup.
 
+#### Linux (Upstart)
 If you're on a Linux distro that uses Upstart, you can do:
 ```bash
 $ mv scripts/nomadic.conf /etc/init/nomadic.conf
 ```
 
+#### OSX
+If you're on a Linux distro that uses Upstart, you can do:
 If you're on OSX, you can do:
 ```bash
 $ mv scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
@@ -70,7 +79,7 @@ Then you can start the daemon:
 $ launchctl start com.nomadic.plist
 ```
 
-
+### Extras
 There's also an additional script which will setup
 the dependencies for `vim-instant-markdown`.
 ```bash
