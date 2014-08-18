@@ -395,6 +395,12 @@ pre code, pre tt {
   padding: 2em;
   list-style-type: none;
 }
+
+.crumbs {
+    padding: 1em;
+    margin: 0;
+    background: #f8f8f8;
+}
 .crumbs li {
     display: inline-block;
 }
