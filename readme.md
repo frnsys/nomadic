@@ -11,7 +11,8 @@ pdf notes and any other files which may need to be referenced. nomadic
 provides an easier way of searching through and browsing those files.
 
 For example:
-```
+
+```bash
 notes
 ├── economics
 │   ├── more economics notes.pdf
@@ -48,28 +49,28 @@ $ pip install .
 
 
 ### Installation
-Create a config file (optional) at `~/.nomadic` in JSON format.
-For example:
-```json
-{
-    "notes_dir": "~/Notes"
-}
-```
+Create a config file (optional) at `~/.nomadic` in JSON format. See
+[Configuration](#configuration) for more details.
 If you don't create this config file, `nomadic` will create one for
 you.
 
 
 ### The Daemon
-To get the `nomadic` daemon to run automatically on startup.
+The daemon watches your notes directory and automatically updates
+the index and compiles notes when they change.
+It will also automatically update references to other notes as they
+change.
+
+To get the `nomadic` daemon to run automatically on startup...
 
 #### Linux (Upstart)
 If you're on a Linux distro that uses Upstart, you can do:
 ```bash
-$ cp scripts/nomadic.conf /etc/init/nomadic.conf
+$ sudo cp scripts/nomadic.conf /etc/init/nomadic.conf
 ```
 Then you can start the daemon:
 ```bash
-$ start nomadic
+$ sudo start nomadic
 ```
 
 #### OSX
@@ -92,17 +93,39 @@ $ ./scripts/install-instant-markdown.sh
 
 ---
 
+## Configuration
+`nomadic` checks for a configuration at `~/.nomadic`. If you
+start `nomadic` without a config, one will be created for you.
+
+For example:
+```json
+{
+    "notes_dir": "~/Notes"
+}
+```
+
+Whenever you change this file, you must restart
+the `nomadic` daemon:
+
+```bash
+# Linux (Upstart)
+$ sudo restart nomadic
+
+# OSX (there might be a better way)
+$ pkill -f nomadic-d
+$ launchctl start com.nomadic
+```
+
+
+---
+
 ## Usage
-Run the `nomadic` daemon.
+Run the `nomadic` daemon if it isn't running already.
 
 ```bash
 $ nomadic-d
 ```
 
-The daemon watches your notes directory and automatically updates
-the index and compiles notes when they change.
-It will also automatically update references to other notes as they
-change.
 
 Primary interaction with `nomadic` is through
 the command line.
