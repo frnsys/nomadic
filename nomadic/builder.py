@@ -103,10 +103,11 @@ class Builder():
         # so we don't have to copy resources over.
         with open(path, 'rb') as note:
             content = ''
+            raw_content = note.read().decode('utf-8')
             if ext == '.html':
-                raw_html = note.read()
+                raw_html = raw_content
             else:
-                rendered = markdown(note.read())
+                rendered = markdown(raw_content)
                 raw_html = md_templ.render(html=rendered, stylesheet=stylesheet)
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
@@ -219,12 +220,9 @@ def _rewrite_link(link):
 def _valid_notebook(dir):
     """
     We want to ignore the build and searchindex
-    as well as all resource directories,
-    which are expected to have the `.resources`
-    extension.
+    as well as all resource directories.
     """
     if '.build' in dir: return False
     if '.searchindex' in dir: return False
-
-    _, ext = os.path.splitext(dir)
-    return ext != '.resources'
+    if '_resources' in dir: return False
+    return True

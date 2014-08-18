@@ -76,7 +76,7 @@ class Index():
                     if mtime > ix_time:
                         # Delete the existing indexed note
                         # and queue for re-indexing.
-                        writer.delete_by_term('path', indexed_path)
+                        writer.delete_by_term('path', ix_path)
                         to_index.add(ix_path)
 
             # See if there are any new files to index
