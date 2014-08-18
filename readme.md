@@ -7,7 +7,7 @@ which led me to reconsider my Evernote usage in general.
 for my Evernote usage.
 
 `nomadic` supports a simple directory structure of HTML, Markdown, txt, and
-pdf notes and any other files which may need to be referenced. nomadic
+pdf notes and any other files which may need to be referenced. `nomadic`
 provides an easier way of searching through and browsing those files.
 
 For example:
@@ -17,7 +17,7 @@ notes
 ├── economics
 │   ├── more economics notes.pdf
 │   ├── my economics notes.md
-│   └── my economics notes.resources
+│   └── _resources
 │       └── some image.png
 ├── programming
 │   └── scala guide.html
@@ -185,6 +185,12 @@ keyword was found, for you to choose from.
 
 `nomadic` can search through HTML, Markdown, txt, and pdf
 files.
+
+### Adding other files (images, etc)
+If you are going to be referencing other files in your notes,
+you should put them in a directory called `_resources` in
+that note's notebook directory. `nomadic` recognizes these
+directories and handles them specially.
 
 ---
 
