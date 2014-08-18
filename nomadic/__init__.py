@@ -5,27 +5,27 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
-from nomad import indexer, builder, searcher, demon
+from nomadic import indexer, builder, searcher, demon
 
-class Nomad():
+class Nomadic():
     pass
-pass_nomad = click.make_pass_decorator(Nomad, ensure=True)
+pass_nomadic = click.make_pass_decorator(Nomadic, ensure=True)
 
 @click.group()
-@pass_nomad
-def cli(nomad):
+@pass_nomadic
+def cli(nomadic):
     cfg = _load_config()
 
-    nomad.index = indexer.Index(cfg['notes_dir'])
-    nomad.builder = builder.Builder(cfg['notes_dir'])
+    nomadic.index = indexer.Index(cfg['notes_dir'])
+    nomadic.builder = builder.Builder(cfg['notes_dir'])
 
     for key, val in cfg.items():
-        setattr(nomad, key, val)
+        setattr(nomadic, key, val)
 
 @cli.command()
 @click.argument('query')
-@pass_nomad
-def search(nomad, query):
+@pass_nomadic
+def search(nomadic, query):
     """
     Search through notes.
     """
@@ -33,7 +33,7 @@ def search(nomad, query):
     # Map notes to their temporary ids.
     note_map = {}
 
-    for idx, (result, highlights) in enumerate(searcher.search(query, nomad.index)):
+    for idx, (result, highlights) in enumerate(searcher.search(query, nomadic.index)):
         note_map[idx] = result['path']
 
         # Show all the results.
@@ -55,18 +55,18 @@ def search(nomad, query):
 
 @cli.command()
 @click.argument('notebook', default='')
-@pass_nomad
-def browse(nomad, notebook):
+@pass_nomadic
+def browse(nomadic, notebook):
     """
     Browse through notes
     via a web browser.
     """
     if not notebook:
-        notebook_dir = nomad.notes_dir
+        notebook_dir = nomadic.notes_dir
 
     else:
         dirs = []
-        for root, dirnames, _ in indexer.walk_notes(nomad.notes_dir):
+        for root, dirnames, _ in indexer.walk_notes(nomadic.notes_dir):
             dirs += [os.path.join(root, dirname) for dirname in dirnames if notebook in dirname]
 
         if len(dirs) == 1:
@@ -83,30 +83,30 @@ def browse(nomad, notebook):
             echo('\nNo matching notebooks found.\n')
             return
 
-    path = notebook_dir.replace(nomad.notes_dir, nomad.build_dir)
+    path = notebook_dir.replace(nomadic.notes_dir, nomadic.build_dir)
     click.launch(os.path.join(path, 'index.html'))
 
 
 @cli.command()
 @click.option('--reset', is_flag=True, help='Recompile the index from scratch.')
-@pass_nomad
-def index(nomad, reset):
+@pass_nomadic
+def index(nomadic, reset):
     """
     Manually update or reset the note index.
     """
     if reset:
-        nomad.index.reset()
+        nomadic.index.reset()
     else:
-        nomad.index.update()
+        nomadic.index.update()
 
 
 @cli.command()
-@pass_nomad
-def build(nomad):
+@pass_nomadic
+def build(nomadic):
     """
     Manually re-build the browsable tree.
     """
-    nomad.builder.build()
+    nomadic.builder.build()
 
 
 
@@ -115,7 +115,7 @@ def build(nomad):
 @click.option('--debug', is_flag=True, help='Run in the foreground for debugging.')
 def daemon(debug):
     """
-    Launch the Nomad daemon.
+    Launch the Nomadic daemon.
     """
     cfg = _load_config()
     demon.start(cfg['notes_dir'], debug=debug)
@@ -125,13 +125,13 @@ def daemon(debug):
 
 
 def _load_config():
-    cfg_path = os.path.expanduser(u'~/.nomad')
+    cfg_path = os.path.expanduser(u'~/.nomadic')
 
     # Create default config if necessary.
     if not os.path.exists(cfg_path):
         with open(cfg_path, 'w') as cfg_file:
             json.dump(cfg_file, {
-                'notes_dir': '~/nomad'
+                'notes_dir': '~/nomadic'
             })
 
     with open(cfg_path, 'r') as cfg_file:

@@ -1,9 +1,9 @@
 import os
 
-from nomad.builder import Builder
-from test import NomadTest, note_at, compiled_path
+from nomadic.builder import Builder
+from test import NomadicTest, note_at, compiled_path
 
-class BuilderTest(NomadTest):
+class BuilderTest(NomadicTest):
     def setUp(self):
         self.builder = Builder(self.notes_dir)
 
@@ -48,7 +48,7 @@ class BuilderTest(NomadTest):
 
         path_ = compiled_path('my note.html')
         with open(path_, 'r') as note:
-            self.assertEqual(note.read(), '<div><h1>HEY HI</h1>\n<p>foo bar qua</p></div>')
+            self.assertTrue('<h1>HEY HI</h1>\n<p>foo bar qua</p>' in note.read())
 
         with open(path, 'w') as note:
             note.write(u'changed note content')
@@ -56,7 +56,9 @@ class BuilderTest(NomadTest):
         self.builder.compile_note(path)
 
         with open(path_, 'r') as note:
-            self.assertEqual(note.read(), '<p>changed note content</p>')
+            note_content = note.read()
+            self.assertTrue('<p>changed note content</p>' in note_content)
+            self.assertFalse('<h1>HEY HI</h1>\n<p>foo bar qua</p>' in note_content)
 
     def test_delete_compiled_note(self):
         path = note_at('my note.md')

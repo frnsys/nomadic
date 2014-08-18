@@ -1,7 +1,7 @@
-from nomad import extractor
-from test import NomadTest, note_at
+from nomadic import extractor
+from test import NomadicTest, note_at
 
-class ExtractorTest(NomadTest):
+class ExtractorTest(NomadicTest):
     def test_extract_html_note_removes_html(self):
         note = extractor.note_from_path(note_at('test.html'))
         data = extractor.process_note(note)

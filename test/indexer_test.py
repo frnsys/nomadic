@@ -1,11 +1,11 @@
 import os
 import shutil
 
-from nomad.indexer import Index
-from test import NomadTest, note_at
+from nomadic.indexer import Index
+from test import NomadicTest, note_at
 
 
-class IndexerTest(NomadTest):
+class IndexerTest(NomadicTest):
     def setUp(self):
         self.index = Index(self.notes_dir)
         self.index.reset()

@@ -12,7 +12,7 @@ from functools import wraps
 import whoosh.index as index
 from whoosh.fields import *
 
-from nomad import extractor
+from nomadic import extractor
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),

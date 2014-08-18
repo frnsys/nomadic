@@ -8,6 +8,7 @@ directory and manages indexing/compiling.
 
 import os
 import re
+import sys
 import time
 import logging
 
@@ -17,37 +18,31 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 from daemon import DaemonContext
 
-from nomad import indexer, builder
+from nomadic import indexer, builder
 
 # Markdown link regex
 md_link_re = re.compile(r'\[.+\]\(`?([^`\(\)]+)`?\)')
 
 def start(note_path, debug=False):
-    logger = logging.getLogger('nomad_daemon')
+    logger = logging.getLogger('nomadic_daemon')
     logger.setLevel( logging.DEBUG )
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    sh = logging.StreamHandler(sys.stdout)
+    sh.setFormatter(formatter)
+    logger.addHandler(sh)
 
     if debug:
-        sh = logging.StreamHandler()
-        sh.setFormatter(formatter)
-        logger.addHandler(sh)
-
         observe(note_path, logger)
 
     else:
-        log = os.path.expanduser('~/.nomad.log')
-        fh = logging.FileHandler(log)
-        fh.setFormatter(formatter)
-        logger.addHandler(fh)
-
-        with DaemonContext(files_preserve=[fh.stream]):
-            logger.debug('NomadDaemon started.')
+        with DaemonContext(stdout=sys.stdout):
+            logger.debug('NomadicDaemon started.')
             observe(note_path, logger)
 
 def observe(note_path, logger):
     try:
         ob = Observer()
-        ob.schedule(NomadDaemon(note_path, logger), note_path, recursive=True)
+        ob.schedule(NomadicDaemon(note_path, logger), note_path, recursive=True)
         ob.start()
 
         try:
@@ -64,12 +59,12 @@ def observe(note_path, logger):
         ob.stop()
         ob.join()
 
-class NomadDaemon(PatternMatchingEventHandler):
+class NomadicDaemon(PatternMatchingEventHandler):
     patterns = ['*.html', '*.md', '*.txt', '*.pdf']
     ignore_patterns = ['*.build*', '*.searchindex*']
 
     def __init__(self, note_path, logger):
-        super(NomadDaemon, self).__init__(ignore_directories=False)
+        super(NomadicDaemon, self).__init__(ignore_directories=False)
         self.index = indexer.Index(note_path)
         self.builder = builder.Builder(note_path)
         self.notes_path = note_path

@@ -11,7 +11,7 @@ from collections import namedtuple
 from colorama import Fore
 from whoosh.qparser import QueryParser
 
-from nomad import extractor
+from nomadic import extractor
 
 Result = namedtuple('Result', ['data', 'highlights'])
 

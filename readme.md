@@ -1,13 +1,13 @@
-# Nomad
+# nomadic
 
 I wasn't able to find a satisfactory way to use Evernote in Linux,
 which led me to reconsider my Evernote usage in general.
 
-Nomad leverages other tools I use daily to create a replacement
+`nomadic` leverages other tools I use daily to create a replacement
 for my Evernote usage.
 
-Nomad supports a simple directory structure of HTML, Markdown, txt, and
-pdf notes and any other files which may need to be referenced. Nomad
+`nomadic` supports a simple directory structure of HTML, Markdown, txt, and
+pdf notes and any other files which may need to be referenced. nomadic
 provides an easier way of searching through and browsing those files.
 
 For example:
@@ -23,7 +23,7 @@ notes
 └── some note.md
 ```
 
-Here are some useful tools to go with Nomad:
+Here are some useful tools to go with `nomadic`:
 * [BitTorrent Sync](www.bittorrent.com/sync) to keep notes synced across devices.
 * [Vim](http://www.vim.org/) with:
     * [vim-instant-markdown](https://github.com/suan/vim-instant-markdown) to have live previews
@@ -31,7 +31,7 @@ Here are some useful tools to go with Nomad:
     * my fork of the [instant-markdown-d](https://github.com/ftzeng/instant-markdown-d) backend for
     vim-instant-markdown (supports MathJax and relative image references)
 
-With these tools, Nomad becomes a decentralized, simplified alternative to Evernote.
+With these tools, `nomadic` becomes a decentralized, simplified alternative to Evernote.
 
 Powerusers of Evernote might find it lacking but it's not for them :)
 
@@ -39,34 +39,51 @@ Powerusers of Evernote might find it lacking but it's not for them :)
 
 ## Setup
 ```bash
-$ git clone https://github.com/ftzeng/nomad.git
-$ cd nomad
+$ git clone https://github.com/ftzeng/nomadic.git
+$ cd nomadic
 $ pip install .
 ```
 
-Create a config file (optional) at `~/.nomad` in JSON format.
+Create a config file (optional) at `~/.nomadic` in JSON format.
 For example:
 ```json
 {
     "notes_dir": "~/Notes"
 }
 ```
-If you don't create this config file, `nomad` will create one for
+If you don't create this config file, `nomadic` will create one for
 you.
+
+To get the `nomadic` daemon to run automatically on startup.
+
+If you're on a Linux distro that uses Upstart, you can do:
+```bash
+$ mv scripts/nomadic.conf /etc/init/nomadic.conf
+```
+
+If you're on OSX, you can do:
+```bash
+$ mv scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
+```
+Then you can start the daemon:
+```bash
+$ launchctl start com.nomadic.plist
+```
+
 
 There's also an additional script which will setup
 the dependencies for `vim-instant-markdown`.
 ```bash
-$ ./setup.sh
+$ ./scripts/install-instant-markdown.sh
 ```
 
 ---
 
 ## Usage
-Run the `nomad` daemon.
+Run the `nomadic` daemon.
 
 ```bash
-$ nomad_d
+$ nomadic-d
 ```
 
 The daemon watches your notes directory and automatically updates
@@ -74,13 +91,13 @@ the index and compiles notes when they change.
 It will also automatically update references to other notes as they
 change.
 
-Primary interaction with `nomad` is through
+Primary interaction with `nomadic` is through
 the command line.
 
 ```bash
-$ nomad --help
+$ nomadic --help
 
-Usage: nomad [OPTIONS] COMMAND [ARGS]...
+Usage: nomadic [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --help  Show this message and exit.
@@ -93,7 +110,7 @@ Commands:
 ```
 
 ### Browsing notes
-The Nomad daemon compiles your notes into a browsable local
+The `nomadic` daemon compiles your notes into a browsable local
 HTML structure as they change.
 
 It compiles only HTML and Markdown notes.
@@ -104,7 +121,7 @@ extra files are redundantly copied over.
 
 You can browse this structure by running:
 ```bash
-$ nomad browse
+$ nomadic browse
 ```
 which opens up the root directory ('notebook') in your
 default web browser.
@@ -112,33 +129,33 @@ default web browser.
 You can immediately jump to a specific notebook by
 passing its name in:
 ```bash
-$ nomad browse economics
+$ nomadic browse economics
 ```
 
 If the specified name matches multiple notebooks,
 you'll be given the option to select the right one.
 
 ### Searching notes
-The Nomad daemon will maintain a search index
+The `nomadic` daemon will maintain a search index
 for your notes as you update them.
 
 You can search through your notes by running:
 ```bash
-$ nomad search <query>
+$ nomadic search <query>
 ```
 
 This will present a list of results, along with snippets where the
 keyword was found, for you to choose from.
 
-Nomad can search through HTML, Markdown, txt, and pdf
+`nomadic` can search through HTML, Markdown, txt, and pdf
 files.
 
 ---
 
 ## Development
 ```bash
-$ git clone https://github.com/ftzeng/nomad.git
-$ cd nomad
+$ git clone https://github.com/ftzeng/nomadic.git
+$ cd nomadic
 $ pip install --editable .
 ```
 
@@ -154,8 +171,14 @@ $ nosetests test
 ---
 
 ## To Do
-* setup daemon to start on startup in osx/ubuntu
 * better css stylesheet
+
+I'm still testing this out personally to
+work out the kinks but eventually I want to
+release platform-specific distributions:
+
+* OSX => [Homebrew](https://github.com/Homebrew/homebrew/wiki/Formula-Cookbook)
+* Debian-based distros => `.deb` package
 
 ---
 

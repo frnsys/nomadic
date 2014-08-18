@@ -1,9 +1,16 @@
+from sys import platform
 from setuptools import setup
 
 setup(
-    name='Nomad',
-    version='0.1',
-    py_modules=['nomad'],
+    name='nomadic',
+    version='0.1.0a',
+    description='a lightweight note management system.',
+    url='https://github.com/ftzeng/nomadic',
+    author='Francis Tseng',
+    author_email='f@frnsys.com',
+    license='GPLv3',
+
+    packages=['nomadic'],
     install_requires=[
         'click',
         'jinja2',
@@ -17,7 +24,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        nomad=nomad:cli
-        nomad_d=nomad:daemon
+        nomadic=nomadic:cli
+        nomadic-d=nomadic:daemon
     ''',
 )

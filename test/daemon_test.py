@@ -4,14 +4,14 @@ import logging
 from threading import Thread
 from collections import namedtuple
 
-from nomad import indexer, builder
-from nomad.demon import NomadDaemon
-from test import NomadTest, note_at, compiled_path
+from nomadic import indexer, builder
+from nomadic.demon import NomadicDaemon
+from test import NomadicTest, note_at, compiled_path
 
 # Mock the watchdog events.
 Event = namedtuple('Event', ['is_directory', 'src_path', 'dest_path'])
 
-class DaemonTest(NomadTest):
+class DaemonTest(NomadicTest):
     """
     This tests the daemon's handling of
     events, but does not test
@@ -23,7 +23,7 @@ class DaemonTest(NomadTest):
     and manually trigger the proper response.
     """
     def setUp(self):
-        logger = logging.getLogger('nomad_daemon_test')
+        logger = logging.getLogger('nomadic_daemon_test')
 
         self.index = indexer.Index(self.notes_dir)
         self.index.reset()
@@ -31,7 +31,7 @@ class DaemonTest(NomadTest):
         self.builder = builder.Builder(self.notes_dir)
         self.builder.build()
 
-        self.daemon = NomadDaemon(self.notes_dir, logger)
+        self.daemon = NomadicDaemon(self.notes_dir, logger)
 
     def test_on_created(self):
         path = note_at('a new note.md')
@@ -75,7 +75,7 @@ class DaemonTest(NomadTest):
         self.daemon.on_modified(e)
 
         with open(path_, 'r') as note:
-            self.assertEqual('<p>a changed note</p>', note.read())
+            self.assertTrue('<p>a changed note</p>' in note.read())
 
         note = self.index.note_at(path)
         self.assertEqual('a changed note', note['content'])

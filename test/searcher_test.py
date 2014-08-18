@@ -1,7 +1,7 @@
-from nomad import searcher, indexer
-from test import NomadTest, note_at
+from nomadic import searcher, indexer
+from test import NomadicTest, note_at
 
-class SearcherTest(NomadTest):
+class SearcherTest(NomadicTest):
     def test_search(self):
         self.index = indexer.Index(self.notes_dir)
         self.index.reset()

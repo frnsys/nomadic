@@ -13,7 +13,7 @@ NOTES_DIR = os.path.join(dir, u'.notes')
 def note_at(path): return os.path.join(NOTES_DIR, path)
 def compiled_path(path): return os.path.join(NOTES_DIR, u'.build', path)
 
-class NomadTest(unittest.TestCase):
+class NomadicTest(unittest.TestCase):
     def __call__(self, result=None):
         """
         Sets up the tests without needing
@@ -21,7 +21,7 @@ class NomadTest(unittest.TestCase):
         """
         try:
             self._pre_setup()
-            super(NomadTest, self).__call__(result)
+            super(NomadicTest, self).__call__(result)
         finally:
             self._post_teardown()
 
