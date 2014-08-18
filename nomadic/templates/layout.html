@@ -11,18 +11,6 @@
 </head>
 
 <body>
-    <ul class="crumbs">
-        {% for crumb in crumbs %}
-            <li>
-                {% if loop.length != loop.index %}
-                    <a href="{{ '../'*(loop.length-loop.index) }}index.html">{{ crumb }}</a> &#8594;
-                {% else %}
-                    {{ crumb }}
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-
     {% block content %}
     {% endblock %}
 </body>

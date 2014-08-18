@@ -1,6 +1,9 @@
+{% from 'macros.html' import breadcrumbs %}
 {% extends 'layout.html' %}
 
 {% block content %}
+    {{ breadcrumbs(crumbs) }}
+
     {% if dirs %}
         <ul class="notebooks">
             {% for dir in dirs %}

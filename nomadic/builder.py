@@ -24,7 +24,7 @@ stylesheet = os.path.join(dir, 'templates/index.css')
 
 env = Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
-index_templ = env.get_template('index.html')
+index_templ = env.get_template('notebook.html')
 md_templ = env.get_template('markdown.html')
 
 class Builder():
