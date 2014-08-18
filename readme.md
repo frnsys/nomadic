@@ -229,8 +229,11 @@ These will handle the setting up of the daemon for you.
 ## Shortcomings (future to dos?)
 * You have to premeditate syncing. That is, with Evernote, you can
 log into your Evernote account from any computer and access your
-notes without needing to set anything up beforehand. To access `nomadic`
-notes, you must sync them beforehand.
+notes without needing to set anything up beforehand. If you're using
+BitTorrent sync, you must set up syncing in advance to access your
+`nomadic` notes. But if you're using a cloud
+service for syncing such as Dropbox, you can just log into that and
+access your notes from anywhere as well.
 * It's very easy to copy and paste HTML into Evernote and preserve the
 formatting. There is not yet an easy workflow for the same in `nomadic`.
 
