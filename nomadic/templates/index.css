@@ -106,8 +106,8 @@ h6 {
   font-size: 14px;
 }
 
-p, blockquote, ul, ol, dl, li, table, pre {
-  margin: 0;
+p, blockquote, ul, ol, dl, table, pre {
+  margin: 1em;
 }
 
 hr {
@@ -383,6 +383,11 @@ pre code, pre tt {
 }
 
 
+.note {
+    padding: 2em;
+    max-width: 800px;
+    margin: 0 auto;
+}
 .notebooks {
   background: #f6f6f6;
 }
