@@ -142,6 +142,10 @@ def new(nomadic, notebook, note):
     notebook_path = nomadic.get_notebook(notebook)
     if notebook_path is None: return
 
+    # Assume Markdown if no ext specified.
+    _, ext = os.path.splitext(note)
+    if not ext: note += '.md'
+
     path = os.path.join(notebook_path, note)
     click.edit(filename=path)
 
