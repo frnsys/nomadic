@@ -92,7 +92,7 @@ def browse(nomadic, notebook):
 @pass_nomadic
 def index(nomadic, reset):
     """
-    Manually update or reset the note index.
+    Update or reset the note index.
     """
     if reset:
         nomadic.index.reset()
@@ -104,7 +104,7 @@ def index(nomadic, reset):
 @pass_nomadic
 def build(nomadic):
     """
-    Manually re-build the browsable tree.
+    Re-build the browsable tree.
     """
     nomadic.builder.build()
 
