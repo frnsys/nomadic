@@ -65,18 +65,18 @@ To get the `nomadic` daemon to run automatically on startup.
 #### Linux (Upstart)
 If you're on a Linux distro that uses Upstart, you can do:
 ```bash
-$ mv scripts/nomadic.conf /etc/init/nomadic.conf
+$ cp scripts/nomadic.conf /etc/init/nomadic.conf
 ```
 
 #### OSX
 If you're on a Linux distro that uses Upstart, you can do:
 If you're on OSX, you can do:
 ```bash
-$ mv scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
+$ cp scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
 ```
 Then you can start the daemon:
 ```bash
-$ launchctl start com.nomadic.plist
+$ launchctl load ~/Library/LaunchAgents/com.nomadic.plist 
 ```
 
 ### Extras

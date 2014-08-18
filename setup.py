@@ -18,7 +18,7 @@ setup(
         'colorama',
         'lxml',
         'pdfminer',
-        'py-gfm',
+        'gfm',
         'python-daemon',
         'watchdog'
     ],

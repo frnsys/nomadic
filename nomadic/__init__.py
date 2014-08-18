@@ -130,9 +130,9 @@ def _load_config():
     # Create default config if necessary.
     if not os.path.exists(cfg_path):
         with open(cfg_path, 'w') as cfg_file:
-            json.dump(cfg_file, {
+            json.dump({
                 'notes_dir': '~/nomadic'
-            })
+            }, cfg_file)
 
     with open(cfg_path, 'r') as cfg_file:
         cfg = json.load(cfg_file)

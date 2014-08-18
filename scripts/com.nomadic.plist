@@ -6,7 +6,15 @@
     <string>com.nomadic</string>
 
     <key>Program</key>
-    <string>nomadic-d >> ~/.nomadic.log</string>
+    <string>/usr/local/bin/nomadic-d</string>
+
+    <key>NumberOfProcesses</key>
+    <integer>1</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/nomadic.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/nomadic.err</string>
 
     <key>KeepAlive</key>
     <true/>
