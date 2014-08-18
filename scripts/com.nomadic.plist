@@ -8,8 +8,11 @@
     <key>Program</key>
     <string>/usr/local/bin/nomadic-d</string>
 
-    <key>NumberOfProcesses</key>
-    <integer>1</integer>
+    <key>HardResourceLimits</key>
+    <dict>
+        <key>NumberOfProcesses</key>
+        <integer>1</integer>
+    </dict>
 
     <key>StandardOutPath</key>
     <string>/tmp/nomadic.log</string>
