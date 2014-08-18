@@ -67,6 +67,10 @@ If you're on a Linux distro that uses Upstart, you can do:
 ```bash
 $ cp scripts/nomadic.conf /etc/init/nomadic.conf
 ```
+Then you can start the daemon:
+```bash
+$ start nomadic
+```
 
 #### OSX
 If you're on a Linux distro that uses Upstart, you can do:
