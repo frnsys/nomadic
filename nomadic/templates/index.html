@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    {% if dirs %}
+        <ul class="notebooks">
+            {% for dir in dirs %}
+                <li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <ul class="notes">
+        {% for file in files %}
+            <li><a href="{{ file.filename }}">{{ file.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

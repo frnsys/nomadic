@@ -12,7 +12,8 @@ from collections import namedtuple
 import lxml.html
 from lxml.etree import tostring
 from markdown import markdown
-from jinja2 import Template
+from jinja2 import Template, FileSystemLoader
+from jinja2.environment import Environment
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -20,10 +21,11 @@ File = namedtuple('File', ['title', 'filename'])
 path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
 stylesheet = os.path.join(dir, 'templates/index.css')
-index_templ_path = os.path.join(dir, 'templates/index.jinja')
-index_templ = Template( open(index_templ_path, 'r').read() )
-md_templ_path = os.path.join(dir, 'templates/markdown.jinja')
-md_templ = Template( open(md_templ_path, 'r').read() )
+
+env = Environment()
+env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
+index_templ = env.get_template('index.html')
+md_templ = env.get_template('markdown.html')
 
 class Builder():
     def __init__(self, notes_path):
@@ -97,6 +99,7 @@ class Builder():
         existing note, if any.
         """
         build_path, ext = self._build_path_for_note_path(path)
+        crumbs = self._build_breadcrumbs(build_path)
 
         # Process all relative paths to
         # point to the raw note directories,
@@ -108,7 +111,7 @@ class Builder():
                 raw_html = raw_content
             else:
                 rendered = markdown(raw_content)
-                raw_html = md_templ.render(html=rendered, stylesheet=stylesheet)
+                raw_html = md_templ.render(html=rendered, crumbs=crumbs, stylesheet=stylesheet)
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
@@ -152,9 +155,10 @@ class Builder():
             path = os.path.join(dir, name)
             if os.path.isfile(path):
                 title, ext = os.path.splitext(name)
-                compiled_filename = title + '.html'
-                file = File(title.decode('utf-8'), compiled_filename.decode('utf-8'))
-                files.append(file)
+                if ext in ['.html', '.md']:
+                    compiled_filename = title + '.html'
+                    file = File(title.decode('utf-8'), compiled_filename.decode('utf-8'))
+                    files.append(file)
             else:
                 if _valid_notebook(name):
                     dirs.append(name.decode('utf-8'))
@@ -215,6 +219,7 @@ def _rewrite_link(link):
         return link.replace('.build/', '')
     elif ext == '.md':
         return root + '.html'
+    return link
 
 
 def _valid_notebook(dir):
