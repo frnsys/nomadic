@@ -220,5 +220,15 @@ These will handle the setting up of the daemon for you.
 
 ---
 
+## Shortcomings (future to dos?)
+* Have to premeditate syncing. That is, with Evernote, you can
+log into your Evernote account from any computer and access your
+notes without needing to set anything up beforehand. To access `nomadic`
+notes, you must sync them beforehand.
+* It's very easy to copy and paste HTML into Evernote and preserve the
+formatting. There is not yet an easy workflow for the same in `nomadic`.
+
+---
+
 ## Acknowledgements
 The CSS stylesheet used for the compiled notes is from [here](https://gist.github.com/tuzz/3331384).
