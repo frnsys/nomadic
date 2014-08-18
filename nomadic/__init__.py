@@ -118,7 +118,16 @@ def daemon(debug):
     Launch the Nomadic daemon.
     """
     cfg = _load_config()
-    demon.start(cfg['notes_dir'], debug=debug)
+    notes_path = cfg['notes_dir']
+
+    # Update the index.
+    indexer.Index(notes_path).update()
+
+    # Build the browsable tree.
+    builder.Builder(notes_path).build()
+
+    # Start the daemon.
+    demon.start(notes_path, debug=debug)
 
 
 
@@ -137,8 +146,14 @@ def _load_config():
     with open(cfg_path, 'r') as cfg_file:
         cfg = json.load(cfg_file)
 
-    cfg['notes_dir'] = os.path.expanduser(cfg['notes_dir'])
-    cfg['build_dir'] = os.path.join(cfg['notes_dir'], u'.build')
+    notes_path = os.path.expanduser(cfg['notes_dir'])
+    cfg['notes_dir'] = notes_path
+    cfg['build_dir'] = os.path.join(notes_path, u'.build')
+
+    # Create the notes directory if necessary.
+    if not os.path.exists(notes_path):
+        os.makedirs(notes_path)
+
     return cfg
 
 def _echo_path_choice(idx, path):
