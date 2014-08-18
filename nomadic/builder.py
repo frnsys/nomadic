@@ -210,7 +210,12 @@ class Builder():
         path = 'notes' + path
 
         # Split the path into the crumbs.
-        return path.split('/')
+        crumbs = path.split('/')
+
+        # Remove the file extension from the last crumb.
+        crumbs[-1], _ = os.path.splitext(crumbs[-1])
+
+        return crumbs
 
 
 def _rewrite_link(link):
