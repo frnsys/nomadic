@@ -12,13 +12,24 @@
 
 <body>
     <main role="main" id="main">
-        <ul>
+        <ul class="crumbs">
+            {% for crumb in crumbs %}
+                <li>
+                    {% if loop.length != loop.index %}
+                    <a href='{{ '../'*(loop.length-loop.index) }}index.html'>{{ crumb }}</a> &#8594;
+                    {% else %}
+                        {{ crumb }}
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <ul class="notebooks">
             {% for dir in dirs %}
                 <li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
             {% endfor %}
         </ul>
 
-        <ul>
+        <ul class="notes">
             {% for file in files %}
                 <li><a href="{{ file.filename }}">{{ file.title }}</a></li>
             {% endfor %}

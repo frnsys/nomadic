@@ -65,7 +65,6 @@ class Builder():
                 # Process valid sub-directories.
                 for dirname in dirnames:
                     if _valid_notebook(dirname):
-                        print(dirname)
                         build_path = os.path.join(build_root, dirname)
 
                         if os.path.exists(build_path):
@@ -87,7 +86,7 @@ class Builder():
                         files.append(file)
 
                 # Write the index file for this node.
-                _write_index(build_root, dirs, files)
+                self._write_index(build_root, dirs, files)
 
     def compile_note(self, path):
         """
@@ -159,7 +158,7 @@ class Builder():
                 if _valid_notebook(name):
                     dirs.append(name.decode('utf-8'))
         # Write the index file for this node.
-        _write_index(build_path, dirs, files)
+        self._write_index(build_path, dirs, files)
 
 
     def _build_path_for_note_path(self, path):
@@ -183,6 +182,31 @@ class Builder():
         """
         return path.replace(self.notes_path, self.build_path)
 
+    def _write_index(self, path, dirs, files):
+        """
+        Write an `index.html` file
+        at the specified path,
+        listing the specified dirs and files.
+        """
+        crumbs = self._build_breadcrumbs(path)
+        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs, stylesheet=stylesheet)
+
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with open( os.path.join(path, 'index.html'), 'w' ) as index:
+            index.write(rendered.encode('utf-8'))
+
+    def _build_breadcrumbs(self, path):
+        # Get rid of the build path.
+        path = path.replace(self.build_path, '')
+
+        # Create some name for the root notebook.
+        path = 'notes' + path
+
+        # Split the path into the crumbs.
+        return path.split('/')
+
 
 def _rewrite_link(link):
     root, ext = os.path.splitext(link)
@@ -191,19 +215,6 @@ def _rewrite_link(link):
     elif ext == '.md':
         return root + '.html'
 
-def _write_index(path, dirs, files):
-    """
-    Write an `index.html` file
-    at the specified path,
-    listing the specified dirs and files.
-    """
-    rendered = index_templ.render(dirs=dirs, files=files, stylesheet=stylesheet)
-
-    if not os.path.exists(path):
-        os.makedirs(path)
-
-    with open( os.path.join(path, 'index.html'), 'w' ) as index:
-        index.write(rendered.encode('utf-8'))
 
 def _valid_notebook(dir):
     """
