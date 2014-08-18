@@ -112,6 +112,7 @@ class Builder():
             else:
                 rendered = markdown(raw_content)
                 raw_html = md_templ.render(html=rendered, crumbs=crumbs, stylesheet=stylesheet)
+
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
