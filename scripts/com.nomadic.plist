@@ -8,7 +8,7 @@
     <key>Program</key>
     <string>/usr/local/bin/nomadic-d</string>
 
-    <key>HardResourceLimits</key>
+    <key>HardResourceLimit</key>
     <dict>
         <key>NumberOfProcesses</key>
         <integer>1</integer>
