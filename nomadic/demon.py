@@ -60,8 +60,9 @@ def observe(note_path, logger):
         ob.join()
 
 class NomadicDaemon(PatternMatchingEventHandler):
-    patterns = ['*.html', '*.md', '*.txt', '*.pdf']
+    patterns = ['*'] # match everything b/c we want to match directories as well.
     ignore_patterns = ['*.build*', '*.searchindex*']
+    valid_exts = ('.html', '.md', '.txt', '.pdf')
 
     def __init__(self, note_path, logger):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
@@ -69,6 +70,14 @@ class NomadicDaemon(PatternMatchingEventHandler):
         self.builder = builder.Builder(note_path)
         self.notes_path = note_path
         self.logger = logger
+
+    def dispatch(self, event):
+        """
+        Only dispatch an event
+        if it satisfies our requirements.
+        """
+        if event.is_directory or event.src_path.endswith(self.valid_exts):
+            super(NomadicDaemon, self).dispatch(event)
 
     def on_modified(self, event):
         """

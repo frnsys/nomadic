@@ -65,6 +65,7 @@ class Builder():
                 # Process valid sub-directories.
                 for dirname in dirnames:
                     if _valid_notebook(dirname):
+                        print(dirname)
                         build_path = os.path.join(build_root, dirname)
 
                         if os.path.exists(build_path):
@@ -155,7 +156,8 @@ class Builder():
                 file = File(title.decode('utf-8'), compiled_filename.decode('utf-8'))
                 files.append(file)
             else:
-                dirs.append(name.decode('utf-8'))
+                if _valid_notebook(name):
+                    dirs.append(name.decode('utf-8'))
         # Write the index file for this node.
         _write_index(build_path, dirs, files)
 
@@ -205,12 +207,13 @@ def _write_index(path, dirs, files):
 
 def _valid_notebook(dir):
     """
-    We want to ignore all resource directories,
+    We want to ignore the build and searchindex
+    as well as all resource directories,
     which are expected to have the `.resources`
     extension.
     """
-    if '.searchindex' in dir: return False
     if '.build' in dir: return False
+    if '.searchindex' in dir: return False
 
     _, ext = os.path.splitext(dir)
     return ext != '.resources'
