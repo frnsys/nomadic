@@ -47,8 +47,7 @@ $ cd nomadic
 $ pip install .
 ```
 
-
-### Installation
+### Configuration
 Create a config file (optional) at `~/.nomadic` in JSON format. See
 [Configuration](#configuration) for more details.
 If you don't create this config file, `nomadic` will create one for
