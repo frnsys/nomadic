@@ -140,6 +140,7 @@ Options:
 Commands:
   browse  Browse through notes via a web browser.
   build   Manually re-build the browsable tree.
+  count   Get the number of notes.
   index   Manually update or reset the note index.
   search  Search through notes.
 ```

@@ -108,6 +108,14 @@ def build(nomadic):
     """
     nomadic.builder.build()
 
+@cli.command()
+@pass_nomadic
+def count(nomadic):
+    """
+    Get the number of notes.
+    """
+    echo('You have ' + Fore.RED + str(nomadic.index.size) + Fore.RESET + ' notes.')
+
 
 
 
