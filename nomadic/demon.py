@@ -76,7 +76,9 @@ class NomadicDaemon(PatternMatchingEventHandler):
         Only dispatch an event
         if it satisfies our requirements.
         """
-        if event.is_directory or event.src_path.endswith(self.valid_exts):
+        if event.is_directory \
+        or event.src_path.endswith(self.valid_exts) \
+        and (not hasattr(event, 'dest_path') or event.dest_path.endswith(self.valid_exts)):
             super(NomadicDaemon, self).dispatch(event)
 
     def on_modified(self, event):
