@@ -8,7 +8,11 @@ for my Evernote usage.
 
 `nomadic` supports a simple directory structure of HTML, Markdown, txt, and
 pdf notes and any other files which may need to be referenced. `nomadic`
-provides an easier way of searching through and browsing those files.
+provides an easier way of searching through and browsing those files
+through either the command line or a simple web interface.
+
+It supports GitHub-Flavored Markdown, relative references to images (and
+other files), and MathJax.
 
 For example:
 
@@ -26,11 +30,6 @@ notes
 
 Here are some useful tools to go with `nomadic`:
 * [BitTorrent Sync](www.bittorrent.com/sync) to keep notes synced across devices.
-* [Vim](http://www.vim.org/) with:
-    * [vim-instant-markdown](https://github.com/suan/vim-instant-markdown) to have live previews
-    of Markdown files as you edit them.
-    * my fork of the [instant-markdown-d](https://github.com/ftzeng/instant-markdown-d) backend for
-    vim-instant-markdown (supports MathJax and relative image references)
 
 With these tools, `nomadic` becomes a decentralized, simplified alternative to Evernote.
 
@@ -60,6 +59,10 @@ the index and compiles notes when they change.
 It will also automatically update references to other notes as they
 change.
 
+The daemon also runs a small websockets server which allows for
+easy browsing/searching through notes as well as a quick way
+of previewing notes as you work on them.
+
 To get the `nomadic` daemon to run automatically on startup...
 
 #### Linux (Upstart)
@@ -83,13 +86,6 @@ Then you can start the daemon:
 $ launchctl load ~/Library/LaunchAgents/com.nomadic.plist 
 ```
 
-### Extras
-There's also an additional script which will setup
-the dependencies for `vim-instant-markdown`.
-```bash
-$ ./scripts/install-instant-markdown.sh
-```
-
 ---
 
 ## Configuration
@@ -99,7 +95,7 @@ start `nomadic` without a config, one will be created for you.
 For example:
 ```json
 {
-    "notes_dir": "~/Notes"
+    "notes_path": "~/Notes"
 }
 ```
 
@@ -213,8 +209,6 @@ $ nosetests test
 ---
 
 ## To Do
-* better css stylesheet
-
 I'm still testing this out personally to
 work out the kinks but eventually I want to
 release platform-specific distributions:

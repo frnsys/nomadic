@@ -15,7 +15,7 @@ from nomadic import extractor
 
 Result = namedtuple('Result', ['data', 'highlights'])
 
-def search(query, index):
+def search(query, index, html=False):
     """
     Yield search results
     for a query.
@@ -26,7 +26,10 @@ def search(query, index):
         results.fragmenter.charlimit = None
         results.fragmenter.surround = 100
         for result in results:
-            highlights = _process_highlights(result.highlights('content'))
+            if html:
+                highlights = result.highlights('content')
+            else:
+                highlights = _process_highlights(result.highlights('content'))
             yield Result(result, highlights)
 
 

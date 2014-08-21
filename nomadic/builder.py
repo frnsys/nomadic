@@ -12,26 +12,27 @@ from collections import namedtuple
 import lxml.html
 from lxml.etree import tostring
 from markdown import markdown
-from jinja2 import Template, FileSystemLoader
-from jinja2.environment import Environment
+from jinja2 import Template, FileSystemLoader, environment
 
 File = namedtuple('File', ['title', 'filename'])
 
 # Load templates.
 path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
-stylesheet = os.path.join(dir, 'templates/index.css')
 
-env = Environment()
+env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
 index_templ = env.get_template('notebook.html')
 md_templ = env.get_template('markdown.html')
 
 class Builder():
     def __init__(self, notes_path):
-        self.notes_path = os.path.expanduser(notes_path)
-        self.build_path = os.path.join(self.notes_path, '.build')
+        # The last '' is to ensure a trailing slash.
+        self.notes_path = os.path.join(notes_path, '')
+        self.build_path = os.path.join(notes_path, u'.build', '')
+
         self._prepare_build_dir()
+
 
     def _prepare_build_dir(self, reset=False):
         """
@@ -98,7 +99,7 @@ class Builder():
         This will overwrite the
         existing note, if any.
         """
-        build_path, ext = self._build_path_for_note_path(path)
+        build_path, ext = self.build_path_for_note_path(path)
         crumbs = self._build_breadcrumbs(build_path)
 
         # Process all relative paths to
@@ -111,12 +112,12 @@ class Builder():
                 raw_html = raw_content
             else:
                 rendered = markdown(raw_content)
-                raw_html = md_templ.render(html=rendered, crumbs=crumbs, stylesheet=stylesheet)
+                raw_html = md_templ.render(html=rendered, crumbs=crumbs)
 
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
-                content = tostring(html)
+                content = tostring(html, method='html')
 
             # Write the compiled note.
             with open(build_path, 'w') as build_note:
@@ -128,7 +129,7 @@ class Builder():
         Deletes a compiled note
         from the build tree.
         """
-        build_path, _ = self._build_path_for_note_path(path)
+        build_path, _ = self.build_path_for_note_path(path)
 
         if os.path.exists(build_path):
             os.remove(build_path)
@@ -138,7 +139,7 @@ class Builder():
         Deletes a compiled notebook
         from the build tree.
         """
-        build_path = self._build_path_for_path(path)
+        build_path = self.build_path_for_path(path)
 
         if os.path.exists(build_path):
             shutil.rmtree(build_path)
@@ -151,7 +152,7 @@ class Builder():
         """
         dirs = []
         files = []
-        build_path = self._build_path_for_path(dir)
+        build_path = self.build_path_for_path(dir)
         for name in os.listdir(dir):
             path = os.path.join(dir, name)
             if os.path.isfile(path):
@@ -167,7 +168,7 @@ class Builder():
         self._write_index(build_path, dirs, files)
 
 
-    def _build_path_for_note_path(self, path):
+    def build_path_for_note_path(self, path):
         """
         Returns a compiled note path for a given
         regular note path.
@@ -177,16 +178,30 @@ class Builder():
         Notes are compiled to html so
         the extension will be `.html`.
         """
-        build_path = self._build_path_for_path(path)
+        build_path = self.build_path_for_path(path)
         base, ext = os.path.splitext(build_path)
         return base + '.html', ext
 
-    def _build_path_for_path(self, path):
+    def build_path_for_path(self, path):
         """
         Returns a build path
         for a given path.
         """
+        path = self.normalize_path(path)
         return path.replace(self.notes_path, self.build_path)
+
+    def normalize_path(self, path):
+        """
+        Normalizes a directory path
+        so that it has a trailing slash and
+        groups of slashes are compressed.
+        
+        i.e. 'A///B' => 'A/B/'
+        """
+        path = os.path.normpath(path)
+        if os.path.isdir(path):
+            path = os.path.join(path, '')
+        return path
 
     def _write_index(self, path, dirs, files):
         """
@@ -195,7 +210,7 @@ class Builder():
         listing the specified dirs and files.
         """
         crumbs = self._build_breadcrumbs(path)
-        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs, stylesheet=stylesheet)
+        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs)
 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -208,7 +223,7 @@ class Builder():
         path = path.replace(self.build_path, '')
 
         # Create some name for the root notebook.
-        path = 'notes' + path
+        path = os.path.join('notes', path)
 
         # Split the path into the crumbs.
         crumbs = path.split('/')
