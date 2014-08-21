@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <ul class="results">
+        {% for result in results %}
+            <li>
+            <a href="{{ result.data['path'] }}">{{ result.data['title'] }}</a>
+                <p>{{ result.highlights|safe }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

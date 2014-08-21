@@ -72,7 +72,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
         self.index = indexer.Index(note_path)
         self.builder = builder.Builder(note_path)
-        self.server = server.Server(self.index, self.builder)
+        self.server = server.Server(self.index)
         self.notes_path = note_path
 
     def dispatch(self, event):
