@@ -391,9 +391,14 @@ pre code, pre tt {
 .notebooks {
   background: #f6f6f6;
 }
-.notebooks, .notes, .crumbs {
+.notebooks, .notes, .crumbs, .results {
   padding: 2em;
   list-style-type: none;
+}
+.match {
+    background: red;
+    color: #fff;
+    padding: 0 0.2em;
 }
 
 .crumbs {

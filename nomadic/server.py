@@ -13,7 +13,7 @@ class Server():
         self.index = index;
 
         self.app = Flask(__name__,
-                static_folder='static',
+                static_folder='templates',
                 static_url_path='',
                 template_folder='templates')
 
@@ -38,7 +38,7 @@ class Server():
         def search():
             q = request.form['query']
             results = searcher.search(q, self.index, html=True)
-            return render_template('results.html', results=results)
+            return render_template('results.html', results=results, stylesheet='/index.css')
 
         @self.socketio.on('connect')
         def on_connect():
