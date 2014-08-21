@@ -20,7 +20,8 @@ File = namedtuple('File', ['title', 'filename'])
 # Load templates.
 path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
-stylesheet = os.path.join(dir, 'templates/index.css')
+#stylesheet = os.path.join(dir, 'templates/index.css')
+stylesheet = 'http://localhost:9137/index.css'
 
 env = Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
@@ -99,7 +100,7 @@ class Builder():
         This will overwrite the
         existing note, if any.
         """
-        build_path, ext = self._build_path_for_note_path(path)
+        build_path, ext = self.build_path_for_note_path(path)
         crumbs = self._build_breadcrumbs(build_path)
 
         # Process all relative paths to
@@ -129,7 +130,7 @@ class Builder():
         Deletes a compiled note
         from the build tree.
         """
-        build_path, _ = self._build_path_for_note_path(path)
+        build_path, _ = self.build_path_for_note_path(path)
 
         if os.path.exists(build_path):
             os.remove(build_path)
@@ -139,7 +140,7 @@ class Builder():
         Deletes a compiled notebook
         from the build tree.
         """
-        build_path = self._build_path_for_path(path)
+        build_path = self.build_path_for_path(path)
 
         if os.path.exists(build_path):
             shutil.rmtree(build_path)
@@ -152,7 +153,7 @@ class Builder():
         """
         dirs = []
         files = []
-        build_path = self._build_path_for_path(dir)
+        build_path = self.build_path_for_path(dir)
         for name in os.listdir(dir):
             path = os.path.join(dir, name)
             if os.path.isfile(path):
@@ -168,7 +169,7 @@ class Builder():
         self._write_index(build_path, dirs, files)
 
 
-    def _build_path_for_note_path(self, path):
+    def build_path_for_note_path(self, path):
         """
         Returns a compiled note path for a given
         regular note path.
@@ -178,11 +179,11 @@ class Builder():
         Notes are compiled to html so
         the extension will be `.html`.
         """
-        build_path = self._build_path_for_path(path)
+        build_path = self.build_path_for_path(path)
         base, ext = os.path.splitext(build_path)
         return base + '.html', ext
 
-    def _build_path_for_path(self, path):
+    def build_path_for_path(self, path):
         """
         Returns a build path
         for a given path.
@@ -209,7 +210,7 @@ class Builder():
         path = path.replace(self.build_path, '')
 
         # Create some name for the root notebook.
-        path = 'notes' + path
+        path = os.path.join('notes', path)
 
         # Split the path into the crumbs.
         crumbs = path.split('/')

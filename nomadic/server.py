@@ -1,16 +1,16 @@
-import threading
-
 from flask import Flask, render_template, request
 from flask.ext.socketio import SocketIO
 
 from nomadic.demon import logger
 from nomadic import searcher
 
+import os
 import sys, logging
 
 class Server():
-    def __init__(self, index):
+    def __init__(self, index, builder):
         self.index = index;
+        self.builder = builder;
 
         self.app = Flask(__name__,
                 static_folder='templates',
@@ -34,6 +34,14 @@ class Server():
         self.socketio.emit('refresh')
 
     def build_routes(self):
+        @self.app.route('/note/<path:note_path>')
+        def note(note_path):
+            note_path = '/' + note_path
+            built_note_path, _ = self.builder.build_path_for_note_path(note_path)
+            with open(built_note_path, 'r') as note:
+                content = note.read().decode('utf-8')
+            return content
+
         @self.app.route('/search', methods=['POST'])
         def search():
             q = request.form['query']
