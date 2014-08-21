@@ -7,6 +7,9 @@ from nomadic import searcher
 import os
 import sys, logging
 
+import html2text
+h = html2text.HTML2Text()
+
 class Server():
     def __init__(self, index, builder, port):
         self.index = index;
@@ -14,7 +17,7 @@ class Server():
         self.port = port
 
         self.app = Flask(__name__,
-                static_folder='templates',
+                static_folder='static',
                 static_url_path='/static',
                 template_folder='templates')
 
@@ -48,7 +51,20 @@ class Server():
         def search():
             q = request.form['query']
             results = searcher.search(q, self.index, html=True)
-            return render_template('results.html', results=results, stylesheet='/index.css')
+            return render_template('results.html', results=results)
+
+        @self.app.route('/new')
+        def new():
+            return render_template('editor.html')
+
+        @self.app.route('/convert', methods=['POST'])
+        def convert():
+            """
+            Convert HTML to Markdown.
+            """
+            html = request.form['html']
+            md = h.handle(html)
+            return md
 
         @self.socketio.on('connect')
         def on_connect():

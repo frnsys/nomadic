@@ -21,7 +21,6 @@ path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
 
 from nomadic.conf import config
-stylesheet = 'http://localhost:{0}/static/index.css'.format(config['port'])
 
 env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
@@ -115,7 +114,7 @@ class Builder():
                 raw_html = raw_content
             else:
                 rendered = markdown(raw_content)
-                raw_html = md_templ.render(html=rendered, crumbs=crumbs, stylesheet=stylesheet)
+                raw_html = md_templ.render(html=rendered, crumbs=crumbs)
 
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
@@ -213,7 +212,7 @@ class Builder():
         listing the specified dirs and files.
         """
         crumbs = self._build_breadcrumbs(path)
-        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs, stylesheet=stylesheet)
+        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs)
 
         if not os.path.exists(path):
             os.makedirs(path)
