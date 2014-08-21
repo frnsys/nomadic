@@ -25,6 +25,7 @@
             var lock = false,
                 $title = $('input[name=title]'),
                 $notebook = $('select[name=notebook]'),
+                $editor = $('#editor'),
 
                 // Keep track of old values
                 // so the backend can tell if they have changed.
@@ -34,7 +35,7 @@
             function save() {
                 var data = {
                     title: $title.val(),
-                    html: $('#editor').code(),
+                    html: $editor.code(),
                     notebook: $notebook.val(),
 
                     // Old values, so we can
@@ -60,7 +61,7 @@
                 }
             }
 
-            $('#editor').summernote({
+            $editor.summernote({
                 focus: true,
                 onChange: save
             });

@@ -1,14 +1,19 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
 from nomadic.demon import logger
 from nomadic import searcher
 
 import os
+import shutil
+import urllib
 from datetime import datetime
 import sys, logging
 
 import html2text
+import lxml.html
+from lxml.etree import tostring
+
 h = html2text.HTML2Text()
 
 class Server():
@@ -38,6 +43,33 @@ class Server():
     def refresh_clients(self):
         self.socketio.emit('refresh')
 
+    def _rewrite_link(self, resources_path):
+        """
+        Creates a link rewriting func
+        for a particular resource path.
+        """
+        def rewriter(link):
+            # If the link is an external image...
+            if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
+                if not os.path.exists(resources_path):
+                    os.makedirs(resources_path)
+
+                # Extract the extension,
+                # and create a filename.
+                ext = link.split('/')[-1].split('.')[-1]
+                filename = str(hash(link)) + '.' + ext
+
+                save_path = os.path.join(resources_path, filename)
+
+                # Download the file if it doesn't exist.
+                if not os.path.exists(save_path):
+                    filename, _ = urllib.urlretrieve(link, save_path)
+
+                # Return as a relative filepath.
+                return save_path.replace(self.index.notes_path, '')
+            return link
+        return rewriter
+
     def build_routes(self):
         @self.app.route('/<path:note_path>')
         def note(note_path):
@@ -65,26 +97,38 @@ class Server():
 
         @self.app.route('/save', methods=['POST'])
         def save():
-            # Assuming this is a "rich text" (i.e. html) note.
-            title = request.form['title'] + '.html'
-            title_ = request.form['prev[title]'] + '.html'
+            title = request.form['title']
+            title_ = request.form['prev[title]']
 
             notebook = request.form['notebook']
             notebook_ = request.form['prev[notebook]']
 
+            resources = os.path.join(notebook, '_resources', title, '')
+
             # If the title or notebook has changed,
-            # remove the old one.
+            # remove the old one and move the
+            # resources directory (if it exists).
             if title != title_ or notebook != notebook_:
-                print('title changed')
-                path_ = os.path.join(notebook_, title_)
+                path_ = os.path.join(notebook_, title_ + '.html')
                 os.remove(path_)
 
+                resources_ = os.path.join(notebook_, '_resources', title_, '')
+                if os.path.exists(resources_):
+                    shutil.move(resources_, resources)
+
             html = request.form['html']
-            path = os.path.join(notebook, title)
+            path = os.path.join(notebook, title + '.html')
+
+            html_ = lxml.html.fromstring(html)
+            html_.rewrite_links(self._rewrite_link(resources))
+            html = tostring(html_, method='html')
 
             with open(path, 'w') as note:
                 note.write(html)
-            return path
+
+            return jsonify({
+                'path': path
+            })
 
         @self.app.route('/convert', methods=['POST'])
         def convert():
@@ -102,3 +146,4 @@ class Server():
             the SocketIO emitting working properly...
             """
             logger.debug('User connected.')
+
