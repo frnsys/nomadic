@@ -41,8 +41,11 @@ class Server():
         @self.app.route('/<path:note_path>')
         def note(note_path):
             note_path = '/' + note_path
-            if note_path.endswith(('.md', '.html')):
+
+            # Convert to build path if appropriate.
+            if note_path.endswith(('.md', '.html')) and '.build' not in note_path:
                 note_path, _ = self.builder.build_path_for_note_path(note_path)
+
             with open(note_path, 'r') as note:
                 content = note.read()
             return content
