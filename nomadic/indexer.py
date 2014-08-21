@@ -13,6 +13,7 @@ import whoosh.index as index
 from whoosh.fields import *
 
 from nomadic import extractor
+from nomadic.builder import valid_notebook
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
@@ -125,10 +126,16 @@ class Index():
         Yields all notebooks
         in the notes directory.
         """
+
+        # The root notes directory.
+        yield Notebook('notes', self.notes_path)
+
+        # All the other notebooks.
         for root, dirnames, _ in walk_notes(self.notes_path):
             for dirname in dirnames:
-                path = os.path.join(root, dirname)
-                yield Notebook(dirname, path)
+                if valid_notebook(dirname):
+                    path = os.path.join(root, dirname)
+                    yield Notebook(dirname, path)
 
     def _walk_notes(self):
         """

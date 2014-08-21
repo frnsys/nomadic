@@ -5,6 +5,7 @@ from nomadic.demon import logger
 from nomadic import searcher
 
 import os
+from datetime import datetime
 import sys, logging
 
 import html2text
@@ -58,7 +59,32 @@ class Server():
 
         @self.app.route('/new')
         def new():
-            return render_template('editor.html')
+            # A unique default title to save without conflicts.
+            default_title = datetime.utcnow()
+            return render_template('editor.html', notebooks=self.index.notebooks(), title=default_title)
+
+        @self.app.route('/save', methods=['POST'])
+        def save():
+            # Assuming this is a "rich text" (i.e. html) note.
+            title = request.form['title'] + '.html'
+            title_ = request.form['prev[title]'] + '.html'
+
+            notebook = request.form['notebook']
+            notebook_ = request.form['prev[notebook]']
+
+            # If the title or notebook has changed,
+            # remove the old one.
+            if title != title_ or notebook != notebook_:
+                print('title changed')
+                path_ = os.path.join(notebook_, title_)
+                os.remove(path_)
+
+            html = request.form['html']
+            path = os.path.join(notebook, title)
+
+            with open(path, 'w') as note:
+                note.write(html)
+            return path
 
         @self.app.route('/convert', methods=['POST'])
         def convert():

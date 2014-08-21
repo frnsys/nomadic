@@ -10,25 +10,63 @@
 
     <link rel="stylesheet" type="text/css" href="/static/editor.css">
 
-    <div id="editor">Hello Summernote</div>
+    <select name='notebook'>
+        {% for notebook in notebooks %}
+            <option value={{ notebook.path }}>{{ notebook.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="title" value="{{ title }}" />
+
+    <div id="editor"></div>
 
     <script type="text/javascript" charset="utf-8">
         $(function() {
-            $('#editor').summernote({
-                focus: true,
-                onChange: function(contents) {
+            var lock = false,
+                $title = $('input[name=title]'),
+                $notebook = $('select[name=notebook]'),
+
+                // Keep track of old values
+                // so the backend can tell if they have changed.
+                last_title = $title.val(),
+                last_notebook = $notebook.val();
+
+            function save() {
+                var data = {
+                    title: $title.val(),
+                    html: $('#editor').code(),
+                    notebook: $notebook.val(),
+
+                    // Old values, so we can
+                    // move/remove the old note.
+                    prev: {
+                        title: last_title,
+                        notebook: last_notebook
+                    }
+                };
+
+                if (!lock) {
+                    lock = true;
                     $.ajax({
-                        url: '/convert',
+                        url: '/save',
                         type: 'POST',
-                        data: {
-                            html: $('#editor').code()
-                        },
-                        success: function(data) {
-                            console.log(data);
+                        data: data,
+                        success: function(d) {
+                            lock = false;
+                            last_title = data.title;
+                            last_notebook = data.notebook;
                         }
                     });
                 }
+            }
+
+            $('#editor').summernote({
+                focus: true,
+                onChange: save
             });
+
+            $title.on('change', save);
+            $notebook.on('change', save);
         });
     </script>
 {% endblock %}
