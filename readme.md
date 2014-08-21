@@ -11,6 +11,9 @@ pdf notes and any other files which may need to be referenced. `nomadic`
 provides an easier way of searching through and browsing those files
 through either the command line or a simple web interface.
 
+It supports GitHub-Flavored Markdown, relative references to images (and
+other files), and MathJax.
+
 For example:
 
 ```bash
