@@ -95,7 +95,7 @@ def browse(nomadic, notebook):
     path = nomadic.get_notebook(notebook)
     if path is None: return
 
-    path = path.replace(nomadic.notes_path, nomadic.build_path)
+    path = nomadic.builder.build_path_for_path(path)
     click.launch(os.path.join(path, 'index.html'))
 
 
