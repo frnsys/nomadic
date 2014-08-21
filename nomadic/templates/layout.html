@@ -13,5 +13,22 @@
 <body>
     {% block content %}
     {% endblock %}
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.4.2.min.js"></script>
+     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            var socket = io.connect('http://localhost:9137');
+
+            socket.on('connect', function() {
+                // To ensure connection with server.
+                socket.emit('connect');
+            });
+
+            socket.on('refresh', function(msg) {
+                location.reload();
+            });
+        });
+    </script>
 </body>
 </html>

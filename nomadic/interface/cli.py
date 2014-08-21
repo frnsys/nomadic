@@ -148,6 +148,3 @@ def new(nomadic, notebook, note):
 
     path = os.path.join(notebook_path, note)
     click.edit(filename=path)
-
-
-

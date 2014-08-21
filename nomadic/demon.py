@@ -18,8 +18,6 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 from daemon import DaemonContext
 
-from nomadic import indexer, builder
-
 # Markdown link regex
 md_link_re = re.compile(r'\[.+\]\(`?([^`\(\)]+)`?\)')
 
@@ -30,20 +28,26 @@ sh = logging.StreamHandler(sys.stdout)
 sh.setFormatter(formatter)
 logger.addHandler(sh)
 
+from nomadic import indexer, builder, server
+
+
 def start(note_path, debug=False):
+    logger.debug('NomadicDaemon started.')
+
     if debug:
         observe(note_path)
 
     else:
         with DaemonContext(stdout=sys.stdout):
-            logger.debug('NomadicDaemon started.')
             observe(note_path)
 
 def observe(note_path):
     try:
         ob = Observer()
-        ob.schedule(NomadicDaemon(note_path), note_path, recursive=True)
+        d = NomadicDaemon(note_path)
+        ob.schedule(d, note_path, recursive=True)
         ob.start()
+        d.server.start()
 
         try:
             while True:
@@ -68,6 +72,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
         self.index = indexer.Index(note_path)
         self.builder = builder.Builder(note_path)
+        self.server = server.Server(self.index, self.builder)
         self.notes_path = note_path
 
     def dispatch(self, event):
@@ -89,6 +94,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
             logger.debug('Modified: {0}'.format(p))
             self.index.update_note(p)
             self.builder.compile_note(p)
+            self.server.refresh_clients()
 
     def on_created(self, event):
         """
@@ -110,6 +116,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         # parent directory index.
         dir = os.path.dirname(p)
         self.builder.index_notebook(dir)
+        self.server.refresh_clients()
 
     def on_deleted(self, event):
         """
@@ -131,6 +138,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         # parent directory index.
         dir = os.path.dirname(p)
         self.builder.index_notebook(dir)
+        self.server.refresh_clients()
 
     def on_moved(self, event):
         """
@@ -159,6 +167,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         for p in [src, dest]:
             dir = os.path.dirname(p)
             self.builder.index_notebook(dir)
+        self.server.refresh_clients()
 
     # TO DO:
     # might need a separate daemon/watcher for this
