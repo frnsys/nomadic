@@ -21,7 +21,7 @@ path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
 
 from nomadic.conf import config
-stylesheet = 'http://localhost:{0}/index.css'.format(config['port'])
+stylesheet = 'http://localhost:{0}/static/index.css'.format(config['port'])
 
 env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))

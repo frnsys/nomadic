@@ -15,7 +15,7 @@ class Server():
 
         self.app = Flask(__name__,
                 static_folder='templates',
-                static_url_path='',
+                static_url_path='/static',
                 template_folder='templates')
 
         self.socketio = SocketIO(self.app)
@@ -35,12 +35,13 @@ class Server():
         self.socketio.emit('refresh')
 
     def build_routes(self):
-        @self.app.route('/note/<path:note_path>')
+        @self.app.route('/<path:note_path>')
         def note(note_path):
             note_path = '/' + note_path
-            built_note_path, _ = self.builder.build_path_for_note_path(note_path)
-            with open(built_note_path, 'r') as note:
-                content = note.read().decode('utf-8')
+            if note_path.endswith(('.md', '.html')):
+                note_path, _ = self.builder.build_path_for_note_path(note_path)
+            with open(note_path, 'r') as note:
+                content = note.read()
             return content
 
         @self.app.route('/search', methods=['POST'])
