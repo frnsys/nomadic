@@ -117,7 +117,7 @@ class Builder():
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
-                content = tostring(html)
+                content = tostring(html, method='html')
 
             # Write the compiled note.
             with open(build_path, 'w') as build_note:
