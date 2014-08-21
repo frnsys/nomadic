@@ -20,9 +20,7 @@ class Nomadic():
             notebook_dir = self.notes_path
 
         else:
-            dirs = []
-            for root, dirnames, _ in indexer.walk_notes(self.notes_path):
-                dirs += [os.path.join(root, dirname) for dirname in dirnames if notebook in dirname]
+            dirs = [nb.path for nb in self.index.notebooks() if notebook in nb.name]
 
             if len(dirs) == 1:
                 notebook_dir = dirs[0]
