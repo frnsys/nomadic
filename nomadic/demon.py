@@ -23,26 +23,26 @@ from nomadic import indexer, builder
 # Markdown link regex
 md_link_re = re.compile(r'\[.+\]\(`?([^`\(\)]+)`?\)')
 
-def start(note_path, debug=False):
-    logger = logging.getLogger('nomadic_daemon')
-    logger.setLevel( logging.DEBUG )
-    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    sh = logging.StreamHandler(sys.stdout)
-    sh.setFormatter(formatter)
-    logger.addHandler(sh)
+logger = logging.getLogger('nomadic_daemon')
+logger.setLevel( logging.DEBUG )
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+sh = logging.StreamHandler(sys.stdout)
+sh.setFormatter(formatter)
+logger.addHandler(sh)
 
+def start(note_path, debug=False):
     if debug:
-        observe(note_path, logger)
+        observe(note_path)
 
     else:
         with DaemonContext(stdout=sys.stdout):
             logger.debug('NomadicDaemon started.')
-            observe(note_path, logger)
+            observe(note_path)
 
-def observe(note_path, logger):
+def observe(note_path):
     try:
         ob = Observer()
-        ob.schedule(NomadicDaemon(note_path, logger), note_path, recursive=True)
+        ob.schedule(NomadicDaemon(note_path), note_path, recursive=True)
         ob.start()
 
         try:
@@ -64,12 +64,11 @@ class NomadicDaemon(PatternMatchingEventHandler):
     ignore_patterns = ['*.build*', '*.searchindex*']
     valid_exts = ('.html', '.md', '.txt', '.pdf')
 
-    def __init__(self, note_path, logger):
+    def __init__(self, note_path):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
         self.index = indexer.Index(note_path)
         self.builder = builder.Builder(note_path)
         self.notes_path = note_path
-        self.logger = logger
 
     def dispatch(self, event):
         """
@@ -87,7 +86,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         if not event.is_directory:
             p = event.src_path
-            self.logger.debug('Modified: {0}'.format(p))
+            logger.debug('Modified: {0}'.format(p))
             self.index.update_note(p)
             self.builder.compile_note(p)
 
@@ -98,7 +97,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        self.logger.debug('Created: {0}'.format(p))
+        logger.debug('Created: {0}'.format(p))
         if not event.is_directory:
             self.index.add_note(p)
             self.builder.compile_note(p)
@@ -119,7 +118,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        self.logger.debug('Deleted: {0}'.format(p))
+        logger.debug('Deleted: {0}'.format(p))
         if not event.is_directory:
             self.index.delete_note(p)
             self.builder.delete_note(p)
@@ -141,7 +140,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         src = event.src_path
         dest = event.dest_path
 
-        self.logger.debug('Moved: {0} to {1}'.format(src, dest))
+        logger.debug('Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:
             self.index.move_note(src, dest)
             self.builder.delete_note(src)
