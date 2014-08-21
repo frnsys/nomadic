@@ -5,7 +5,7 @@ from click import echo
 from colorama import Fore, Back, Style
 
 from nomadic import indexer, builder, searcher
-from nomadic.interface import config
+from nomadic.conf import config
 
 class Nomadic():
     def get_notebook(self, notebook):
@@ -17,11 +17,11 @@ class Nomadic():
         the user is promped to choose one.
         """
         if not notebook:
-            notebook_dir = self.notes_dir
+            notebook_dir = self.notes_path
 
         else:
             dirs = []
-            for root, dirnames, _ in indexer.walk_notes(self.notes_dir):
+            for root, dirnames, _ in indexer.walk_notes(self.notes_path):
                 dirs += [os.path.join(root, dirname) for dirname in dirnames if notebook in dirname]
 
             if len(dirs) == 1:
@@ -45,12 +45,10 @@ pass_nomadic = click.make_pass_decorator(Nomadic, ensure=True)
 @click.group()
 @pass_nomadic
 def cli(nomadic):
-    cfg = config.load()
+    nomadic.index = indexer.Index(config['notes_path'])
+    nomadic.builder = builder.Builder(config['notes_path'])
 
-    nomadic.index = indexer.Index(cfg['notes_dir'])
-    nomadic.builder = builder.Builder(cfg['notes_dir'])
-
-    for key, val in cfg.items():
+    for key, val in config.items():
         setattr(nomadic, key, val)
 
 @cli.command()
@@ -97,7 +95,7 @@ def browse(nomadic, notebook):
     path = nomadic.get_notebook(notebook)
     if path is None: return
 
-    path = path.replace(nomadic.notes_dir, nomadic.build_dir)
+    path = path.replace(nomadic.notes_path, nomadic.build_path)
     click.launch(os.path.join(path, 'index.html'))
 
 

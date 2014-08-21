@@ -31,20 +31,20 @@ logger.addHandler(sh)
 from nomadic import indexer, builder, server
 
 
-def start(note_path, debug=False):
+def start(note_path, port, debug=False):
     logger.debug('NomadicDaemon started.')
 
     if debug:
-        observe(note_path)
+        summon(note_path, port)
 
     else:
         with DaemonContext(stdout=sys.stdout):
-            observe(note_path)
+            summon(note_path, port)
 
-def observe(note_path):
+def summon(note_path, port):
     try:
         ob = Observer()
-        d = NomadicDaemon(note_path)
+        d = NomadicDaemon(note_path, port)
         ob.schedule(d, note_path, recursive=True)
         ob.start()
         d.server.start()
@@ -68,11 +68,11 @@ class NomadicDaemon(PatternMatchingEventHandler):
     ignore_patterns = ['*.build*', '*.searchindex*']
     valid_exts = ('.html', '.md', '.txt', '.pdf')
 
-    def __init__(self, note_path):
+    def __init__(self, note_path, port):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
         self.index = indexer.Index(note_path)
         self.builder = builder.Builder(note_path)
-        self.server = server.Server(self.index, self.builder)
+        self.server = server.Server(self.index, self.builder, port)
         self.notes_path = note_path
 
     def dispatch(self, event):

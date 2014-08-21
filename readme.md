@@ -99,7 +99,7 @@ start `nomadic` without a config, one will be created for you.
 For example:
 ```json
 {
-    "notes_dir": "~/Notes"
+    "notes_path": "~/Notes"
 }
 ```
 

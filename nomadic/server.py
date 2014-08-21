@@ -8,9 +8,10 @@ import os
 import sys, logging
 
 class Server():
-    def __init__(self, index, builder):
+    def __init__(self, index, builder, port):
         self.index = index;
         self.builder = builder;
+        self.port = port
 
         self.app = Flask(__name__,
                 static_folder='templates',
@@ -28,7 +29,7 @@ class Server():
 
     def start(self):
         logger.debug('Starting the Nomadic server...')
-        self.socketio.run(self.app, port=9137)
+        self.socketio.run(self.app, port=self.port)
 
     def refresh_clients(self):
         self.socketio.emit('refresh')

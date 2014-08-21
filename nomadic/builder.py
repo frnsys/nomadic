@@ -12,18 +12,18 @@ from collections import namedtuple
 import lxml.html
 from lxml.etree import tostring
 from markdown import markdown
-from jinja2 import Template, FileSystemLoader
-from jinja2.environment import Environment
+from jinja2 import Template, FileSystemLoader, environment
 
 File = namedtuple('File', ['title', 'filename'])
 
 # Load templates.
 path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
-#stylesheet = os.path.join(dir, 'templates/index.css')
-stylesheet = 'http://localhost:9137/index.css'
 
-env = Environment()
+from nomadic.conf import config
+stylesheet = 'http://localhost:{0}/index.css'.format(config['port'])
+
+env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
 index_templ = env.get_template('notebook.html')
 md_templ = env.get_template('markdown.html')
@@ -31,9 +31,11 @@ md_templ = env.get_template('markdown.html')
 class Builder():
     def __init__(self, notes_path):
         # The last '' is to ensure a trailing slash.
-        self.notes_path = os.path.expanduser(notes_path)
-        self.build_path = os.path.join(self.notes_path, '.build', '')
+        self.notes_path = os.path.join(notes_path, '')
+        self.build_path = os.path.join(notes_path, u'.build', '')
+
         self._prepare_build_dir()
+
 
     def _prepare_build_dir(self, reset=False):
         """
@@ -188,7 +190,21 @@ class Builder():
         Returns a build path
         for a given path.
         """
+        path = self.normalize_path(path)
         return path.replace(self.notes_path, self.build_path)
+
+    def normalize_path(self, path):
+        """
+        Normalizes a directory path
+        so that it has a trailing slash and
+        groups of slashes are compressed.
+        
+        i.e. 'A///B' => 'A/B/'
+        """
+        path = os.path.normpath(path)
+        if os.path.isdir(path):
+            path = os.path.join(path, '')
+        return path
 
     def _write_index(self, path, dirs, files):
         """
