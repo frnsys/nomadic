@@ -1,4 +1,5 @@
 import os
+from urllib import quote
 
 from nomadic.builder import Builder
 from test import NomadicTest, note_at, compiled_path
@@ -29,7 +30,8 @@ class BuilderTest(NomadicTest):
 
         path_ = compiled_path('some_notebook/a cool note.html')
         with open(path_, 'r') as note:
-            self.assertTrue('{0}/some_notebook/a cool note.resources/some_image.png'.format(self.notes_dir) in note.read())
+            expected = '{0}/some_notebook/a cool note.resources/some_image.png'.format(self.notes_dir) 
+            self.assertTrue(quote(expected) in note.read())
 
     def test_compiled_note_markdown_urls_become_html(self):
         self.builder.build()
@@ -40,7 +42,7 @@ class BuilderTest(NomadicTest):
 
         path_ = compiled_path('some_notebook/a cool note.html')
         with open(path_, 'r') as note:
-            self.assertTrue('nested book/empty.html' in note.read())
+            self.assertTrue(quote('nested book/empty.html') in note.read())
 
     def test_compile_note_overwrites(self):
         path = note_at('my note.md')
