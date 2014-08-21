@@ -43,7 +43,7 @@ class Server():
             note_path = '/' + note_path
 
             # Convert to build path if appropriate.
-            if note_path.endswith(('.md', '.html')) and '.build' not in note_path:
+            if note_path.endswith(('.md', '.html')):
                 note_path, _ = self.builder.build_path_for_note_path(note_path)
 
             with open(note_path, 'r') as note:

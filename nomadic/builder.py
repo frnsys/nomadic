@@ -189,8 +189,10 @@ class Builder():
         Returns a build path
         for a given path.
         """
-        path = self.normalize_path(path)
-        return path.replace(self.notes_path, self.build_path)
+        if '.build' not in path:
+            path = self.normalize_path(path)
+            path = path.replace(self.notes_path, self.build_path)
+        return path
 
     def normalize_path(self, path):
         """
