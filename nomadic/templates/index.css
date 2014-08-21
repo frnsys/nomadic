@@ -225,7 +225,7 @@ table tr {
 }
 
 table tr:nth-child(2n) {
-  background-color: #f8f8f8;
+  background-color: #f4f4f4;
 }
 
 table tr th {
@@ -347,7 +347,7 @@ code, tt {
   margin: 0 2px;
   padding: 0 5px;
   white-space: nowrap;
-  background-color: #f8f8f8;
+  background-color: #f4f4f4;
   border-radius: 3px;
 }
 
@@ -360,7 +360,7 @@ pre code {
 }
 
 .highlight pre {
-  background-color: #f8f8f8;
+  background-color: #f4f4f4;
   font-size: 13px;
   line-height: 19px;
   overflow: auto;
@@ -369,7 +369,7 @@ pre code {
 }
 
 pre {
-  background-color: #f8f8f8;
+  background-color: #f4f4f4;
   font-size: 13px;
   line-height: 19px;
   overflow: auto;
@@ -400,11 +400,17 @@ pre code, pre tt {
     color: #fff;
     padding: 0 0.2em;
 }
+form[name=search] {
+    float: right;
+    position: relative;
+    top: 0.8em;
+    right: 1em;
+}
 
 .crumbs {
     padding: 1em;
     margin: 0;
-    background: #f8f8f8;
+    background: #f4f4f4;
 }
 .crumbs li {
     display: inline-block;
