@@ -78,6 +78,8 @@ class Builder():
 
                 # Process notes.
                 for filename in filenames:
+                    if filename == 'index.html':
+                        continue
                     title, ext = os.path.splitext(filename)
                     compiled_filename = title + '.html'
                     if ext in ['.html', '.md']:
@@ -226,7 +228,8 @@ class Builder():
         path = os.path.join('notes', path)
 
         # Split the path into the crumbs.
-        crumbs = path.split('/')
+        # Filter out any empty crumbs.
+        crumbs = filter(None, path.split('/'))
 
         # Remove the file extension from the last crumb.
         crumbs[-1], _ = os.path.splitext(crumbs[-1])
