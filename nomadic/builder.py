@@ -29,8 +29,9 @@ md_templ = env.get_template('markdown.html')
 
 class Builder():
     def __init__(self, notes_path):
+        # The last '' is to ensure a trailing slash.
         self.notes_path = os.path.expanduser(notes_path)
-        self.build_path = os.path.join(self.notes_path, '.build')
+        self.build_path = os.path.join(self.notes_path, '.build', '')
         self._prepare_build_dir()
 
     def _prepare_build_dir(self, reset=False):
