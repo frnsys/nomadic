@@ -133,9 +133,8 @@ class Index():
         # All the other notebooks.
         for root, dirnames, _ in walk(self.notes_path):
             for dirname in dirnames:
-                if valid_notebook(dirname):
-                    path = os.path.join(root, dirname)
-                    yield Notebook(dirname, path)
+                path = os.path.join(root, dirname)
+                yield Notebook(dirname, path)
 
     def _walk_notes(self):
         """
@@ -144,10 +143,8 @@ class Index():
         """
         for root, dirnames, filenames in walk(self.notes_path):
             for filename in filenames:
-                _, ext = os.path.splitext(filename)
-                if ext in VALID_EXTS:
-                    path = os.path.join(root, filename)
-                    yield extractor.note_from_path(path)
+                path = os.path.join(root, filename)
+                yield extractor.note_from_path(path)
 
 
     def _load_index(self, reset=False):

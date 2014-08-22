@@ -68,19 +68,16 @@ class Builder():
 
             # Process valid sub-directories.
             for dirname in dirnames:
-                if valid_notebook(dirname):
-                    build_path = os.path.join(build_root, dirname)
+                build_path = os.path.join(build_root, dirname)
 
-                    if os.path.exists(build_path):
-                        shutil.rmtree(build_path)
-                    os.makedirs(build_path)
+                if os.path.exists(build_path):
+                    shutil.rmtree(build_path)
+                os.makedirs(build_path)
 
-                    dirs.append(dirname.decode('utf-8'))
+                dirs.append(dirname.decode('utf-8'))
 
             # Process notes.
             for filename in filenames:
-                if filename == 'index.html':
-                    continue
                 title, ext = os.path.splitext(filename)
                 compiled_filename = title + '.html'
                 if ext in ['.html', '.md']:

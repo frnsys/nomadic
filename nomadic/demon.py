@@ -29,6 +29,7 @@ sh.setFormatter(formatter)
 logger.addHandler(sh)
 
 from nomadic import indexer, builder, server
+from nomadic.common import walk
 
 
 def start(note_path, port, debug=False):
@@ -183,7 +184,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in indexer.walk(self.notes_path):
+        for root, dirnames, filenames in walk(self.notes_path):
             for filename in filenames:
                 _, ext = os.path.splitext(filename)
                 path = os.path.join(root, filename)
