@@ -30,7 +30,7 @@ class BuilderTest(NomadicTest):
 
         path_ = compiled_path('some_notebook/a cool note.html')
         with open(path_, 'r') as note:
-            expected = '{0}/some_notebook/a cool note.resources/some_image.png'.format(self.notes_dir) 
+            expected = '../../some_notebook/a cool note.resources/some_image.png'
             self.assertTrue(quote(expected) in note.read())
 
     def test_compiled_note_markdown_urls_become_html(self):

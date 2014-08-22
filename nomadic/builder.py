@@ -114,7 +114,8 @@ class Builder():
 
             if raw_html.strip():
                 html = fromstring(raw_html)
-                html.rewrite_links(_rewrite_link, base_href=build_path)
+
+                html.rewrite_links(self._rewrite_link(path, build_path))
                 raw_html = tostring(html)
                 content = note_templ.render(html=raw_html, crumbs=crumbs)
 
@@ -233,11 +234,24 @@ class Builder():
 
         return crumbs
 
+    def _rewrite_link(self, path, build_path):
+        # Build the relative base path for the note's references.
+        note_dir = os.path.split(path.replace(self.notes_path, ''))[0]
+        note_build_dir = build_path.replace(self.notes_path, '')
+        dirs_up = len(note_build_dir.split('/')) - 1
+        base_path = os.path.join(('../'*dirs_up), note_dir, '')
 
-def _rewrite_link(link):
-    root, ext = os.path.splitext(link)
-    if ext not in ['.html', '.md']:
-        return link.replace('.build/', '')
-    elif ext == '.md':
-        return root + '.html'
-    return link
+        def rewriter(link):
+            # Ignore external and absolute links.
+            if not link.startswith(('http', '/')):
+                root, ext = os.path.splitext(link)
+
+                # Update references to non-note files
+                # so that they point outside the build directory.
+                if ext not in ['.html', '.md']:
+                    return os.path.join(base_path, link)
+
+                elif ext == '.md':
+                    return root + '.html'
+            return link
+        return rewriter

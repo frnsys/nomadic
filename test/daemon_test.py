@@ -163,7 +163,7 @@ class DaemonTest(NomadicTest):
         rel_link = 'nested book/empty.md'
         rel_link_ = quote('nested book/empty.html')
         rel_link_new = '../moved empty note.md'
-        rel_link_new_ = quote(compiled_path('moved empty note.html'))
+        rel_link_new_ = quote('../moved empty note.html')
 
         with open(path, 'r') as note:
             note_content = note.read()
@@ -182,6 +182,7 @@ class DaemonTest(NomadicTest):
             self.assertTrue(rel_link_new in note_content)
         with open(path_, 'r') as note:
             note_content = note.read()
+            print(note_content)
             self.assertFalse(rel_link_ in note_content)
             self.assertTrue(rel_link_new_ in note_content)
 

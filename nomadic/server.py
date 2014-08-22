@@ -75,7 +75,7 @@ class Server():
     def build_routes(self):
         @self.app.route('/<path:note_path>')
         def note(note_path):
-            note_path = '/' + note_path
+            note_path = os.path.join(self.index.notes_path, note_path)
 
             # Convert to build path if appropriate.
             if note_path.endswith(('.md', '.html')):
