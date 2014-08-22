@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css"> 
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.2/summernote.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.2/summernote.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="/static/editor.css">
+
+    <select name='notebook'>
+        {% for notebook in notebooks %}
+            <option value={{ notebook.path }}>{{ notebook.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="text" name="title" value="{{ title }}" />
+
+    <div id="editor"></div>
+
+    <script type="text/javascript" charset="utf-8">
+        $(function() {
+            var lock = false,
+                $title = $('input[name=title]'),
+                $notebook = $('select[name=notebook]'),
+                $editor = $('#editor'),
+
+                // Keep track of old values
+                // so the backend can tell if they have changed.
+                last_title = $title.val(),
+                last_notebook = $notebook.val();
+
+            function save() {
+                var data = {
+                    title: $title.val(),
+                    html: $editor.code(),
+                    notebook: $notebook.val(),
+
+                    // Old values, so we can
+                    // move/remove the old note.
+                    prev: {
+                        title: last_title,
+                        notebook: last_notebook
+                    }
+                };
+
+                if (!lock) {
+                    lock = true;
+                    $.ajax({
+                        url: '/save',
+                        type: 'POST',
+                        data: data,
+                        success: function(d) {
+                            lock = false;
+                            last_title = data.title;
+                            last_notebook = data.notebook;
+                        },
+                        error: function(jqxhr, textStatus, err) {
+                            // Note already exists, change the title.
+                            if (err === 'CONFLICT') {
+                                $title.val(data.title + ' COPY');
+                            }
+                        }
+                    });
+                }
+            }
+
+            $editor.summernote({
+                focus: true,
+                onChange: save
+            });
+
+            $title.on('change', save);
+            $notebook.on('change', save);
+        });
+    </script>
+{% endblock %}

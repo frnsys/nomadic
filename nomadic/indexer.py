@@ -7,17 +7,20 @@ Indexes note files.
 
 import os
 import shutil
-from functools import wraps
+from collections import namedtuple
 
 import whoosh.index as index
 from whoosh.fields import *
 
 from nomadic import extractor
+from nomadic.builder import valid_notebook
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
         last_mod=STORED,
         content=TEXT(stored=True))
+
+Notebook = namedtuple('Notebook', ['name', 'path'])
 
 VALID_EXTS = ['.html', '.md', '.pdf', '.txt']
 
@@ -117,6 +120,22 @@ class Index():
         """
         searcher = self.ix.searcher()
         return searcher.document(path=path)
+
+    def notebooks(self):
+        """
+        Yields all notebooks
+        in the notes directory.
+        """
+
+        # The root notes directory.
+        yield Notebook('notes', self.notes_path)
+
+        # All the other notebooks.
+        for root, dirnames, _ in walk_notes(self.notes_path):
+            for dirname in dirnames:
+                if valid_notebook(dirname):
+                    path = os.path.join(root, dirname)
+                    yield Notebook(dirname, path)
 
     def _walk_notes(self):
         """

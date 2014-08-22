@@ -23,7 +23,7 @@ dir = os.path.dirname(path)
 env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
 index_templ = env.get_template('notebook.html')
-md_templ = env.get_template('markdown.html')
+note_templ = env.get_template('note.html')
 
 class Builder():
     def __init__(self, notes_path):
@@ -59,7 +59,7 @@ class Builder():
         compiling notes and indexes.
         """
         for root, dirnames, filenames in os.walk(path):
-            if _valid_notebook(root):
+            if valid_notebook(root):
                 build_root = root.replace(self.notes_path, self.build_path)
 
                 dirs = []
@@ -67,7 +67,7 @@ class Builder():
 
                 # Process valid sub-directories.
                 for dirname in dirnames:
-                    if _valid_notebook(dirname):
+                    if valid_notebook(dirname):
                         build_path = os.path.join(build_root, dirname)
 
                         if os.path.exists(build_path):
@@ -113,13 +113,13 @@ class Builder():
             if ext == '.html':
                 raw_html = raw_content
             else:
-                rendered = markdown(raw_content)
-                raw_html = md_templ.render(html=rendered, crumbs=crumbs)
+                raw_html = markdown(raw_content)
 
             if raw_html:
                 html = lxml.html.fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
-                content = tostring(html, method='html')
+                raw_html = tostring(html, method='html')
+                content = note_templ.render(html=raw_html, crumbs=crumbs)
 
             # Write the compiled note.
             with open(build_path, 'w') as build_note:
@@ -164,7 +164,7 @@ class Builder():
                     file = File(title.decode('utf-8'), compiled_filename.decode('utf-8'))
                     files.append(file)
             else:
-                if _valid_notebook(name):
+                if valid_notebook(name):
                     dirs.append(name.decode('utf-8'))
         # Write the index file for this node.
         self._write_index(build_path, dirs, files)
@@ -189,8 +189,10 @@ class Builder():
         Returns a build path
         for a given path.
         """
-        path = self.normalize_path(path)
-        return path.replace(self.notes_path, self.build_path)
+        if '.build' not in path:
+            path = self.normalize_path(path)
+            path = path.replace(self.notes_path, self.build_path)
+        return path
 
     def normalize_path(self, path):
         """
@@ -246,7 +248,7 @@ def _rewrite_link(link):
     return link
 
 
-def _valid_notebook(dir):
+def valid_notebook(dir):
     """
     We want to ignore the build and searchindex
     as well as all resource directories.

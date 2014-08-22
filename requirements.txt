@@ -23,6 +23,7 @@ pdfminer==20140328
 python-daemon==1.6.1
 watchdog==0.8.1
 wsgiref==0.1.2
+html2text==2014.7.3
 
 # For now, use my fork which disables gevent monkey patching.
 # It was interrupting `watchdog`, and the lib seems to work fine without it.
