@@ -14,6 +14,8 @@ from lxml.etree import tostring
 from markdown import markdown
 from jinja2 import Template, FileSystemLoader, environment
 
+from nomadic.common import walk, valid_notebook
+
 File = namedtuple('File', ['title', 'filename'])
 
 # Load templates.
@@ -58,40 +60,39 @@ class Builder():
         Build a notebook, recursively,
         compiling notes and indexes.
         """
-        for root, dirnames, filenames in os.walk(path):
-            if valid_notebook(root):
-                build_root = root.replace(self.notes_path, self.build_path)
+        for root, dirnames, filenames in walk(path):
+            build_root = root.replace(self.notes_path, self.build_path)
 
-                dirs = []
-                files = []
+            dirs = []
+            files = []
 
-                # Process valid sub-directories.
-                for dirname in dirnames:
-                    if valid_notebook(dirname):
-                        build_path = os.path.join(build_root, dirname)
+            # Process valid sub-directories.
+            for dirname in dirnames:
+                if valid_notebook(dirname):
+                    build_path = os.path.join(build_root, dirname)
 
-                        if os.path.exists(build_path):
-                            shutil.rmtree(build_path)
-                        os.makedirs(build_path)
+                    if os.path.exists(build_path):
+                        shutil.rmtree(build_path)
+                    os.makedirs(build_path)
 
-                        dirs.append(dirname.decode('utf-8'))
+                    dirs.append(dirname.decode('utf-8'))
 
-                # Process notes.
-                for filename in filenames:
-                    if filename == 'index.html':
-                        continue
-                    title, ext = os.path.splitext(filename)
-                    compiled_filename = title + '.html'
-                    if ext in ['.html', '.md']:
-                        path = os.path.join(root, filename)
+            # Process notes.
+            for filename in filenames:
+                if filename == 'index.html':
+                    continue
+                title, ext = os.path.splitext(filename)
+                compiled_filename = title + '.html'
+                if ext in ['.html', '.md']:
+                    path = os.path.join(root, filename)
 
-                        self.compile_note(path)
+                    self.compile_note(path)
 
-                        file = File(title, compiled_filename)
-                        files.append(file)
+                    file = File(title, compiled_filename)
+                    files.append(file)
 
-                # Write the index file for this node.
-                self._write_index(build_root, dirs, files)
+            # Write the index file for this node.
+            self._write_index(build_root, dirs, files)
 
     def compile_note(self, path):
         """
@@ -246,14 +247,3 @@ def _rewrite_link(link):
     elif ext == '.md':
         return root + '.html'
     return link
-
-
-def valid_notebook(dir):
-    """
-    We want to ignore the build and searchindex
-    as well as all resource directories.
-    """
-    if '.build' in dir: return False
-    if '.searchindex' in dir: return False
-    if '_resources' in dir: return False
-    return True

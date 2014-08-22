@@ -183,7 +183,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in indexer.walk_notes(self.notes_path):
+        for root, dirnames, filenames in indexer.walk(self.notes_path):
             for filename in filenames:
                 _, ext = os.path.splitext(filename)
                 path = os.path.join(root, filename)
