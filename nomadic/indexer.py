@@ -21,8 +21,6 @@ schema = Schema(title=TEXT(stored=True),
 
 Notebook = namedtuple('Notebook', ['name', 'path'])
 
-VALID_EXTS = ['.html', '.md', '.pdf', '.txt']
-
 class Index():
     def __init__(self, notes_path):
         self.notes_path = os.path.expanduser(notes_path)
@@ -93,8 +91,7 @@ class Index():
 
     def add_note(self, path):
         with self.ix.writer() as writer:
-            _, ext = os.path.splitext(path)
-            if ext in VALID_EXTS:
+            if common.valid_note(path):
                 n = extractor.note_from_path(path)
                 note = extractor.process_note(n)
                 writer.add_document(**note)
