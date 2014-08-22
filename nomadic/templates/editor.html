@@ -56,6 +56,12 @@
                             lock = false;
                             last_title = data.title;
                             last_notebook = data.notebook;
+                        },
+                        error: function(jqxhr, textStatus, err) {
+                            // Note already exists, change the title.
+                            if (err === 'CONFLICT') {
+                                $title.val(data.title + ' COPY');
+                            }
                         }
                     });
                 }

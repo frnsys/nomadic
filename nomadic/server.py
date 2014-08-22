@@ -97,38 +97,47 @@ class Server():
 
         @self.app.route('/save', methods=['POST'])
         def save():
-            title = request.form['title']
-            title_ = request.form['prev[title]']
-
-            notebook = request.form['notebook']
-            notebook_ = request.form['prev[notebook]']
-
-            resources = os.path.join(notebook, '_resources', title, '')
-
-            # If the title or notebook has changed,
-            # remove the old one and move the
-            # resources directory (if it exists).
-            if title != title_ or notebook != notebook_:
-                path_ = os.path.join(notebook_, title_ + '.html')
-                os.remove(path_)
-
-                resources_ = os.path.join(notebook_, '_resources', title_, '')
-                if os.path.exists(resources_):
-                    shutil.move(resources_, resources)
-
             html = request.form['html']
-            path = os.path.join(notebook, title + '.html')
 
-            html_ = lxml.html.fromstring(html)
-            html_.rewrite_links(self._rewrite_link(resources))
-            html = tostring(html_, method='html')
+            if html:
+                title = request.form['title']
+                title_ = request.form['prev[title]']
 
-            with open(path, 'w') as note:
-                note.write(html)
+                notebook = request.form['notebook']
+                notebook_ = request.form['prev[notebook]']
 
-            return jsonify({
-                'path': path
-            })
+                resources = os.path.join(notebook, '_resources', title, '')
+                path = os.path.join(notebook, title + '.html')
+
+                # If the title or notebook has changed,
+                # remove the old one and move the
+                # resources directory (if it exists).
+                if title != title_ or notebook != notebook_:
+                    path_ = os.path.join(notebook_, title_ + '.html')
+                    if os.path.exists(path_):
+                        os.remove(path_)
+
+                    resources_ = os.path.join(notebook_, '_resources', title_, '')
+                    if os.path.exists(resources_):
+                        shutil.move(resources_, resources)
+
+                    # Check if the new path exists already.
+                    # We don't want to overwrite existing notes.
+                    if os.path.exists(path):
+                        # 409 = Conflict
+                        return 409
+
+                html_ = lxml.html.fromstring(html)
+                html_.rewrite_links(self._rewrite_link(resources))
+                html = tostring(html_, method='html')
+
+                with open(path, 'w') as note:
+                    note.write(html)
+
+                return jsonify({
+                    'path': path
+                })
+            return 200
 
         @self.app.route('/convert', methods=['POST'])
         def convert():
