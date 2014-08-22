@@ -49,7 +49,7 @@ def clean_note_resources(path):
     r = note_resources(path)
     if os.path.exists(r):
         with open(path, 'r') as note:
-            content = note.read()
+            content = note.read().decode('utf-8')
             for name in os.listdir(r):
                 p = os.path.join(r, name)
                 if os.path.isfile(p) and name not in content:
