@@ -124,54 +124,12 @@ class Server():
             else:
                 return 'Content type of {0} not allowed'.format(content_type), 415
 
-        @self.app.route('/save', methods=['POST'])
-        def save():
-            html = request.form['html']
-
-            if html:
-                save_as_markdown = request.form['save_as_markdown']
-                if save_as_markdown:
-                    ext = '.md'
-                else:
-                    ext = '.html'
-
-                title = request.form['title']
-                notebook = request.form['notebook']
-                path = os.path.join(notebook, title + ext) 
-
-                title_new = request.form['new[title]']
-                notebook_new = request.form['new[notebook]']
-                path_new = os.path.join(notebook_new, title_new + ext)
-
-                # If the title or notebook has changed,
-                # move the note by updating its path.
-                if path != path_new:
-
-                    # Check if the new path exists already.
-                    # We don't want to overwrite existing notes.
-                    if os.path.exists(path_new):
-                        # 409 = Conflict
-                        self.app.logger.debug('Note at {0} already exists.'.format(path_new))
-                        return 'Note already exists', 409
-
-                    manager.move_note(path, path_new)
-                    path = path_new
-
-                resources = manager.note_resources(path)
-                html_ = fromstring(html)
-                html_.rewrite_links(self._rewrite_link(resources))
-                html = tostring(html_)
-
-                if save_as_markdown:
-                    content = converter.html_to_markdown(html)
-
-                manager.save_note(path, content)
-                manager.clean_note_resources(path)
-
-                return jsonify({
-                    'path': path
-                })
-            return 200
+        @self.app.route('/note', methods=['POST', 'PUT', 'DELETE'])
+        def editor():
+            if request.method in ['POST', 'PUT']:
+                return self.save(request.form)
+            if request.method == 'DELETE':
+                return self.delete(request.form)
 
         @self.socketio.on('connect')
         def on_connect():
@@ -180,3 +138,62 @@ class Server():
             the SocketIO emitting working properly...
             """
             logger.debug('User connected.')
+
+    def delete(self, data):
+        title = data['title']
+        notebook = data['notebook']
+
+        for ext in ['.md', '.html']:
+            path = os.path.join(notebook, title + ext)
+            manager.delete_note(path)
+        return 'Success', 200
+
+    def save(self, data):
+        html = data['html']
+
+        if html:
+            save_as_markdown = data['save_as_markdown']
+            if save_as_markdown:
+                ext = '.md'
+            else:
+                ext = '.html'
+
+            title = data['title']
+            notebook = data['notebook']
+            path = os.path.join(notebook, title + ext) 
+
+            title_new = data['new[title]']
+            notebook_new = data['new[notebook]']
+            path_new = os.path.join(notebook_new, title_new + ext)
+
+            # If the title or notebook has changed,
+            # move the note by updating its path.
+            if path != path_new:
+
+                # Check if the new path exists already.
+                # We don't want to overwrite existing notes.
+                if os.path.exists(path_new):
+                    # 409 = Conflict
+                    self.app.logger.debug('Note at {0} already exists.'.format(path_new))
+                    return 'Note already exists', 409
+
+                manager.move_note(path, path_new)
+                path = path_new
+
+            resources = manager.note_resources(path)
+            html_ = fromstring(html)
+            html_.rewrite_links(self._rewrite_link(resources))
+            html = tostring(html_)
+
+            if save_as_markdown:
+                content = converter.html_to_markdown(html)
+
+            manager.save_note(path, content)
+            manager.clean_note_resources(path)
+
+            return jsonify({
+                'path': path
+            })
+        return 'Success', 200
+
+

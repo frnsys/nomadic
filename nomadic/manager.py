@@ -29,6 +29,14 @@ def move_note(src, dest):
     if os.path.exists(from_resources):
         shutil.move(from_resources, to_resources)
 
+def delete_note(path):
+    if os.path.exists(path):
+        os.remove(path)
+
+    resources = note_resources(path)
+    if os.path.exists(resources):
+        shutil.rmtree(resources)
+
 def clean_note_resources(path):
     r = note_resources(path)
     if os.path.exists(r):
