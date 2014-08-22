@@ -27,28 +27,29 @@ def convert_span(span):
     """
     p = span.getparent()
 
-    children = []
-    if span.text is not None:
-        children.append(span.text)
-    for c in span.getchildren():
-        children.append(c)
-        if c.tail is not None and c.tail.strip():
-            # Have to wrap the tail text in a span tag,
-            # or else it won't get added.
-            children.append(builder.SPAN(c.tail))
-
     style = span.get('style')
-
     builders = []
     if 'bold' in style:
         builders.append(builder.STRONG)
     if 'italic' in style:
         builders.append(builder.EM)
 
-    # Recursively apply the builders.
-    el = builders[0](*children)
-    for b in builders[1:]:
-        el = b(el)
+    if builders:
+        children = []
+        if span.text is not None:
+            children.append(span.text)
+        for c in span.getchildren():
+            children.append(c)
+            if c.tail is not None and c.tail.strip():
+                # Have to wrap the tail text in a span tag,
+                # or else it won't get added.
+                children.append(builder.SPAN(c.tail))
 
-    # Replace the old element with the new one.
-    p.replace(span, el)
+
+        # Recursively apply the builders.
+        el = builders[0](*children)
+        for b in builders[1:]:
+            el = b(el)
+
+        # Replace the old element with the new one.
+        p.replace(span, el)
