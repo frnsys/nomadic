@@ -11,9 +11,6 @@ pdf notes and any other files which may need to be referenced. `nomadic`
 provides an easier way of searching through and browsing those files
 through either the command line or a simple web interface.
 
-It supports GitHub-Flavored Markdown, relative references to images (and
-other files), and MathJax.
-
 For example:
 
 ```bash
@@ -34,6 +31,23 @@ Here are some useful tools to go with `nomadic`:
 With these tools, `nomadic` becomes a decentralized, simplified alternative to Evernote.
 
 Powerusers of Evernote might find it lacking but it's not for them :)
+
+---
+
+## Features
+
+* Supports GitHub-Flavored Markdown
+* Supports MathJax syntax
+* Supports references to images and other files, and will automatically
+update those references if the files are moved
+* Full-text search (across html, txt, markdown, and even pdf files)
+* A rich text editor (in-browser) for dumping in web clippings (external
+        images are automatically saved locally)
+* The rich text editor can convert and save HTML notes into Markdown
+* Auto-recompiling of Markdown notes and updating of whatever browser is
+viewing the note (i.e. live-ish previews)
+* Automatically builds a browsable site of all your notes
+* Complete command-line interface
 
 ---
 
@@ -63,25 +77,30 @@ The daemon also runs a small websockets server which allows for
 easy browsing/searching through notes as well as a quick way
 of previewing notes as you work on them.
 
-To get the `nomadic` daemon to run automatically on startup...
+#### To get the `nomadic` daemon to run automatically on startup...
 
-#### Linux (Upstart)
+##### Linux (Upstart)
 If you're on a Linux distro that uses Upstart, you can do:
+
 ```bash
 $ sudo cp scripts/nomadic.conf /etc/init/nomadic.conf
 ```
+
 Then you can start the daemon:
+
 ```bash
 $ sudo start nomadic
 ```
 
-#### OSX
-If you're on a Linux distro that uses Upstart, you can do:
+##### OSX
 If you're on OSX, you can do:
+
 ```bash
 $ cp scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
 ```
+
 Then you can start the daemon:
+
 ```bash
 $ launchctl load ~/Library/LaunchAgents/com.nomadic.plist 
 ```
@@ -93,6 +112,7 @@ $ launchctl load ~/Library/LaunchAgents/com.nomadic.plist
 start `nomadic` without a config, one will be created for you.
 
 For example:
+
 ```json
 {
     "notes_path": "~/Notes"
@@ -138,6 +158,7 @@ Commands:
   build   Re-build the browsable tree.
   count   Get the number of notes.
   index   Update or reset the note index.
+  new     Create a new note.
   search  Search through notes.
 ```
 
@@ -152,14 +173,17 @@ to the build directory, so no
 extra files are redundantly copied over.
 
 You can browse this structure by running:
+
 ```bash
 $ nomadic browse
 ```
+
 which opens up the root directory ('notebook') in your
 default web browser.
 
 You can immediately jump to a specific notebook by
 passing its name in:
+
 ```bash
 $ nomadic browse economics
 ```
@@ -227,9 +251,10 @@ notes without needing to set anything up beforehand. If you're using
 BitTorrent sync, you must set up syncing in advance to access your
 `nomadic` notes. But if you're using a cloud
 service for syncing such as Dropbox, you can just log into that and
-access your notes from anywhere as well.
-* It's very easy to copy and paste HTML into Evernote and preserve the
-formatting. There is not yet an easy workflow for the same in `nomadic`.
+access your notes from anywhere as well. **Update:** this is less of an
+issue now that the daemon runs a small server, so in theory you could
+access your files that way. You'd want to wrap it some authentication
+though.
 
 ---
 
