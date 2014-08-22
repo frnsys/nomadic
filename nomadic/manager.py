@@ -30,6 +30,10 @@ def move_note(src, dest):
         shutil.move(from_resources, to_resources)
 
 def delete_note(path):
+    """
+    Delete a note and its resources
+    from the filesystem.
+    """
     if os.path.exists(path):
         os.remove(path)
 
@@ -38,6 +42,10 @@ def delete_note(path):
         shutil.rmtree(resources)
 
 def clean_note_resources(path):
+    """
+    Delete resources which are not
+    referenced by the note.
+    """
     r = note_resources(path)
     if os.path.exists(r):
         with open(path, 'r') as note:
@@ -63,22 +71,22 @@ def walk(path):
             yield root, dirs, files
 
 def filenames(path):
-        """
-        Lists all files and directories
-        in this path, NOT recursive.
-        It does not return their paths,
-        just their names.
-        """
-        dirs = []
-        files = []
-        for name in os.listdir(path):
-            p = os.path.join(path, name)
-            if os.path.isfile(p):
-                files.append(name)
-            else:
-                if valid_notebook(name):
-                    dirs.append(name.decode('utf-8'))
-        return dirs, files
+    """
+    Lists all files and directories
+    in this path, NOT recursive.
+    It does not return their paths,
+    just their names.
+    """
+    dirs = []
+    files = []
+    for name in os.listdir(path):
+        p = os.path.join(path, name)
+        if os.path.isfile(p):
+            files.append(name)
+        else:
+            if valid_notebook(name):
+                dirs.append(name.decode('utf-8'))
+    return dirs, files
 
 def valid_notebook(path):
     """

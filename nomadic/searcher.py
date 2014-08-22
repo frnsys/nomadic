@@ -11,8 +11,6 @@ from collections import namedtuple
 from colorama import Fore
 from whoosh.qparser import QueryParser
 
-from nomadic import extractor
-
 Result = namedtuple('Result', ['data', 'highlights'])
 
 def search(query, index, html=False):
