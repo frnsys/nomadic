@@ -36,18 +36,18 @@ Powerusers of Evernote might find it lacking but it's not for them :)
 
 ## Features
 
-* Supports *GitHub-Flavored* Markdown
-* Supports *MathJax* syntax
-* Supports *references to images* and other files, and will automatically
+* Supports **GitHub-Flavored** Markdown
+* Supports **MathJax** syntax
+* Supports **references to images** and other files, and will automatically
 update those references if the files are moved
-* *Full-text search* (across html, txt, markdown, and even pdf files)
-* A *rich text editor* (in-browser) for dumping in web clippings (external
+* **Full-text search** (across html, txt, markdown, and even pdf files)
+* A **rich text editor** (in-browser) for dumping in web clippings (external
         images are automatically saved locally)
-* The rich text editor can *convert and save HTML notes into Markdown*
-* *Auto-recompiling of Markdown* notes and updating of whatever browser is
+* The rich text editor can **convert and save HTML notes into Markdown**
+* **Auto-recompiling of Markdown** notes and updating of whatever browser is
 viewing the note (i.e. live-ish previews)
-* Automatically builds *a browsable site of all your notes*
-* Complete *command-line interface*
+* Automatically builds **a browsable site of all your notes**
+* Complete **command-line interface**
 
 ---
 
