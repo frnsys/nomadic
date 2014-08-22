@@ -23,8 +23,8 @@ def filenames(path):
         dirs = []
         files = []
         for name in os.listdir(path):
-            path = os.path.join(path, name)
-            if os.path.isfile(path):
+            p = os.path.join(path, name)
+            if os.path.isfile(p):
                 files.append(name)
             else:
                 if valid_notebook(name):

@@ -14,7 +14,7 @@ from lxml.etree import tostring
 from markdown import markdown
 from jinja2 import Template, FileSystemLoader, environment
 
-from nomadic.common import walk, valid_notebook
+from nomadic import common
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -60,7 +60,7 @@ class Builder():
         Build a notebook, recursively,
         compiling notes and indexes.
         """
-        for root, dirnames, filenames in walk(path):
+        for root, dirnames, filenames in common.walk(path):
             build_root = root.replace(self.notes_path, self.build_path)
 
             dirs = []
@@ -150,20 +150,18 @@ class Builder():
         This does not compile the notes in the directory,
         nor is it recursive.
         """
-        dirs = []
-        files = []
         build_path = self.build_path_for_path(dir)
-        for name in os.listdir(dir):
-            path = os.path.join(dir, name)
-            if os.path.isfile(path):
-                title, ext = os.path.splitext(name)
-                if ext in ['.html', '.md']:
-                    compiled_filename = title + '.html'
-                    file = File(title.decode('utf-8'), compiled_filename.decode('utf-8'))
-                    files.append(file)
-            else:
-                if valid_notebook(name):
-                    dirs.append(name.decode('utf-8'))
+
+        dirs, files_ = common.filenames(dir)
+        files = []
+
+        for name in files_:
+            title, ext = os.path.splitext(name)
+            if ext in ['.html', '.md']:
+                compiled_filename = title + '.html'
+                file = File(title, compiled_filename)
+                files.append(file)
+
         # Write the index file for this node.
         self._write_index(build_path, dirs, files)
 
