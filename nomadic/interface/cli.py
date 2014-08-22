@@ -130,17 +130,24 @@ def count(nomadic):
 @cli.command()
 @click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
 @click.argument('note')
+@click.option('--rich', is_flag=True, help='Create a new "rich" (wysiwyg html) note in a browser editor')
 @pass_nomadic
-def new(nomadic, notebook, note):
+def new(nomadic, notebook, note, rich):
     """
     Create a new note.
     """
     notebook_path = nomadic.get_notebook(notebook)
-    if notebook_path is None: return
+    if notebook_path is None:
+        echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
+        return
 
-    # Assume Markdown if no ext specified.
-    _, ext = os.path.splitext(note)
-    if not ext: note += '.md'
+    if not rich:
+        # Assume Markdown if no ext specified.
+        _, ext = os.path.splitext(note)
+        if not ext: note += '.md'
 
-    path = os.path.join(notebook_path, note)
-    click.edit(filename=path)
+        path = os.path.join(notebook_path, note)
+        click.edit(filename=path)
+    else:
+        # Launch the daemon server's rich editor.
+        click.launch('http://localhost:{0}/new'.format(nomadic.port))
