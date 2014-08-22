@@ -9,8 +9,7 @@ import os
 import shutil
 from collections import namedtuple
 
-import lxml.html
-from lxml.etree import tostring
+from lxml.html import fromstring, tostring
 from markdown import markdown
 from jinja2 import Template, FileSystemLoader, environment
 
@@ -113,10 +112,10 @@ class Builder():
             else:
                 raw_html = markdown(raw_content)
 
-            if raw_html:
-                html = lxml.html.fromstring(raw_html)
+            if raw_html.strip():
+                html = fromstring(raw_html)
                 html.rewrite_links(_rewrite_link, base_href=build_path)
-                raw_html = tostring(html, method='html')
+                raw_html = tostring(html)
                 content = note_templ.render(html=raw_html, crumbs=crumbs)
 
             # Write the compiled note.

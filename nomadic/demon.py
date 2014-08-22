@@ -91,9 +91,10 @@ class NomadicDaemon(PatternMatchingEventHandler):
         if not event.is_directory:
             p = event.src_path
             logger.debug('Modified: {0}'.format(p))
-            self.index.update_note(p)
-            self.builder.compile_note(p)
-            self.server.refresh_clients()
+            if os.path.exists(p):
+                self.index.update_note(p)
+                self.builder.compile_note(p)
+                self.server.refresh_clients()
 
     def on_created(self, event):
         """

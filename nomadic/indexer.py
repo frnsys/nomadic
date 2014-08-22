@@ -23,7 +23,7 @@ Notebook = namedtuple('Notebook', ['name', 'path'])
 
 class Index():
     def __init__(self, notes_path):
-        self.notes_path = os.path.expanduser(notes_path)
+        self.notes_path = os.path.join(os.path.expanduser(notes_path), '')
         self._load_index()
 
     @property

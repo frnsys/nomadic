@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
 from nomadic.demon import logger
-from nomadic import searcher, manager
+from nomadic import searcher, manager, converter
 
 import os
 import shutil
@@ -10,11 +10,7 @@ import urllib
 from datetime import datetime
 import sys, logging
 
-import html2text
-import lxml.html
-from lxml.etree import tostring
-
-h = html2text.HTML2Text()
+from lxml.html import fromstring, tostring
 
 class Server():
     def __init__(self, index, builder, port):
@@ -99,20 +95,26 @@ class Server():
         def new():
             # A unique default title to save without conflicts.
             default_title = datetime.utcnow()
-            return render_template('editor.html', notebooks=self.index.notebooks(), title=default_title)
+            return render_template('editor.html', notebooks=self.index.notebooks, title=default_title)
 
         @self.app.route('/save', methods=['POST'])
         def save():
             html = request.form['html']
 
             if html:
+                save_as_markdown = request.form['save_as_markdown']
+                if save_as_markdown:
+                    ext = '.md'
+                else:
+                    ext = '.html'
+
                 title = request.form['title']
                 notebook = request.form['notebook']
-                path = os.path.join(notebook, title + '.html')
+                path = os.path.join(notebook, title + ext) 
 
                 title_new = request.form['new[title]']
                 notebook_new = request.form['new[notebook]']
-                path_new = os.path.join(notebook_new, title_new + '.html')
+                path_new = os.path.join(notebook_new, title_new + ext)
 
                 # If the title or notebook has changed,
                 # move the note by updating its path.
@@ -122,31 +124,27 @@ class Server():
                     # We don't want to overwrite existing notes.
                     if os.path.exists(path_new):
                         # 409 = Conflict
-                        return 409
+                        self.app.logger.debug('Note at {0} already exists.'.format(path_new))
+                        return 'Note already exists', 409
 
                     manager.move_note(path, path_new)
                     path = path_new
 
-                html_ = lxml.html.fromstring(html)
+                resources = manager.note_resources(path, create=True)
+                html_ = fromstring(html)
                 html_.rewrite_links(self._rewrite_link(resources))
-                html = tostring(html_, method='html')
+                html = tostring(html_)
 
-                manager.save_note(path, html)
+                if save_as_markdown:
+                    content = converter.html_to_markdown(html)
+
+                manager.save_note(path, content)
                 manager.clean_note_resources(path)
 
                 return jsonify({
                     'path': path
                 })
             return 200
-
-        @self.app.route('/convert', methods=['POST'])
-        def convert():
-            """
-            Convert HTML to Markdown.
-            """
-            html = request.form['html']
-            md = h.handle(html)
-            return md
 
         @self.socketio.on('connect')
         def on_connect():
@@ -155,4 +153,3 @@ class Server():
             the SocketIO emitting working properly...
             """
             logger.debug('User connected.')
-

@@ -9,10 +9,15 @@ handles file system interaction.
 import os
 import shutil
 
-def note_resources(path):
+def note_resources(path, create=False):
     notebook, filename = os.path.split(path)
     title, ext = os.path.splitext(filename)
-    return os.path.join(notebook, '_resources', title, '')
+    resources = os.path.join(notebook, '_resources', title, '')
+
+    if create and not os.path.exists(resources):
+        os.makedirs(resources)
+
+    return resources
 
 def move_note(src, dest):
     from_resources = note_resources(src)
@@ -35,7 +40,7 @@ def clean_note_resources(path):
 
 def save_note(path, content):
     with open(path, 'w') as note:
-        note.write(content)
+        note.write(content.encode('utf-8'))
 
 def walk(path):
     """

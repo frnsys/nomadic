@@ -17,6 +17,7 @@
     </select>
 
     <input type="text" name="title" value="{{ title }}" />
+    <input type="checkbox" name="save_as_markdown"> Save as Markdown
 
     <div id="editor"></div>
 
@@ -37,6 +38,7 @@
                     html: $editor.code(),
                     title: title,
                     notebook: notebook,
+                    save_as_markdown: $('input[name=save_as_markdown]').is(':checked'),
 
                     // New values, so we can
                     // move/remove the old note.
@@ -56,8 +58,8 @@
                             lock = false;
 
                             // Update current values.
-                            title = data.title;
-                            notebook = data.notebook;
+                            title = data.new.title;
+                            notebook = data.new.notebook;
                         },
                         error: function(jqxhr, textStatus, err) {
                             // Note already exists, change the title.
