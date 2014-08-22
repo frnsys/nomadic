@@ -14,7 +14,7 @@ from lxml.etree import tostring
 from markdown import markdown
 from jinja2 import Template, FileSystemLoader, environment
 
-from nomadic import common
+from nomadic import manager
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -60,7 +60,7 @@ class Builder():
         Build a notebook, recursively,
         compiling notes and indexes.
         """
-        for root, dirnames, filenames in common.walk(path):
+        for root, dirnames, filenames in manager.walk(path):
             build_root = root.replace(self.notes_path, self.build_path)
 
             dirs = []
@@ -152,7 +152,7 @@ class Builder():
         """
         build_path = self.build_path_for_path(dir)
 
-        dirs, files_ = common.filenames(dir)
+        dirs, files_ = manager.filenames(dir)
         files = []
 
         for name in files_:

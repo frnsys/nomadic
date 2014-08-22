@@ -12,7 +12,7 @@ from collections import namedtuple
 import whoosh.index as index
 from whoosh.fields import *
 
-from nomadic import extractor, common
+from nomadic import extractor, manager
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
@@ -91,7 +91,7 @@ class Index():
 
     def add_note(self, path):
         with self.ix.writer() as writer:
-            if common.valid_note(path):
+            if manager.valid_note(path):
                 n = extractor.note_from_path(path)
                 note = extractor.process_note(n)
                 writer.add_document(**note)
@@ -128,7 +128,7 @@ class Index():
         yield Notebook('notes', self.notes_path)
 
         # All the other notebooks.
-        for root, dirnames, _ in common.walk(self.notes_path):
+        for root, dirnames, _ in manager.walk(self.notes_path):
             for dirname in dirnames:
                 path = os.path.join(root, dirname)
                 yield Notebook(dirname, path)
@@ -139,7 +139,7 @@ class Index():
         Yield Notes in the
         specified directory.
         """
-        for root, dirnames, filenames in common.walk(self.notes_path):
+        for root, dirnames, filenames in manager.walk(self.notes_path):
             for filename in filenames:
                 path = os.path.join(root, filename)
                 yield extractor.note_from_path(path)

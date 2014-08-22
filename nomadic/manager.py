@@ -1,13 +1,48 @@
+"""
+Manager
+=======================
+
+Management of notes and notebooks,
+handles file system interaction.
+"""
+
 import os
+import shutil
 
-VALID_EXTS = ('.html', '.md', '.pdf', '.txt')
+def note_resources(path):
+    notebook, filename = os.path.split(path)
+    title, ext = os.path.splitext(filename)
+    return os.path.join(notebook, '_resources', title, '')
 
-def walk(notes_dir):
+def move_note(src, dest):
+    from_resources = note_resources(src)
+    to_resources = note_resources(dest)
+
+    if os.path.exists(src):
+        shutil.move(src, dest)
+
+    if os.path.exists(from_resources):
+        shutil.move(from_resources, to_resources)
+
+def clean_note_resources(path):
+    r = note_resources(path)
+    with open(path, 'r') as note:
+        content = note.read()
+        for name in os.listdir(r):
+            p = os.path.join(r, name)
+            if os.path.isfile(p) and name not in content:
+                os.remove(p)
+
+def save_note(path, content):
+    with open(path, 'w') as note:
+        note.write(content)
+
+def walk(path):
     """
     Walk a notes directory,
     yielding only for valid directories.
     """
-    for root, dirs, files in os.walk(notes_dir):
+    for root, dirs, files in os.walk(path):
         if valid_notebook(root):
             dirs = [d for d in dirs if valid_notebook(d)]
             files = [f for f in files if valid_note(f)]
@@ -47,4 +82,4 @@ def valid_note(path):
     and we want to ignore ones named 'index.html'
     since they may be build indexes.
     """
-    return path.endswith(VALID_EXTS) and 'index.html' not in path
+    return path.endswith(('.html', '.md', '.pdf', '.txt')) and 'index.html' not in path

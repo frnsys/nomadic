@@ -27,22 +27,22 @@
                 $notebook = $('select[name=notebook]'),
                 $editor = $('#editor'),
 
-                // Keep track of old values
+                // Keep track of current values
                 // so the backend can tell if they have changed.
-                last_title = $title.val(),
-                last_notebook = $notebook.val();
+                title = $title.val(),
+                notebook = $notebook.val();
 
             function save() {
                 var data = {
-                    title: $title.val(),
                     html: $editor.code(),
-                    notebook: $notebook.val(),
+                    title: title,
+                    notebook: notebook,
 
-                    // Old values, so we can
+                    // New values, so we can
                     // move/remove the old note.
-                    prev: {
-                        title: last_title,
-                        notebook: last_notebook
+                    'new': {
+                        title: $title.val(),
+                        notebook: $notebook.val()
                     }
                 };
 
@@ -54,8 +54,10 @@
                         data: data,
                         success: function(d) {
                             lock = false;
-                            last_title = data.title;
-                            last_notebook = data.notebook;
+
+                            // Update current values.
+                            title = data.title;
+                            notebook = data.notebook;
                         },
                         error: function(jqxhr, textStatus, err) {
                             // Note already exists, change the title.
