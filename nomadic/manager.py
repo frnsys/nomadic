@@ -31,12 +31,13 @@ def move_note(src, dest):
 
 def clean_note_resources(path):
     r = note_resources(path)
-    with open(path, 'r') as note:
-        content = note.read()
-        for name in os.listdir(r):
-            p = os.path.join(r, name)
-            if os.path.isfile(p) and name not in content:
-                os.remove(p)
+    if os.path.exists(r):
+        with open(path, 'r') as note:
+            content = note.read()
+            for name in os.listdir(r):
+                p = os.path.join(r, name)
+                if os.path.isfile(p) and name not in content:
+                    os.remove(p)
 
 def save_note(path, content):
     with open(path, 'w') as note:

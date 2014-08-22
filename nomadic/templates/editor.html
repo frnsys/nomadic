@@ -55,11 +55,16 @@
                         type: 'POST',
                         data: data,
                         success: function(d) {
-                            lock = false;
+                            lock = false,
+                            old_title = title;
 
                             // Update current values.
                             title = data.new.title;
                             notebook = data.new.notebook;
+
+                            if (old_title !== title) {
+                                update_resource_references(old_title, title);
+                            }
                         },
                         error: function(jqxhr, textStatus, err) {
                             // Note already exists, change the title.
@@ -73,11 +78,44 @@
 
             $editor.summernote({
                 focus: true,
-                onChange: save
+                onChange: save,
+                onImageUpload: function(files, editor, $editable) {
+                    for (var i=0;i<files.length;i++) {
+                        var file = files[i];
+                        var data = new FormData();
+                        data.append('file', file);
+                        data.append('title', title);
+                        data.append('notebook', notebook);
+                        $.ajax({
+                            data: data,
+                            type: 'POST',
+                            url: '/upload',
+                            cache: false,
+                            contentType: false,
+                            processData: false,
+                            async: false,
+                            success: function(url) {
+                                editor.insertImage($editable, url);
+                            }
+                        });
+                    }
+                }
             });
 
             $title.on('change', save);
             $notebook.on('change', save);
+
+            // Re-write all references to the old resources folder
+            // to point to the new resources folder.
+            function update_resource_references(old_title, new_title) {
+                var html = $editor.code(),
+                    old_ref = '_resources/'+old_title,
+                    new_ref = '_resources/'+new_title;
+
+                html = html.replace(old_ref, new_ref);
+                $editor.code(html);
+                save();
+            }
         });
     </script>
 {% endblock %}

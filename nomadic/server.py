@@ -97,6 +97,33 @@ class Server():
             default_title = datetime.utcnow()
             return render_template('editor.html', notebooks=self.index.notebooks, title=default_title)
 
+        @self.app.route('/upload', methods=['POST'])
+        def upload():
+            file = request.files['file']
+
+            allowed_content_types = ['image/gif', 'image/jpeg', 'image/png']
+            content_type = file.headers['Content-Type']
+            if content_type in allowed_content_types:
+                title = request.form['title']
+                notebook = request.form['notebook']
+                path = os.path.join(notebook, title + '.ext') # some arbitrary extension
+
+                # Build a unique filename.
+                _, ext = os.path.splitext(file.filename)
+                if not ext:
+                    ext = '.' + content_type.split('/')[-1]
+                if ext == '.jpeg': ext = '.jpg'
+                filename = str(hash(file.filename + str(datetime.utcnow()))) + ext
+
+                resources = manager.note_resources(path, create=True)
+                save_path = os.path.join(resources, filename)
+
+                file.save(save_path)
+                return save_path.replace(self.index.notes_path, ''), 200
+
+            else:
+                return 'Content type of {0} not allowed'.format(content_type), 415
+
         @self.app.route('/save', methods=['POST'])
         def save():
             html = request.form['html']
@@ -130,7 +157,7 @@ class Server():
                     manager.move_note(path, path_new)
                     path = path_new
 
-                resources = manager.note_resources(path, create=True)
+                resources = manager.note_resources(path)
                 html_ = fromstring(html)
                 html_.rewrite_links(self._rewrite_link(resources))
                 html = tostring(html_)
