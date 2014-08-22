@@ -28,8 +28,7 @@ sh = logging.StreamHandler(sys.stdout)
 sh.setFormatter(formatter)
 logger.addHandler(sh)
 
-from nomadic import indexer, builder, server
-from nomadic.common import walk
+from nomadic import indexer, builder, server, common
 
 
 def start(note_path, port, debug=False):
@@ -67,7 +66,6 @@ def summon(note_path, port):
 class NomadicDaemon(PatternMatchingEventHandler):
     patterns = ['*'] # match everything b/c we want to match directories as well.
     ignore_patterns = ['*.build*', '*.searchindex*']
-    valid_exts = ('.html', '.md', '.txt', '.pdf')
 
     def __init__(self, note_path, port):
         super(NomadicDaemon, self).__init__(ignore_directories=False)
@@ -82,8 +80,8 @@ class NomadicDaemon(PatternMatchingEventHandler):
         if it satisfies our requirements.
         """
         if event.is_directory \
-        or event.src_path.endswith(self.valid_exts) \
-        and (not hasattr(event, 'dest_path') or event.dest_path.endswith(self.valid_exts)):
+        or common.valid_note(event.src_path) \
+        and (not hasattr(event, 'dest_path') or common.valid_note(event.dest_path)):
             super(NomadicDaemon, self).dispatch(event)
 
     def on_modified(self, event):
@@ -184,7 +182,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in walk(self.notes_path):
+        for root, dirnames, filenames in common.walk(self.notes_path):
             for filename in filenames:
                 _, ext = os.path.splitext(filename)
                 path = os.path.join(root, filename)

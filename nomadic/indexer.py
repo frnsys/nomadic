@@ -12,8 +12,7 @@ from collections import namedtuple
 import whoosh.index as index
 from whoosh.fields import *
 
-from nomadic import extractor
-from nomadic.common import walk, valid_notebook
+from nomadic import extractor, common
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
@@ -44,7 +43,7 @@ class Index():
         self._load_index(reset=True)
 
         # Collect all the notes.
-        notes = [note for note in self._walk_notes()]
+        notes = [note for note in self.notes]
 
         # Process all the notes.
         with self.ix.writer() as writer:
@@ -85,7 +84,7 @@ class Index():
             # See if there are any new files to index
             # and index queued notes.
             notes = []
-            for note in self._walk_notes():
+            for note in self.notes:
                 if note.path in to_index or note.path not in ix_paths:
                     notes.append(note)
 
@@ -121,6 +120,7 @@ class Index():
         searcher = self.ix.searcher()
         return searcher.document(path=path)
 
+    @property
     def notebooks(self):
         """
         Yields all notebooks
@@ -131,17 +131,18 @@ class Index():
         yield Notebook('notes', self.notes_path)
 
         # All the other notebooks.
-        for root, dirnames, _ in walk(self.notes_path):
+        for root, dirnames, _ in common.walk(self.notes_path):
             for dirname in dirnames:
                 path = os.path.join(root, dirname)
                 yield Notebook(dirname, path)
 
-    def _walk_notes(self):
+    @property
+    def notes(self):
         """
         Yield Notes in the
         specified directory.
         """
-        for root, dirnames, filenames in walk(self.notes_path):
+        for root, dirnames, filenames in common.walk(self.notes_path):
             for filename in filenames:
                 path = os.path.join(root, filename)
                 yield extractor.note_from_path(path)
