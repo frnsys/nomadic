@@ -96,6 +96,7 @@ def valid_notebook(path):
     if '.build' in path: return False
     if '.searchindex' in path: return False
     if '_resources' in path: return False
+    if '.SyncArchive' in path: return False
     return True
 
 def valid_note(path):
