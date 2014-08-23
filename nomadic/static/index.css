@@ -107,7 +107,7 @@ h6 {
 }
 
 p, blockquote, ul, ol, dl, table, pre {
-  margin: 1em;
+  margin: 1em 0;
 }
 
 hr {
@@ -383,7 +383,7 @@ pre code, pre tt {
 }
 
 
-.note {
+.note, .notes {
     padding: 2em;
     max-width: 800px;
     margin: 0 auto;

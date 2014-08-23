@@ -4,7 +4,7 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
-from nomadic import indexer, builder, searcher
+from nomadic import indexer, builder, searcher, converter
 from nomadic.conf import config
 
 class Nomadic():
@@ -125,6 +125,35 @@ def count(nomadic):
     Get the number of notes.
     """
     echo('You have ' + Fore.RED + str(nomadic.index.size) + Fore.RESET + ' notes.')
+
+@cli.command()
+@click.argument('html_path', type=click.Path())
+@click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
+@pass_nomadic
+def convert(nomadic, notebook, html_path):
+    """
+    Convert an HTML note into a Markdown
+    note and save it.
+    """
+    notebook_path = nomadic.get_notebook(notebook)
+    if notebook_path is None:
+        echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
+        return
+
+    basepath, filename = os.path.split(html_path)
+    title, ext = os.path.splitext(filename)
+
+    with open(html_path, 'r') as html_file:
+        html = html_file.read()
+
+    markdown = converter.html_to_markdown(html)
+
+    # Add in the title.
+    markdown = '# {0}\n\n'.format(title) + markdown
+
+    path = os.path.join(notebook_path, title + '.md')
+    with open(path, 'w') as note:
+        note.write(markdown.encode('utf-8'))
 
 
 @cli.command()
