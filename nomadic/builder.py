@@ -15,6 +15,7 @@ from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 from jinja2 import Template, FileSystemLoader, environment
 
 from nomadic import manager
+from nomadic.md import HighlightExtension
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -111,7 +112,7 @@ class Builder():
             if ext == '.html':
                 raw_html = raw_content
             else:
-                raw_html = markdown(raw_content, extensions=[GFM()])
+                raw_html = markdown(raw_content, extensions=[GFM(), HighlightExtension()])
 
             if raw_html.strip():
                 html = fromstring(raw_html)
