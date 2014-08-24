@@ -191,6 +191,9 @@ class Server():
             manager.save_note(path, content)
             manager.clean_note_resources(path)
 
+            # Update all connected clients.
+            self.refresh_clients()
+
             return jsonify({
                 'path': path
             })
