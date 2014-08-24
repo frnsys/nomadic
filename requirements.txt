@@ -28,3 +28,6 @@ html2text==2014.7.3
 # For now, use my fork which disables gevent monkey patching.
 # It was interrupting `watchdog`, and the lib seems to work fine without it.
 git+git://github.com/ftzeng/Flask-SocketIO
+
+# The py-gfm package is not in pypi, so install from git.
+git+git://github.com/dart-lang/py-gfm

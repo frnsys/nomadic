@@ -11,6 +11,7 @@ from collections import namedtuple
 
 from lxml.html import fromstring, tostring
 from markdown import markdown
+from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 from jinja2 import Template, FileSystemLoader, environment
 
 from nomadic import manager
@@ -110,7 +111,7 @@ class Builder():
             if ext == '.html':
                 raw_html = raw_content
             else:
-                raw_html = markdown(raw_content)
+                raw_html = markdown(raw_content, extensions=[GFM()])
 
             if raw_html.strip():
                 html = fromstring(raw_html)
