@@ -28,7 +28,7 @@ sh = logging.StreamHandler(sys.stdout)
 sh.setFormatter(formatter)
 logger.addHandler(sh)
 
-from nomadic import indexer, builder, server, common
+from nomadic import indexer, builder, server, manager
 
 
 def start(note_path, port, debug=False):
@@ -80,8 +80,8 @@ class NomadicDaemon(PatternMatchingEventHandler):
         if it satisfies our requirements.
         """
         if event.is_directory \
-        or common.valid_note(event.src_path) \
-        and (not hasattr(event, 'dest_path') or common.valid_note(event.dest_path)):
+        or manager.valid_note(event.src_path) \
+        and (not hasattr(event, 'dest_path') or manager.valid_note(event.dest_path)):
             super(NomadicDaemon, self).dispatch(event)
 
     def on_modified(self, event):
@@ -183,7 +183,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in common.walk(self.notes_path):
+        for root, dirnames, filenames in manager.walk(self.notes_path):
             for filename in filenames:
                 _, ext = os.path.splitext(filename)
                 path = os.path.join(root, filename)
