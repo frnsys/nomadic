@@ -243,8 +243,8 @@ class Builder():
         base_path = os.path.join(('../'*dirs_up), note_dir, '')
 
         def rewriter(link):
-            # Ignore external and absolute links.
-            if not link.startswith(('http', '/')):
+            # Ignore external, absolute, and hash links.
+            if not link.startswith(('http', '/', '#')):
                 root, ext = os.path.splitext(link)
 
                 # Update references to non-note files

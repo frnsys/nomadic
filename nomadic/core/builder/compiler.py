@@ -5,7 +5,8 @@ def compile_markdown(md):
     """
     Compiles markdown to html.
     """
-    return markdown.markdown(md, extensions=[GFM(), HighlightExtension()])
+    # toc = table of contents extension
+    return markdown.markdown(md, extensions=[GFM(), HighlightExtension(), 'toc'])
 
 
 HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
