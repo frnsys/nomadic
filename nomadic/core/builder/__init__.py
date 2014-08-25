@@ -2,7 +2,8 @@
 Builder
 =======================
 
-Builds note files a local HTML site.
+Builds note files a local HTML site
+and manages built files.
 """
 
 import os

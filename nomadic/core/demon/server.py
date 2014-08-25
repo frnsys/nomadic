@@ -1,3 +1,11 @@
+"""
+Server
+=======================
+
+Handles the web interface and
+refreshing of connected clients.
+"""
+
 from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 

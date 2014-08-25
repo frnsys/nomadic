@@ -2,8 +2,8 @@
 Demon
 =======================
 
-A daemon which monitors the notebook
-directory and manages indexing/compiling.
+Manages the filesystem handler
+and background server.
 """
 
 import sys

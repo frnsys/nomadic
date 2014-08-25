@@ -1,3 +1,11 @@
+"""
+Handler
+=======================
+
+Watches the notes directory for any file system
+changes and responds appropriately.
+"""
+
 import os
 import re
 
