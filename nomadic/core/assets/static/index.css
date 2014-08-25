@@ -110,6 +110,10 @@ p, blockquote, ul, ol, dl, table, pre {
   margin: 1em 0;
 }
 
+li > ul {
+  margin: 0;
+}
+
 hr {
   background: #ccc;
   border: 0 none;
