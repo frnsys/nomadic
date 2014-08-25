@@ -4,55 +4,18 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
-from nomadic import indexer, builder, searcher, converter
-from nomadic.conf import config
+from nomadic.core import Nomadic
+from nomadic.interface.conf import config
 
-class Nomadic():
-    def get_notebook(self, notebook):
-        """
-        Searches for a notebook by name
-        and returns its path.
-
-        If multiple matching notebooks were found,
-        the user is promped to choose one.
-        """
-        if not notebook:
-            notebook_dir = self.notes_path
-
-        else:
-            dirs = [nb.path for nb in self.index.notebooks if notebook in nb.name]
-
-            if len(dirs) == 1:
-                notebook_dir = dirs[0]
-
-            elif len(dirs) > 1:
-                echo('\nFound multiple matching notebooks:\n')
-                for idx, dir in enumerate(dirs):
-                    header = ('\n'+'['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
-                    echo(Back.BLACK + header + Fore.YELLOW + path + Back.RESET + Fore.RESET)
-                idx = click.prompt('Select a notebook', type=int)
-                notebook_dir = dirs[idx]
-
-            else:
-                echo('\nNo matching notebooks found.\n')
-                return
-
-        return notebook_dir
-pass_nomadic = click.make_pass_decorator(Nomadic, ensure=True)
+nomadic = Nomadic(config['notes_path'])
 
 @click.group()
-@pass_nomadic
-def cli(nomadic):
-    nomadic.index = indexer.Index(config['notes_path'])
-    nomadic.builder = builder.Builder(config['notes_path'])
-
-    for key, val in config.items():
-        setattr(nomadic, key, val)
+def cli():
+    pass
 
 @cli.command()
 @click.argument('query')
-@pass_nomadic
-def search(nomadic, query):
+def search(query):
     """
     Search through notes.
     """
@@ -60,7 +23,7 @@ def search(nomadic, query):
     # Map notes to their temporary ids.
     note_map = {}
 
-    for idx, (result, highlights) in enumerate(searcher.search(query, nomadic.index)):
+    for idx, (result, highlights) in enumerate(nomadic.index.search(query)):
         path = result['path']
         note_map[idx] = path
 
@@ -84,23 +47,20 @@ def search(nomadic, query):
 
 @cli.command()
 @click.argument('notebook', default='')
-@pass_nomadic
-def browse(nomadic, notebook):
+def browse(notebook):
     """
     Browse through notes
     via a web browser.
     """
-    path = nomadic.get_notebook(notebook)
-    if path is None: return
+    notebook_path = select_notebook(notebook)
 
-    path = nomadic.builder.build_path_for_path(path)
+    path = nomadic.builder.build_path_for_path(notebook_path)
     click.launch(os.path.join(path, 'index.html'))
 
 
 @cli.command()
 @click.option('--reset', is_flag=True, help='Recompile the index from scratch.')
-@pass_nomadic
-def index(nomadic, reset):
+def index(reset):
     """
     Update or reset the note index.
     """
@@ -111,16 +71,14 @@ def index(nomadic, reset):
 
 
 @cli.command()
-@pass_nomadic
-def build(nomadic):
+def build():
     """
     Re-build the browsable tree.
     """
     nomadic.builder.build()
 
 @cli.command()
-@pass_nomadic
-def count(nomadic):
+def count():
     """
     Get the number of notes.
     """
@@ -129,13 +87,12 @@ def count(nomadic):
 @cli.command()
 @click.argument('html_path', type=click.Path())
 @click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
-@pass_nomadic
-def convert(nomadic, notebook, html_path):
+def convert(notebook, html_path):
     """
     Convert an HTML note into a Markdown
     note and save it.
     """
-    notebook_path = nomadic.get_notebook(notebook)
+    notebook_path = select_notebook(notebook)
     if notebook_path is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
@@ -160,12 +117,11 @@ def convert(nomadic, notebook, html_path):
 @click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
 @click.argument('note')
 @click.option('--rich', is_flag=True, help='Create a new "rich" (wysiwyg html) note in a browser editor')
-@pass_nomadic
-def new(nomadic, notebook, note, rich):
+def new(notebook, note, rich):
     """
     Create a new note.
     """
-    notebook_path = nomadic.get_notebook(notebook)
+    notebook_path = select_notebook(notebook)
     if notebook_path is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
@@ -180,3 +136,27 @@ def new(nomadic, notebook, note, rich):
     else:
         # Launch the daemon server's rich editor.
         click.launch('http://localhost:{0}/new'.format(nomadic.port))
+
+
+def select_notebook(notebook):
+    if not notebook:
+        notebook_dir = nomadic.notes_path
+
+    else:
+        dirs = [nb.path for nb in nomadic.index.notebooks if notebook in nb.name]
+
+        if len(dirs) == 1:
+            notebook_dir = dirs[0]
+
+        elif len(dirs) > 1:
+            echo('\nFound multiple matching notebooks:\n')
+            for idx, dir in enumerate(dirs):
+                header = ('\n'+'['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
+                echo(Back.BLACK + header + Fore.YELLOW + path + Back.RESET + Fore.RESET)
+            idx = click.prompt('Select a notebook', type=int)
+            notebook_dir = dirs[idx]
+
+        else:
+            echo('\nNo matching notebooks found.\n')
+            return
+    return notebook_dir

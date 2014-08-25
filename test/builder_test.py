@@ -1,7 +1,7 @@
 import os
 from urllib import quote
 
-from nomadic.builder import Builder
+from nomadic.core.builder import Builder
 from test import NomadicTest, note_at, compiled_path
 
 class BuilderTest(NomadicTest):

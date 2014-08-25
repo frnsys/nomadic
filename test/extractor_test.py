@@ -1,4 +1,4 @@
-from nomadic import extractor
+from nomadic.core.indexer import extractor
 from test import NomadicTest, note_at
 
 class ExtractorTest(NomadicTest):

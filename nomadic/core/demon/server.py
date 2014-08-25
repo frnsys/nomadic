@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
-from nomadic.demon import logger
-from nomadic import searcher, manager, converter
+from nomadic.core import manager
+from nomadic.core.builder import converter
+from nomadic.core.demon.logger import log
 
 import os
 import shutil
@@ -13,15 +14,14 @@ import sys, logging
 from lxml.html import fromstring, tostring
 
 class Server():
-    def __init__(self, index, builder, port):
-        self.index = index;
-        self.builder = builder;
+    def __init__(self, nomadic, port):
+        self.n = nomadic
         self.port = port
 
         self.app = Flask(__name__,
-                static_folder='static',
+                static_folder='../assets/static',
                 static_url_path='/static',
-                template_folder='templates')
+                template_folder='../assets/templates')
 
         self.socketio = SocketIO(self.app)
         self.build_routes()
@@ -33,7 +33,7 @@ class Server():
         self.app.logger.addHandler(sh)
 
     def start(self):
-        logger.debug('Starting the Nomadic server...')
+        log.debug('Starting the nomadic server...')
         self.socketio.run(self.app, port=self.port)
 
     def refresh_clients(self):
@@ -68,18 +68,18 @@ class Server():
                     filename, _ = urllib.urlretrieve(link, save_path)
 
                 # Return as a relative filepath.
-                return save_path.replace(self.index.notes_path, '')
+                return save_path.replace(self.n.notes_path, '')
             return link
         return rewriter
 
     def build_routes(self):
         @self.app.route('/<path:note_path>')
         def note(note_path):
-            note_path = os.path.join(self.index.notes_path, note_path)
+            note_path = os.path.join(self.n.notes_path, note_path)
 
             # Convert to build path if appropriate.
             if note_path.endswith(('.md', '.html')):
-                note_path, _ = self.builder.build_path_for_note_path(note_path)
+                note_path, _ = self.n.builder.build_path_for_note_path(note_path)
 
             with open(note_path, 'r') as note:
                 content = note.read()
@@ -88,14 +88,14 @@ class Server():
         @self.app.route('/search', methods=['POST'])
         def search():
             q = request.form['query']
-            results = searcher.search(q, self.index, html=True)
+            results = searcher.search(q, self.n.index, html=True)
             return render_template('results.html', results=results)
 
         @self.app.route('/new')
         def new():
             # A unique default title to save without conflicts.
             default_title = datetime.utcnow()
-            return render_template('editor.html', notebooks=self.index.notebooks, title=default_title)
+            return render_template('editor.html', notebooks=self.n.manager.notebooks, title=default_title)
 
         @self.app.route('/upload', methods=['POST'])
         def upload():
@@ -115,11 +115,11 @@ class Server():
                 if ext == '.jpeg': ext = '.jpg'
                 filename = str(hash(file.filename + str(datetime.utcnow()))) + ext
 
-                resources = manager.note_resources(path, create=True)
+                resources = self.n.manager.note_resources(path, create=True)
                 save_path = os.path.join(resources, filename)
 
                 file.save(save_path)
-                return save_path.replace(self.index.notes_path, ''), 200
+                return save_path.replace(self.n.notes_path, ''), 200
 
             else:
                 return 'Content type of {0} not allowed'.format(content_type), 415
@@ -137,7 +137,7 @@ class Server():
             This seems necessary to get
             the SocketIO emitting working properly...
             """
-            logger.debug('User connected.')
+            log.debug('User connected.')
 
     def delete(self, data):
         title = data['title']
@@ -145,7 +145,7 @@ class Server():
 
         for ext in ['.md', '.html']:
             path = os.path.join(notebook, title + ext)
-            manager.delete_note(path)
+            self.n.manager.delete_note(path)
         return 'Success', 200
 
     def save(self, data):
@@ -174,13 +174,13 @@ class Server():
                 # We don't want to overwrite existing notes.
                 if os.path.exists(path_new):
                     # 409 = Conflict
-                    self.app.logger.debug('Note at {0} already exists.'.format(path_new))
+                    self.app.log.debug('Note at {0} already exists.'.format(path_new))
                     return 'Note already exists', 409
 
-                manager.move_note(path, path_new)
+                self.n.manager.move_note(path, path_new)
                 path = path_new
 
-            resources = manager.note_resources(path)
+            resources = self.n.manager.note_resources(path)
             html_ = fromstring(html)
             html_.rewrite_links(self._rewrite_link(resources))
             html = tostring(html_)
@@ -188,8 +188,8 @@ class Server():
             if save_as_markdown:
                 content = converter.html_to_markdown(html)
 
-            manager.save_note(path, content)
-            manager.clean_note_resources(path)
+            self.n.manager.save_note(path, content)
+            self.n.manager.clean_note_resources(path)
 
             # Update all connected clients.
             self.refresh_clients()

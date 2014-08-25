@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from nomadic.indexer import Index
+from nomadic.core.indexer import Index
 from test import NomadicTest, note_at
 
 

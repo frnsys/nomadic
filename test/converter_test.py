@@ -1,7 +1,7 @@
 import shutil
 from os.path import exists
 
-from nomadic import converter
+from nomadic.core.builder import converter
 from test import NomadicTest, note_at
 
 from lxml.html import fromstring, tostring

@@ -1,78 +1,24 @@
-"""
-Demon
-=======================
-
-A daemon which monitors the notebook
-directory and manages indexing/compiling.
-"""
-
 import os
 import re
-import sys
-import time
-import logging
 
 import lxml.html
 from lxml.etree import tostring
-from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
-from daemon import DaemonContext
+
+from nomadic.core import manager
+from nomadic.core.demon.logger import log
 
 # Markdown link regex
 md_link_re = re.compile(r'\[.+\]\(`?([^`\(\)]+)`?\)')
 
-logger = logging.getLogger('nomadic_daemon')
-logger.setLevel( logging.DEBUG )
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-sh = logging.StreamHandler(sys.stdout)
-sh.setFormatter(formatter)
-logger.addHandler(sh)
-
-from nomadic import indexer, builder, server, manager
-
-
-def start(note_path, port, debug=False):
-    logger.debug('NomadicDaemon started.')
-
-    if debug:
-        summon(note_path, port)
-
-    else:
-        with DaemonContext(stdout=sys.stdout):
-            summon(note_path, port)
-
-def summon(note_path, port):
-    try:
-        ob = Observer()
-        d = NomadicDaemon(note_path, port)
-        ob.schedule(d, note_path, recursive=True)
-        ob.start()
-        d.server.start()
-
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            ob.stop()
-
-        ob.join()
-    except Exception as e:
-        logger.exception(e)
-        raise
-    else:
-        ob.stop()
-        ob.join()
-
-class NomadicDaemon(PatternMatchingEventHandler):
+class Handler(PatternMatchingEventHandler):
     patterns = ['*'] # match everything b/c we want to match directories as well.
     ignore_patterns = ['*.build*', '*.searchindex*']
 
-    def __init__(self, note_path, port):
-        super(NomadicDaemon, self).__init__(ignore_directories=False)
-        self.index = indexer.Index(note_path)
-        self.builder = builder.Builder(note_path)
-        self.server = server.Server(self.index, self.builder, port)
-        self.notes_path = note_path
+    def __init__(self, nomadic, server):
+        super(Handler, self).__init__(ignore_directories=False)
+        self.n = nomadic
+        self.server = server
 
     def dispatch(self, event):
         """
@@ -82,7 +28,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         if event.is_directory \
         or manager.valid_note(event.src_path) \
         and (not hasattr(event, 'dest_path') or manager.valid_note(event.dest_path)):
-            super(NomadicDaemon, self).dispatch(event)
+            super(Handler, self).dispatch(event)
 
     def on_modified(self, event):
         """
@@ -90,10 +36,10 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         if not event.is_directory:
             p = event.src_path
-            logger.debug('Modified: {0}'.format(p))
+            log.debug('Modified: {0}'.format(p))
             if os.path.exists(p):
-                self.index.update_note(p)
-                self.builder.compile_note(p)
+                self.n.index.update_note(p)
+                self.n.builder.compile_note(p)
                 self.server.refresh_clients()
 
     def on_created(self, event):
@@ -103,19 +49,19 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        logger.debug('Created: {0}'.format(p))
+        log.debug('Created: {0}'.format(p))
         if not event.is_directory:
-            self.index.add_note(p)
-            self.builder.compile_note(p)
+            self.n.index.add_note(p)
+            self.n.builder.compile_note(p)
         else:
             # Add new notes to the index.
-            self.index.update()
-            self.builder.compile_notebook(p)
+            self.n.index.update()
+            self.n.builder.compile_notebook(p)
 
         # Update this note/notebook's
         # parent directory index.
         dir = os.path.dirname(p)
-        self.builder.index_notebook(dir)
+        self.n.builder.index_notebook(dir)
         self.server.refresh_clients()
 
     def on_deleted(self, event):
@@ -125,19 +71,19 @@ class NomadicDaemon(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        logger.debug('Deleted: {0}'.format(p))
+        log.debug('Deleted: {0}'.format(p))
         if not event.is_directory:
-            self.index.delete_note(p)
-            self.builder.delete_note(p)
+            self.n.index.delete_note(p)
+            self.n.builder.delete_note(p)
         else:
             # Remove deleted notes from the index.
-            self.index.update()
-            self.builder.delete_notebook(p)
+            self.n.index.update()
+            self.n.builder.delete_notebook(p)
 
         # Update this note/notebook's
         # parent directory index.
         dir = os.path.dirname(p)
-        self.builder.index_notebook(dir)
+        self.n.builder.index_notebook(dir)
         self.server.refresh_clients()
 
     def on_moved(self, event):
@@ -148,16 +94,16 @@ class NomadicDaemon(PatternMatchingEventHandler):
         src = event.src_path
         dest = event.dest_path
 
-        logger.debug('Moved: {0} to {1}'.format(src, dest))
+        log.debug('Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:
-            self.index.move_note(src, dest)
-            self.builder.delete_note(src)
-            self.builder.compile_note(dest)
+            self.n.index.move_note(src, dest)
+            self.n.builder.delete_note(src)
+            self.n.builder.compile_note(dest)
         else:
             # Move the notes in the index.
-            self.index.update()
-            self.builder.delete_notebook(src)
-            self.builder.compile_notebook(dest)
+            self.n.index.update()
+            self.n.builder.delete_notebook(src)
+            self.n.builder.compile_notebook(dest)
 
         # Update all references to this
         # path in any .md or .html files.
@@ -166,7 +112,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         # Update the compiled indexes.
         for p in [src, dest]:
             dir = os.path.dirname(p)
-            self.builder.index_notebook(dir)
+            self.n.builder.index_notebook(dir)
         self.server.refresh_clients()
 
     # TO DO:
@@ -183,7 +129,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in manager.walk(self.notes_path):
+        for root, dirnames, filenames in manager.walk(self.n.notes_path):
             for filename in filenames:
                 _, ext = os.path.splitext(filename)
                 path = os.path.join(root, filename)
@@ -208,7 +154,7 @@ class NomadicDaemon(PatternMatchingEventHandler):
 
                         with open(path, 'w') as note:
                             note.write(content.encode('utf-8'))
-                        self.builder.compile_note(path)
+                        self.n.builder.compile_note(path)
 
     def update_reference(self, src_filename, src_abs, dest_abs):
         def wrapper(current_dir):

@@ -6,13 +6,13 @@ Indexes note files.
 """
 
 import os
-import shutil
 from collections import namedtuple
 
 import whoosh.index as index
 from whoosh.fields import *
 
-from nomadic import extractor, manager
+from nomadic.core import manager
+from nomadic.core.indexer import extractor, searcher
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
@@ -89,12 +89,15 @@ class Index():
             [writer.add_document(**note) for note in extractor.process_notes(notes)]
             writer.commit()
 
+    def search(self, query):
+        for result in searcher.search(query, self):
+            yield result
+
     def add_note(self, path):
         with self.ix.writer() as writer:
-            if manager.valid_note(path):
-                n = extractor.note_from_path(path)
-                note = extractor.process_note(n)
-                writer.add_document(**note)
+            n = extractor.note_from_path(path)
+            note = extractor.process_note(n)
+            writer.add_document(**note)
 
     def delete_note(self, path):
         with self.ix.writer() as writer:
@@ -143,7 +146,6 @@ class Index():
             for filename in filenames:
                 path = os.path.join(root, filename)
                 yield extractor.note_from_path(path)
-
 
     def _load_index(self, reset=False):
         index_path = os.path.join(self.notes_path, '.searchindex')

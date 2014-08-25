@@ -1,7 +1,7 @@
 import shutil
 from os.path import exists
 
-from nomadic import manager
+from nomadic.core import manager
 from test import NomadicTest, note_at
 
 

@@ -10,12 +10,10 @@ import shutil
 from collections import namedtuple
 
 from lxml.html import fromstring, tostring
-from markdown import markdown
-from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 from jinja2 import Template, FileSystemLoader, environment
 
-from nomadic import manager
-from nomadic.md import HighlightExtension
+from nomadic.core import manager
+from nomadic.core.builder import compiler
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -24,7 +22,7 @@ path = os.path.abspath(__file__)
 dir = os.path.dirname(path)
 
 env = environment.Environment()
-env.loader = FileSystemLoader(os.path.join(dir, 'templates'))
+env.loader = FileSystemLoader(os.path.join(dir, '../assets/templates'))
 index_templ = env.get_template('notebook.html')
 note_templ = env.get_template('note.html')
 
@@ -112,7 +110,7 @@ class Builder():
             if ext == '.html':
                 raw_html = raw_content
             else:
-                raw_html = markdown(raw_content, extensions=[GFM(), HighlightExtension()])
+                raw_html = compiler.compile_markdown(raw_content)
 
             if raw_html.strip():
                 html = fromstring(raw_html)
