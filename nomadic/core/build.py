@@ -1,9 +1,9 @@
 """
-Builder
+Build
 =======================
 
-Builds note files a local HTML site
-and manages built files.
+Build note files a local HTML site
+and manage built files.
 """
 
 import os
@@ -13,8 +13,8 @@ from collections import namedtuple
 from lxml.html import fromstring, tostring
 from jinja2 import Template, FileSystemLoader, environment
 
-from nomadic.core import manager
-from nomadic.core.builder import compiler
+from nomadic.core import Notebook
+from nomadic.util import md2html
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -60,7 +60,8 @@ class Builder():
         Build a notebook, recursively,
         compiling notes and indexes.
         """
-        for root, dirnames, filenames in manager.walk(path):
+        notebook = Notebook(path)
+        for root, dirnames, filenames in notebook.walk():
             build_root = root.replace(self.notes_path, self.build_path)
 
             dirs = []
@@ -111,7 +112,7 @@ class Builder():
             if ext == '.html':
                 raw_html = raw_content
             else:
-                raw_html = compiler.compile_markdown(raw_content)
+                raw_html = md2html.compile_markdown(raw_content)
 
             if raw_html.strip():
                 html = fromstring(raw_html)
@@ -153,7 +154,8 @@ class Builder():
         """
         build_path = self.build_path_for_path(dir)
 
-        dirs, files_ = manager.filenames(dir)
+        notebook = Notebook(dir)
+        dirs, files_ = notebook.contents
         files = []
 
         for name in files_:

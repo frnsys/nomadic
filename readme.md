@@ -115,7 +115,7 @@ For example:
 
 ```json
 {
-    "notes_path": "~/Notes"
+    "root": "~/Notes"
 }
 ```
 

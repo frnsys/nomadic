@@ -1,8 +1,8 @@
 import shutil
 from os.path import exists
 
-from nomadic.core.builder import converter
-from test import NomadicTest, note_at
+from nomadic.util import html2md
+from test import NomadicTest
 
 from lxml.html import fromstring, tostring
 
@@ -26,9 +26,9 @@ html = '''
     </p>
 '''
 
-class ConverterTest(NomadicTest):
+class html2mdTest(NomadicTest):
     def test_html_to_markdown(self):
-        markdown = converter.html_to_markdown(html)
+        markdown = html2md.html_to_markdown(html)
         expected = u'_** foobar _ lala ** yum **_ hey hey ** uh oh ** yes **_\n\n'
         self.assertEqual(markdown, expected)
 
@@ -58,7 +58,7 @@ class ConverterTest(NomadicTest):
 
         h = fromstring(html)
         for span in h.findall('.//span'):
-            converter.convert_span(span)
+            html2md.convert_span(span)
         result = tostring(h)
 
         results = [x.replace('\n', '').replace(' ', '') for x in [result, expected]]

@@ -1,11 +1,11 @@
 import os
 import shutil
 
-from nomadic.core.indexer import Index
-from test import NomadicTest, note_at
+from nomadic.core.index import Index
+from test import NomadicTest, _path
 
 
-class IndexerTest(NomadicTest):
+class IndexTest(NomadicTest):
     def setUp(self):
         self.index = Index(self.notes_dir)
         self.index.reset()
@@ -20,7 +20,7 @@ class IndexerTest(NomadicTest):
         self.assertEqual(self.index.size, self.expected_notes)
 
     def test_update_index(self):
-        with open(note_at('new note.md'), 'w') as new_note:
+        with open(_path('new note.md'), 'w') as new_note:
             new_note.write('foobar')
 
         self.index.update()
@@ -28,7 +28,7 @@ class IndexerTest(NomadicTest):
         self.assertEqual(self.index.size, self.expected_notes + 1)
 
     def test_add_note(self):
-        path = note_at('new note.md')
+        path = _path('new note.md')
         with open(path, 'w') as new_note:
             new_note.write('foobar')
 
@@ -37,14 +37,14 @@ class IndexerTest(NomadicTest):
         self.assertEqual(self.index.size, self.expected_notes + 1)
 
     def test_delete_note(self):
-        path = note_at('my note.md')
+        path = _path('my note.md')
         self.index.delete_note(path)
         self.assertEqual(self.index.size, self.expected_notes - 1)
 
         self.assertTrue(not self.index.note_at(path))
 
     def test_update_note(self):
-        path = note_at('my note.md')
+        path = _path('my note.md')
         with open(path, 'w') as note:
             note.write(u'changed note content')
 
@@ -55,8 +55,8 @@ class IndexerTest(NomadicTest):
         self.assertEqual(note_['content'], u'changed note content')
 
     def test_move_note(self):
-        src = note_at('my note.md')
-        dest = note_at('my note moved.md')
+        src = _path('my note.md')
+        dest = _path('my note moved.md')
 
         self.assertTrue(self.index.note_at(src))
 
@@ -65,5 +65,10 @@ class IndexerTest(NomadicTest):
 
         self.assertTrue(not self.index.note_at(src))
         self.assertTrue(self.index.note_at(dest))
+
+    def test_search(self):
+        results = [result for result in self.index.search('hullo')]
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0][0]['path'], _path('some_notebook/a cool note.md'))
 
 
