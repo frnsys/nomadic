@@ -34,6 +34,9 @@ def convert_span(span):
     p = span.getparent()
 
     style = span.get('style')
+    if style is None:
+        return
+
     builders = []
     if 'bold' in style:
         builders.append(builder.STRONG)

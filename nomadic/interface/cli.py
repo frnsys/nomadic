@@ -6,7 +6,7 @@ from colorama import Fore, Back, Style
 
 from nomadic import conf
 from nomadic.core import Nomadic
-from nomadic.util import html2md
+from nomadic.util import evernote
 
 nomadic = Nomadic(conf.ROOT)
 
@@ -98,17 +98,8 @@ def convert(notebook, html_path):
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
 
-    basepath, filename = os.path.split(html_path)
-    title, ext = os.path.splitext(filename)
+    evernote.port_evernote(html_path, nb)
 
-    with open(html_path, 'r') as html_file:
-        html = html_file.read()
-
-    markdown = html2md.html_to_markdown(html)
-
-    path = os.path.join(nb.path.abs, title + '.md')
-    with open(path, 'w') as note:
-        note.write(markdown.encode('utf-8'))
 
 
 @cli.command()
