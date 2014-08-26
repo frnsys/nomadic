@@ -8,6 +8,7 @@ changes and responds appropriately.
 
 import os
 import re
+from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
 
@@ -16,7 +17,7 @@ from nomadic.util import valid_note, parsers
 from nomadic.demon.logger import log
 
 # Markdown link regex
-md_link_re = re.compile(r'\[.+\]\(`?([^`\(\)]+)`?\)')
+md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
 
 class Handler(PatternMatchingEventHandler):
     patterns = ['*'] # match everything b/c we want to match directories as well.
@@ -43,7 +44,7 @@ class Handler(PatternMatchingEventHandler):
         """
         if not event.is_directory:
             note = Note(event.src_path)
-            log.debug('Modified: {0}'.format(note.path.rel))
+            log.debug(u'Modified: {0}'.format(note.path.rel))
             if os.path.exists(note.path.abs):
                 self.n.index.update_note(note)
                 self.n.builder.compile_note(note)
@@ -56,7 +57,7 @@ class Handler(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        log.debug('Created: {0}'.format(p))
+        log.debug(u'Created: {0}'.format(p))
         if not event.is_directory:
             note = Note(p)
             self.n.index.add_note(note)
@@ -80,7 +81,7 @@ class Handler(PatternMatchingEventHandler):
         """
         p = event.src_path
 
-        log.debug('Deleted: {0}'.format(p))
+        log.debug(u'Deleted: {0}'.format(p))
         if not event.is_directory:
             note = Note(p)
             self.n.index.delete_note(note)
@@ -105,7 +106,7 @@ class Handler(PatternMatchingEventHandler):
         src = event.src_path
         dest = event.dest_path
 
-        log.debug('Moved: {0} to {1}'.format(src, dest))
+        log.debug(u'Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:
             src_note = Note(src)
             dest_note = Note(dest)
@@ -175,6 +176,7 @@ class Handler(PatternMatchingEventHandler):
         def wrapper(current_dir):
             def update_func(ref):
                 if src_filename not in ref: return ref
+                if quote(src_filename) not in ref: return ref
                 if '://' in ref: return ref
 
                 if os.path.isabs(ref):
