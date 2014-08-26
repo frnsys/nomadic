@@ -6,6 +6,7 @@ from colorama import Fore, Back, Style
 
 from nomadic import conf
 from nomadic.core import Nomadic
+from nomadic.util import html2md
 
 nomadic = Nomadic(conf.ROOT)
 
@@ -103,7 +104,7 @@ def convert(notebook, html_path):
     with open(html_path, 'r') as html_file:
         html = html_file.read()
 
-    markdown = converter.html_to_markdown(html)
+    markdown = html2md.html_to_markdown(html)
 
     # Add in the title.
     markdown = '# {0}\n\n'.format(title) + markdown
