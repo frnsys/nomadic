@@ -25,12 +25,11 @@ notes
 └── some note.md
 ```
 
-Here are some useful tools to go with `nomadic`:
-* [BitTorrent Sync](www.bittorrent.com/sync) to keep notes synced across devices.
+I recommend using `nomadic` with [BitTorrent Sync](www.bittorrent.com/sync) to keep
+notes synced across devices. With this setup, `nomadic` becomes a decentralized,
+simplified alternative to Evernote.
 
-With these tools, `nomadic` becomes a decentralized, simplified alternative to Evernote.
-
-Powerusers of Evernote might find it lacking but it's not for them :)
+Power users of Evernote might find it lacking but it's not for them :)
 
 ---
 
@@ -229,20 +228,6 @@ To run the included tests:
 $ pip install nose
 $ nosetests test
 ```
-
----
-
-## To Do
-I'm still testing this out personally to
-work out the kinks but eventually I want to
-release platform-specific distributions:
-
-* OSX => [Homebrew](https://github.com/Homebrew/homebrew/wiki/Formula-Cookbook)
-* Debian-based distros => `.deb` package
-
-These will handle the setting up of the daemon for you.
-
----
 
 ## Shortcomings (future to dos?)
 * You have to premeditate syncing. That is, with Evernote, you can
