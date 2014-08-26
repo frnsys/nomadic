@@ -1,10 +1,10 @@
 import os
 from urllib import quote
 
-from nomadic.core.builder import Builder
-from test import NomadicTest, note_at, compiled_path
+from nomadic.core.build import Builder
+from test import NomadicTest, _path, compiled_path
 
-class BuilderTest(NomadicTest):
+class BuildTest(NomadicTest):
     def setUp(self):
         self.builder = Builder(self.notes_dir)
 
@@ -16,7 +16,7 @@ class BuilderTest(NomadicTest):
             self.assertTrue(os.path.exists(path))
 
     def test_compile_note(self):
-        self.builder.compile_note(note_at('my note.md'))
+        self.builder.compile_note(_path('my note.md'))
 
         path = compiled_path('my note.html')
         self.assertTrue(os.path.exists(path))
@@ -24,7 +24,7 @@ class BuilderTest(NomadicTest):
     def test_compiled_note_relative_urls_become_absolute(self):
         self.builder.build()
 
-        path = note_at('some_notebook/a cool note.md')
+        path = _path('some_notebook/a cool note.md')
         with open(path, 'r') as note:
             self.assertTrue('a cool note.resources/some_image.png' in note.read())
 
@@ -36,7 +36,7 @@ class BuilderTest(NomadicTest):
     def test_compiled_note_markdown_urls_become_html(self):
         self.builder.build()
 
-        path = note_at('some_notebook/a cool note.md')
+        path = _path('some_notebook/a cool note.md')
         with open(path, 'r') as note:
             self.assertTrue('nested book/empty.md' in note.read())
 
@@ -45,12 +45,12 @@ class BuilderTest(NomadicTest):
             self.assertTrue(quote('nested book/empty.html') in note.read())
 
     def test_compile_note_overwrites(self):
-        path = note_at('my note.md')
+        path = _path('my note.md')
         self.builder.compile_note(path)
 
         path_ = compiled_path('my note.html')
         with open(path_, 'r') as note:
-            self.assertTrue('<h1>HEY HI</h1>\n<p>foo bar qua</p>' in note.read())
+            self.assertTrue('<h1 id="hey-hi">HEY HI</h1>\n<p>foo bar qua</p>' in note.read())
 
         with open(path, 'w') as note:
             note.write(u'changed note content')
@@ -63,7 +63,7 @@ class BuilderTest(NomadicTest):
             self.assertFalse('<h1>HEY HI</h1>\n<p>foo bar qua</p>' in note_content)
 
     def test_delete_compiled_note(self):
-        path = note_at('my note.md')
+        path = _path('my note.md')
         path_ = compiled_path('my note.html')
 
         self.builder.compile_note(path)
@@ -86,12 +86,12 @@ class BuilderTest(NomadicTest):
         with open(path, 'r') as ix:
             self.assertTrue(u'a new note.html' not in ix.read())
 
-        new_path = note_at('some_notebook/a new note.md')
+        new_path = _path('some_notebook/a new note.md')
         with open(new_path, 'w') as new_note:
             new_note.write(u'new note')
         self.builder.compile_note(new_path)
 
-        self.builder.index_notebook(note_at('some_notebook'))
+        self.builder.index_notebook(_path('some_notebook'))
 
         with open(path, 'r') as ix:
             self.assertTrue(u'a new note.html' in ix.read())
@@ -102,6 +102,6 @@ class BuilderTest(NomadicTest):
         path = compiled_path('some_notebook')
         self.assertTrue(os.path.exists(path))
 
-        self.builder.delete_notebook(note_at('some_notebook'))
+        self.builder.delete_notebook(_path('some_notebook'))
 
         self.assertFalse(os.path.exists(path))

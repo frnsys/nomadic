@@ -4,10 +4,10 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
+from nomadic import conf
 from nomadic.core import Nomadic
-from nomadic.interface.conf import config
 
-nomadic = Nomadic(config['notes_path'])
+nomadic = Nomadic(conf.ROOT)
 
 @click.group()
 def cli():

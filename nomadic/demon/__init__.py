@@ -12,7 +12,7 @@ import time
 from watchdog.observers import Observer
 from daemon import DaemonContext
 
-from nomadic.core.demon import server, handler, logger
+from nomadic.demon import server, handler, logger
 
 def start(nomadic, port, debug=False):
     logger.log.debug('nomadic daemon started.')

@@ -9,9 +9,10 @@ refreshing of connected clients.
 from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
-from nomadic.core import manager
-from nomadic.core.builder import converter
-from nomadic.core.demon.logger import log
+from nomadic.util import html2md
+from nomadic.core import Note
+from nomadic.core.note import NoteConflictError
+from nomadic.demon.logger import log
 
 import os
 import shutil
@@ -103,7 +104,7 @@ class Server():
         def new():
             # A unique default title to save without conflicts.
             default_title = datetime.utcnow()
-            return render_template('editor.html', notebooks=self.n.manager.notebooks, title=default_title)
+            return render_template('editor.html', notebooks=self.n.rootbook.notebooks, title=default_title)
 
         @self.app.route('/upload', methods=['POST'])
         def upload():
@@ -166,38 +167,30 @@ class Server():
             else:
                 ext = '.html'
 
-            title = data['title']
-            notebook = data['notebook']
-            path = os.path.join(notebook, title + ext) 
+            path = os.path.join(data['notebook'], data['title'] + ext) 
+            path_new = os.path.join(data['new[notebook]'], data['new[title]'] + ext)
 
-            title_new = data['new[title]']
-            notebook_new = data['new[notebook]']
-            path_new = os.path.join(notebook_new, title_new + ext)
+            note = Note(path)
 
             # If the title or notebook has changed,
             # move the note by updating its path.
             if path != path_new:
-
-                # Check if the new path exists already.
-                # We don't want to overwrite existing notes.
-                if os.path.exists(path_new):
+                try:
+                    note.move(path_new)
+                except NoteConflictError:
                     # 409 = Conflict
                     self.app.log.debug('Note at {0} already exists.'.format(path_new))
                     return 'Note already exists', 409
 
-                self.n.manager.move_note(path, path_new)
-                path = path_new
-
-            resources = self.n.manager.note_resources(path)
             html_ = fromstring(html)
-            html_.rewrite_links(self._rewrite_link(resources))
+            html_.rewrite_links(self._rewrite_link(note.resources))
             html = tostring(html_)
 
             if save_as_markdown:
-                content = converter.html_to_markdown(html)
+                content = html2md.html_to_markdown(html)
 
-            self.n.manager.save_note(path, content)
-            self.n.manager.clean_note_resources(path)
+            note.save(content)
+            note.clean_resources()
 
             # Update all connected clients.
             self.refresh_clients()

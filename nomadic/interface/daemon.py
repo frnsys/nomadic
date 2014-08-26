@@ -1,7 +1,7 @@
 import click
 
-from nomadic.core import Nomadic, demon
-from nomadic.interface.conf import config
+from nomadic.core import Nomadic
+from nomadic import demon, conf
 
 @click.command()
 @click.option('--debug', is_flag=True, help='Run in the foreground for debugging.')
@@ -9,7 +9,7 @@ def daemon(debug):
     """
     Launch the Nomadic daemon.
     """
-    nomadic = Nomadic(config['notes_path'])
+    nomadic = Nomadic(conf.ROOT)
 
     # Update the index.
     nomadic.index.update()
@@ -18,4 +18,4 @@ def daemon(debug):
     nomadic.builder.build()
 
     # Start the daemon.
-    demon.start(nomadic, config['port'], debug=debug)
+    demon.start(nomadic, conf.PORT, debug=debug)
