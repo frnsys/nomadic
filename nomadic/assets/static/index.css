@@ -396,6 +396,18 @@ mark {
     max-width: 800px;
     margin: 0 auto;
 }
+.notes li {
+    margin: 2em 0;
+}
+.notes span {
+    font-size: 1.2em;
+}
+.notes p {
+    margin-top: 0;
+    color: #aaa;
+    font-style: italic;
+    font-size: 0.9em;
+}
 .notebooks {
   background: #f6f6f6;
 }

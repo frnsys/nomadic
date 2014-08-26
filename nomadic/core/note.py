@@ -43,6 +43,13 @@ class Note():
 
         return text
 
+    @property
+    def excerpt(self):
+        char_limit = 400
+        excerpt = self.plaintext
+        if len(excerpt) > char_limit:
+            excerpt = excerpt[:char_limit-3] + '...'
+        return excerpt
 
     @property
     def last_modified(self):

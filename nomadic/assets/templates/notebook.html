@@ -14,7 +14,12 @@
 
     <ul class="notes">
         {% for file in files %}
-            <li><a href="./{{ file.filename }}">{{ file.title }}</a></li>
+            <li>
+                <a href="./{{ file.filename }}">
+                    <span>{{ file.title }}</span>
+                    <p>{{ file.excerpt }}</p>
+                </a>
+            </li>
         {% endfor %}
     </ul>
 {% endblock %}
