@@ -386,6 +386,10 @@ pre code, pre tt {
   border: none;
 }
 
+mark {
+    background: #FFFF88;
+}
+
 
 .note, .notes {
     padding: 2em;
