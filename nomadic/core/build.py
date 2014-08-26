@@ -10,11 +10,11 @@ import os
 import shutil
 from collections import namedtuple
 
-from lxml.html import fromstring, tostring
 from jinja2 import Template, FileSystemLoader, environment
 
-from nomadic.core import Notebook
-from nomadic.util import md2html
+from nomadic.core import Notebook, Note
+from nomadic.util import md2html, parsers
+
 
 File = namedtuple('File', ['title', 'filename'])
 
@@ -24,22 +24,21 @@ dir = os.path.dirname(path)
 
 env = environment.Environment()
 env.loader = FileSystemLoader(os.path.join(dir, '../assets/templates'))
-index_templ = env.get_template('notebook.html')
+notebook_templ = env.get_template('notebook.html')
 note_templ = env.get_template('note.html')
+
 
 class Builder():
     def __init__(self, notes_path):
         # The last '' is to ensure a trailing slash.
         self.notes_path = os.path.join(notes_path, '')
         self.build_path = os.path.join(notes_path, u'.build', '')
-
         self._prepare_build_dir()
 
 
     def _prepare_build_dir(self, reset=False):
         """
-        Prepare the build directory,
-        creating it if necessary.
+        Prepare the build directory, creating it if necessary.
         """
         if reset and os.path.exists(self.build_path):
             shutil.rmtree(self.build_path)
@@ -47,27 +46,28 @@ class Builder():
         if not os.path.exists(self.build_path):
             os.makedirs(self.build_path)
 
+
     def build(self):
         """
         Compile all notes into a
         browsable HTML structure.
         """
+        rootbook = Notebook(self.notes_path)
         self._prepare_build_dir(reset=True)
-        self.compile_notebook(self.notes_path)
+        self.compile_notebook(rootbook)
 
-    def compile_notebook(self, path):
+
+    def compile_notebook(self, notebook):
         """
         Build a notebook, recursively,
         compiling notes and indexes.
         """
-        notebook = Notebook(path)
         for root, dirnames, filenames in notebook.walk():
             build_root = root.replace(self.notes_path, self.build_path)
 
             dirs = []
             files = []
 
-            # Process valid sub-directories.
             for dirname in dirnames:
                 build_path = os.path.join(build_root, dirname)
 
@@ -77,14 +77,14 @@ class Builder():
 
                 dirs.append(dirname.decode('utf-8'))
 
-            # Process notes.
             for filename in filenames:
                 title, ext = os.path.splitext(filename)
                 compiled_filename = title + '.html'
                 if ext in ['.html', '.md']:
                     path = os.path.join(root, filename)
+                    note = Note(path)
 
-                    self.compile_note(path)
+                    self.compile_note(note)
 
                     file = File(title, compiled_filename)
                     files.append(file)
@@ -92,7 +92,8 @@ class Builder():
             # Write the index file for this node.
             self._write_index(build_root, dirs, files)
 
-    def compile_note(self, path):
+
+    def compile_note(self, note):
         """
         Compile a single Markdown or
         HTML note to the build tree.
@@ -100,61 +101,57 @@ class Builder():
         This will overwrite the
         existing note, if any.
         """
-        build_path, ext = self.build_path_for_note_path(path)
+
+        build_path = self.to_build_path(note.path.abs)
         crumbs = self._build_breadcrumbs(build_path)
 
         # Process all relative paths to
         # point to the raw note directories,
         # so we don't have to copy resources over.
-        with open(path, 'rb') as note:
-            content = ''
-            raw_content = note.read().decode('utf-8')
-            if ext == '.html':
-                raw_html = raw_content
-            else:
-                raw_html = md2html.compile_markdown(raw_content)
+        content = ''
+        raw_content = note.content
+        if note.ext == '.html':
+            raw_html = raw_content
+        else:
+            raw_html = md2html.compile_markdown(raw_content)
 
-            if raw_html.strip():
-                html = fromstring(raw_html)
+        if raw_html.strip():
+            raw_html = parsers.rewrite_links(raw_html, self._rewrite_link(note.path.abs, build_path))
+            content = note_templ.render(html=raw_html, crumbs=crumbs)
 
-                html.rewrite_links(self._rewrite_link(path, build_path))
-                raw_html = tostring(html)
-                content = note_templ.render(html=raw_html, crumbs=crumbs)
-
-            # Write the compiled note.
-            with open(build_path, 'w') as build_note:
-                build_note.write(content.encode('utf-8'))
+        # Write the compiled note.
+        with open(build_path, 'w') as build_note:
+            build_note.write(content.encode('utf-8'))
 
 
-    def delete_note(self, path):
+    def delete_note(self, note):
         """
-        Deletes a compiled note
-        from the build tree.
+        Deletes a compiled note from the build tree.
         """
-        build_path, _ = self.build_path_for_note_path(path)
+        build_path = self.to_build_path(note.path.abs)
 
         if os.path.exists(build_path):
             os.remove(build_path)
 
-    def delete_notebook(self, path):
+
+    def delete_notebook(self, notebook):
         """
-        Deletes a compiled notebook
-        from the build tree.
+        Deletes a compiled notebook from the build tree.
         """
-        build_path = self.build_path_for_path(path)
+        build_path = self.to_build_path(notebook.path.abs)
 
         if os.path.exists(build_path):
             shutil.rmtree(build_path)
 
-    def index_notebook(self, dir):
+
+    def index_notebook(self, notebook):
         """
         Compiles an index for a given directory.
         This does not compile the notes in the directory,
         nor is it recursive.
         """
-        build_path = self.build_path_for_path(dir)
+        build_path = self.to_build_path(notebook.path.abs)
 
-        notebook = Notebook(dir)
         dirs, files_ = notebook.contents
         files = []
 
@@ -169,29 +166,19 @@ class Builder():
         self._write_index(build_path, dirs, files)
 
 
-    def build_path_for_note_path(self, path):
+    def to_build_path(self, path):
         """
-        Returns a compiled note path for a given
-        regular note path.
-
-        Also returns the original extension.
-
-        Notes are compiled to html so
-        the extension will be `.html`.
-        """
-        build_path = self.build_path_for_path(path)
-        base, ext = os.path.splitext(build_path)
-        return base + '.html', ext
-
-    def build_path_for_path(self, path):
-        """
-        Returns a build path
-        for a given path.
+        Returns a build path for a given path.
         """
         if '.build' not in path:
+            if path.endswith('.md'):
+                base, _ = os.path.splitext(path)
+                path = base + '.html'
+
             path = self.normalize_path(path)
             path = path.replace(self.notes_path, self.build_path)
         return path
+
 
     def normalize_path(self, path):
         """
@@ -206,6 +193,7 @@ class Builder():
             path = os.path.join(path, '')
         return path
 
+
     def _write_index(self, path, dirs, files):
         """
         Write an `index.html` file
@@ -213,13 +201,14 @@ class Builder():
         listing the specified dirs and files.
         """
         crumbs = self._build_breadcrumbs(path)
-        rendered = index_templ.render(dirs=dirs, files=files, crumbs=crumbs)
+        rendered = notebook_templ.render(dirs=dirs, files=files, crumbs=crumbs)
 
         if not os.path.exists(path):
             os.makedirs(path)
 
         with open( os.path.join(path, 'index.html'), 'w' ) as index:
             index.write(rendered.encode('utf-8'))
+
 
     def _build_breadcrumbs(self, path):
         # Get rid of the build path.
@@ -236,6 +225,7 @@ class Builder():
         crumbs[-1], _ = os.path.splitext(crumbs[-1])
 
         return crumbs
+
 
     def _rewrite_link(self, path, build_path):
         # Build the relative base path for the note's references.

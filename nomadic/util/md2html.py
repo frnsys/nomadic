@@ -1,6 +1,7 @@
 import markdown
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
+
 def compile_markdown(md):
     """
     Compiles markdown to html.

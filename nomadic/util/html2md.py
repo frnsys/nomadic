@@ -1,7 +1,10 @@
 import html2text
 from lxml.html import builder, fromstring, tostring
 
+
 to_md = html2text.HTML2Text().handle
+
+
 def html_to_markdown(html):
     """
     Convert HTML to Markdown.
@@ -17,6 +20,7 @@ def html_to_markdown(html):
     html = tostring(h)
 
     return to_md(html)
+
 
 def convert_span(span):
     """

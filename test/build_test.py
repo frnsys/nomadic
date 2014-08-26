@@ -1,7 +1,7 @@
 import os
 from urllib import quote
 
-from nomadic.core.build import Builder
+from nomadic.core import Notebook, Note, Builder
 from test import NomadicTest, _path, compiled_path
 
 class BuildTest(NomadicTest):
@@ -16,7 +16,8 @@ class BuildTest(NomadicTest):
             self.assertTrue(os.path.exists(path))
 
     def test_compile_note(self):
-        self.builder.compile_note(_path('my note.md'))
+        note = Note(_path('my note.md'))
+        self.builder.compile_note(note)
 
         path = compiled_path('my note.html')
         self.assertTrue(os.path.exists(path))
@@ -45,31 +46,30 @@ class BuildTest(NomadicTest):
             self.assertTrue(quote('nested book/empty.html') in note.read())
 
     def test_compile_note_overwrites(self):
-        path = _path('my note.md')
-        self.builder.compile_note(path)
+        note = Note(_path('my note.md'))
+        self.builder.compile_note(note)
 
         path_ = compiled_path('my note.html')
-        with open(path_, 'r') as note:
-            self.assertTrue('<h1 id="hey-hi">HEY HI</h1>\n<p>foo bar qua</p>' in note.read())
+        with open(path_, 'r') as n:
+            self.assertTrue('<h1 id="hey-hi">HEY HI</h1>\n<p>foo bar qua</p>' in n.read())
 
-        with open(path, 'w') as note:
-            note.write(u'changed note content')
+        note.write(u'changed note content')
 
-        self.builder.compile_note(path)
+        self.builder.compile_note(note)
 
-        with open(path_, 'r') as note:
-            note_content = note.read()
+        with open(path_, 'r') as n:
+            note_content = n.read()
             self.assertTrue('<p>changed note content</p>' in note_content)
             self.assertFalse('<h1>HEY HI</h1>\n<p>foo bar qua</p>' in note_content)
 
     def test_delete_compiled_note(self):
-        path = _path('my note.md')
+        note = Note(_path('my note.md'))
         path_ = compiled_path('my note.html')
 
-        self.builder.compile_note(path)
+        self.builder.compile_note(note)
         self.assertTrue(os.path.exists(path_))
 
-        self.builder.delete_note(path)
+        self.builder.delete_note(note)
         self.assertFalse(os.path.exists(path_))
 
     def test_compiled_index(self):
@@ -86,12 +86,12 @@ class BuildTest(NomadicTest):
         with open(path, 'r') as ix:
             self.assertTrue(u'a new note.html' not in ix.read())
 
-        new_path = _path('some_notebook/a new note.md')
-        with open(new_path, 'w') as new_note:
-            new_note.write(u'new note')
-        self.builder.compile_note(new_path)
+        new_note = Note(_path('some_notebook/a new note.md'))
+        new_note.write(u'new note')
+        self.builder.compile_note(new_note)
 
-        self.builder.index_notebook(_path('some_notebook'))
+        notebook = Notebook(_path('some_notebook'))
+        self.builder.index_notebook(notebook)
 
         with open(path, 'r') as ix:
             self.assertTrue(u'a new note.html' in ix.read())
@@ -102,6 +102,7 @@ class BuildTest(NomadicTest):
         path = compiled_path('some_notebook')
         self.assertTrue(os.path.exists(path))
 
-        self.builder.delete_notebook(_path('some_notebook'))
+        notebook = Notebook(_path('some_notebook'))
+        self.builder.delete_notebook(notebook)
 
         self.assertFalse(os.path.exists(path))

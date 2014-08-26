@@ -12,12 +12,15 @@ import whoosh.index as index
 from whoosh.fields import *
 from whoosh.qparser import QueryParser
 
-from nomadic.core import Notebook, Note
+from nomadic.core import Notebook
+from nomadic.util import parsers
+
 
 schema = Schema(title=TEXT(stored=True),
         path=ID(stored=True, unique=True),
         last_mod=STORED,
         content=TEXT(stored=True))
+
 
 class Index():
     def __init__(self, notes_path):
@@ -25,9 +28,11 @@ class Index():
         self.rootbook = Notebook(self.notes_path)
         self._prepare_index()
 
+
     @property
     def size(self):
         return self.ix.doc_count()
+
 
     def reset(self):
         """
@@ -40,6 +45,7 @@ class Index():
 
         # Process all the notes.
         self.add_notes(notes)
+
 
     def update(self):
         """
@@ -80,11 +86,12 @@ class Index():
 
             self.add_notes(notes)
 
+
     def search(self, query, html=False):
         """
         Yield search results for a query.
         """
-        parser = HighlightParser()
+        parser = parsers.HighlightParser()
         with self.ix.searcher() as searcher:
             query = QueryParser('content', self.ix.schema).parse(query)
             results = searcher.search(query, limit=None)
@@ -96,6 +103,7 @@ class Index():
                     parser.feed(highlights)
                     highlights = parser.get_data()
                 yield result, highlights
+
 
     def add_notes(self, notes):
         with self.ix.writer() as writer:
@@ -109,9 +117,9 @@ class Index():
                         content  = note.plaintext
                     )
 
-    def add_note(self, path):
+
+    def add_note(self, note):
         with self.ix.writer() as writer:
-            note = Note(path)
             writer.add_document(
                 title    = note.title,
                 path     = note.path.abs,
@@ -119,68 +127,32 @@ class Index():
                 content  = note.plaintext
             )
 
-    def delete_note(self, path):
+
+    def delete_note(self, note):
         with self.ix.writer() as writer:
-            writer.delete_by_term('path', path)
+            writer.delete_by_term('path', note.path.abs)
 
-    def update_note(self, path):
-        self.delete_note(path)
-        self.add_note(path)
 
-    def move_note(self, src_path, dest_path):
-        self.delete_note(src_path)
-        self.add_note(dest_path)
+    def update_note(self, note):
+        self.delete_note(note)
+        self.add_note(note)
+
 
     def note_at(self, path):
         """
-        Convenience method for
-        fetching a note by path
-        from the index.
+        Fetching a note by path from the index.
         """
         searcher = self.ix.searcher()
         return searcher.document(path=path)
 
+
     def _prepare_index(self, reset=False):
-        index_path = os.path.join(self.notes_path, '.searchindex')
+        ix_path = os.path.join(self.notes_path, '.searchindex')
 
         # Load or create the index.
-        if not os.path.exists(index_path):
-            os.makedirs(index_path)
-        if not index.exists_in(index_path) or reset:
-            self.ix = index.create_in(index_path, schema)
+        if not os.path.exists(ix_path):
+            os.makedirs(ix_path)
+        if not index.exists_in(ix_path) or reset:
+            self.ix = index.create_in(ix_path, schema)
         else:
-            self.ix = index.open_dir(index_path)
-
-
-
-
-from HTMLParser import HTMLParser
-from colorama import Fore
-
-class HighlightParser(HTMLParser):
-    """
-    The Whoosh highlight returns highlighted
-    search words in HTML::
-
-        <b class="match term0">keyword</b>
-        <b class="match term1">keyword_two</b>
-
-    This parser converts that markup into terminal
-    color sequences so they are highlighted in the terminal.
-    """
-    def __init__(self):
-        self.reset()
-        self.fed = []
-        self.highlight_encountered = False
-    def handle_starttag(self, tag, attrs):
-        cls = [a for a in attrs if a[0] == 'class'][0][1]
-        if tag == 'b' and 'match' in cls:
-            self.highlight_encountered = True
-    def handle_endtag(self, tag):
-        self.highlight_encountered = False
-    def handle_data(self, d):
-        if self.highlight_encountered:
-            d = Fore.RED + d + Fore.RESET
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
+            self.ix = index.open_dir(ix_path)

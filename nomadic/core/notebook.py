@@ -4,9 +4,12 @@ from nomadic.core.path import Path
 from nomadic.core.note import Note
 from nomadic.util import valid_notebook, valid_note
 
+
 class Notebook():
     def __init__(self, path):
         self.path = Path(path)
+        self.name = os.path.basename(path)
+
 
     @property
     def notebooks(self):
@@ -15,6 +18,7 @@ class Notebook():
                 path = os.path.join(root, dir)
                 yield Notebook(path)
 
+
     @property
     def notes(self):
         for root, dirs, files in self.walk():
@@ -22,17 +26,6 @@ class Notebook():
                 path = os.path.join(root, file)
                 yield Note(path)
 
-    def walk(self):
-        """
-        Walks the notebook, yielding only
-        valid directories and files.
-        """
-
-        for root, dirs, files in os.walk(self.path.abs):
-            if valid_notebook(root):
-                dirs = [d for d in dirs if valid_notebook(d)]
-                files = [f for f in files if valid_note(f)]
-                yield root, dirs, files
 
     @property
     def contents(self):
@@ -53,4 +46,14 @@ class Notebook():
         return dirs, files
 
 
+    def walk(self):
+        """
+        Walks the notebook, yielding only
+        valid directories and files.
+        """
 
+        for root, dirs, files in os.walk(self.path.abs):
+            if valid_notebook(root):
+                dirs = [d for d in dirs if valid_notebook(d)]
+                files = [f for f in files if valid_note(f)]
+                yield root, dirs, files

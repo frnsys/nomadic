@@ -1,16 +1,10 @@
-"""
-Extractor
-=======================
-
-Extracts data from note files.
-"""
-
 from StringIO import StringIO
 
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
+
 
 def pdf_text(pdf_file):
     rsrcmgr = PDFResourceManager(caching=True)

@@ -1,7 +1,7 @@
 import os
 import shutil
 
-from nomadic.core.index import Index
+from nomadic.core import Note, Index
 from test import NomadicTest, _path
 
 
@@ -28,43 +28,29 @@ class IndexTest(NomadicTest):
         self.assertEqual(self.index.size, self.expected_notes + 1)
 
     def test_add_note(self):
-        path = _path('new note.md')
-        with open(path, 'w') as new_note:
-            new_note.write('foobar')
+        note = Note(_path('new note.md'))
+        note.write('foobar')
 
-        self.index.add_note(path)
+        self.index.add_note(note)
 
         self.assertEqual(self.index.size, self.expected_notes + 1)
 
     def test_delete_note(self):
-        path = _path('my note.md')
-        self.index.delete_note(path)
+        note = Note(_path('my note.md'))
+        self.index.delete_note(note)
         self.assertEqual(self.index.size, self.expected_notes - 1)
 
-        self.assertTrue(not self.index.note_at(path))
+        self.assertTrue(not self.index.note_at(note.path.abs))
 
     def test_update_note(self):
-        path = _path('my note.md')
-        with open(path, 'w') as note:
-            note.write(u'changed note content')
+        note = Note(_path('my note.md'))
+        note.write(u'changed note content')
 
-        self.index.update_note(path)
+        self.index.update_note(note)
 
-        note_ = self.index.note_at(path)
+        note_ = self.index.note_at(note.path.abs)
         self.assertTrue(note_)
         self.assertEqual(note_['content'], u'changed note content')
-
-    def test_move_note(self):
-        src = _path('my note.md')
-        dest = _path('my note moved.md')
-
-        self.assertTrue(self.index.note_at(src))
-
-        shutil.move(src, dest)
-        self.index.move_note(src, dest)
-
-        self.assertTrue(not self.index.note_at(src))
-        self.assertTrue(self.index.note_at(dest))
 
     def test_search(self):
         results = [result for result in self.index.search('hullo')]

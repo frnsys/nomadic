@@ -1,3 +1,4 @@
+
 def valid_notebook(path):
     """
     We want to ignore the build and searchindex
@@ -8,6 +9,7 @@ def valid_notebook(path):
     if '_resources' in path: return False
     if '.SyncArchive' in path: return False
     return True
+
 
 def valid_note(path):
     """

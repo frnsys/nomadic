@@ -1,6 +1,7 @@
 import os
 import json
 
+
 # Defaults
 config = {
     'root': '~/nomadic',

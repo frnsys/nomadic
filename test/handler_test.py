@@ -193,7 +193,7 @@ class HandlerTest(NomadicTest):
 
         rel_link = 'some_notebook/a cool note.md'
         rel_link_ = quote('some_notebook/a cool note.html')
-        rel_link_new = 'moved cool note.md'
+        rel_link_new = quote('moved cool note.md')
         rel_link_new_ = quote('moved cool note.html')
 
         with open(path, 'r') as note:
@@ -207,11 +207,11 @@ class HandlerTest(NomadicTest):
 
         self.handler.update_references(ref, ref_new)
 
-        with open(path, 'r') as note:
-            note_content = note.read()
-            self.assertFalse(rel_link in note_content)
-            self.assertTrue(rel_link_new in note_content)
         with open(path_, 'r') as note:
             note_content = note.read()
             self.assertFalse(rel_link_ in note_content)
             self.assertTrue(rel_link_new_ in note_content)
+        with open(path, 'r') as note:
+            note_content = note.read()
+            self.assertFalse(rel_link in note_content)
+            self.assertTrue(rel_link_new in note_content)

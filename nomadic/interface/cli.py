@@ -28,8 +28,8 @@ def search(query):
         note_map[idx] = path
 
         # Show all the results.
-        header = ('\n'+'['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
-        echo(Back.BLACK + header + Fore.YELLOW + path + Back.RESET + Fore.RESET)
+        header = ('['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
+        echo('\n' + header + Back.BLUE + Fore.WHITE + path + Back.RESET + Fore.RESET)
         echo(highlights)
         echo('\n---')
 
@@ -52,9 +52,9 @@ def browse(notebook):
     Browse through notes
     via a web browser.
     """
-    notebook_path = select_notebook(notebook)
+    nb = select_notebook(notebook)
 
-    path = nomadic.builder.build_path_for_path(notebook_path)
+    path = nomadic.builder.to_build_path(nb.path.abs)
     click.launch(os.path.join(path, 'index.html'))
 
 
@@ -82,7 +82,7 @@ def count():
     """
     Get the number of notes.
     """
-    echo('You have ' + Fore.RED + str(nomadic.index.size) + Fore.RESET + ' notes.')
+    echo('You have ' + Fore.GREEN + str(nomadic.index.size) + Fore.RESET + ' notes.')
 
 @cli.command()
 @click.argument('html_path', type=click.Path())
@@ -92,8 +92,8 @@ def convert(notebook, html_path):
     Convert an HTML note into a Markdown
     note and save it.
     """
-    notebook_path = select_notebook(notebook)
-    if notebook_path is None:
+    nb = select_notebook(notebook)
+    if nb is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
 
@@ -108,7 +108,7 @@ def convert(notebook, html_path):
     # Add in the title.
     markdown = '# {0}\n\n'.format(title) + markdown
 
-    path = os.path.join(notebook_path, title + '.md')
+    path = os.path.join(nb.path.abs, title + '.md')
     with open(path, 'w') as note:
         note.write(markdown.encode('utf-8'))
 
@@ -121,8 +121,8 @@ def new(notebook, note, rich):
     """
     Create a new note.
     """
-    notebook_path = select_notebook(notebook)
-    if notebook_path is None:
+    nb = select_notebook(notebook)
+    if nb is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
 
@@ -131,32 +131,32 @@ def new(notebook, note, rich):
         _, ext = os.path.splitext(note)
         if not ext: note += '.md'
 
-        path = os.path.join(notebook_path, note)
+        path = os.path.join(nb.path.abs, note)
         click.edit(filename=path)
     else:
         # Launch the daemon server's rich editor.
         click.launch('http://localhost:{0}/new'.format(nomadic.port))
 
 
-def select_notebook(notebook):
-    if not notebook:
-        notebook_dir = nomadic.notes_path
+def select_notebook(name):
+    if not name:
+        notebook = nomadic.rootbook
 
     else:
-        dirs = [nb.path for nb in nomadic.index.notebooks if notebook in nb.name]
+        notebooks = [nb for nb in nomadic.rootbook.notebooks if name in nb.name]
 
-        if len(dirs) == 1:
-            notebook_dir = dirs[0]
+        if len(notebooks) == 1:
+            notebook = notebooks[0]
 
-        elif len(dirs) > 1:
+        elif len(notebooks) > 1:
             echo('\nFound multiple matching notebooks:\n')
-            for idx, dir in enumerate(dirs):
-                header = ('\n'+'['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
-                echo(Back.BLACK + header + Fore.YELLOW + path + Back.RESET + Fore.RESET)
+            for idx, notebook in enumerate(notebooks):
+                header = ('['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
+                echo('\n' + header + Back.BLUE + Fore.WHITE + notebook.path.rel + Back.RESET + Fore.RESET)
             idx = click.prompt('Select a notebook', type=int)
-            notebook_dir = dirs[idx]
+            notebook = notebooks[idx]
 
         else:
             echo('\nNo matching notebooks found.\n')
             return
-    return notebook_dir
+    return notebook

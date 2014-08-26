@@ -9,7 +9,7 @@ refreshing of connected clients.
 from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
-from nomadic.util import html2md
+from nomadic.util import html2md, parsers
 from nomadic.core import Note
 from nomadic.core.note import NoteConflictError
 from nomadic.demon.logger import log
@@ -19,8 +19,6 @@ import shutil
 import urllib
 from datetime import datetime
 import sys, logging
-
-from lxml.html import fromstring, tostring
 
 class Server():
     def __init__(self, nomadic, port):
@@ -33,7 +31,7 @@ class Server():
                 template_folder='../assets/templates')
 
         self.socketio = SocketIO(self.app)
-        self.build_routes()
+        self._build_routes()
 
         # To log errors to stdout.
         # Can't really use Flask's debug w/ the websocket lib,
@@ -42,7 +40,7 @@ class Server():
         self.app.logger.addHandler(sh)
 
     def start(self):
-        log.debug('Starting the nomadic server...')
+        log.debug('starting the nomadic server...')
         self.socketio.run(self.app, port=self.port)
 
     def refresh_clients(self):
@@ -50,48 +48,43 @@ class Server():
 
     def _rewrite_link(self, resources_path):
         """
-        Creates a link rewriting func
-        for a particular resource path.
+        Creates a link rewriting func for a particular resource path.
         """
         def rewriter(link):
             """
-            This downloads externally-hosted images
-            to a note's local resources folder and
-            rewrites the referencing links to point
-            to the local files.
+            This downloads externally-hosted images to a note's local resources folder and
+            rewrites the referencing links to point to the local files.
             """
-            # If the link is an external image...
             if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
                 if not os.path.exists(resources_path):
                     os.makedirs(resources_path)
 
-                # Extract the extension,
-                # and create a filename.
                 ext = link.split('/')[-1].split('.')[-1]
                 filename = str(hash(link)) + '.' + ext
 
                 save_path = os.path.join(resources_path, filename)
 
-                # Download the file if it doesn't exist.
                 if not os.path.exists(save_path):
                     filename, _ = urllib.urlretrieve(link, save_path)
 
-                # Return as a relative filepath.
+                # Return relative path.
                 return save_path.replace(self.n.notes_path, '')
             return link
         return rewriter
 
-    def build_routes(self):
+    def _build_routes(self):
         @self.app.route('/<path:note_path>')
-        def note(note_path):
-            note_path = os.path.join(self.n.notes_path, note_path)
+        def note(path):
+            note = Note(path)
 
             # Convert to build path if appropriate.
-            if note_path.endswith(('.md', '.html')):
+            if note.ext in ['.md', '.html']:
                 note_path, _ = self.n.builder.build_path_for_note_path(note_path)
+                with open(note_path, 'r') as note:
+                    content = note.read()
+            else:
+                content = note.content
 
-            with open(note_path, 'r') as note:
-                content = note.read()
             return content
 
         @self.app.route('/search', methods=['POST'])
@@ -148,33 +141,27 @@ class Server():
             """
             log.debug('User connected.')
 
-    def delete(self, data):
-        title = data['title']
-        notebook = data['notebook']
+    def _process_form(self, form):
+        ext = '.md' if form['save_as_markdown'] else '.html'
+        path = os.path.join(form['notebook'], form['title'] + ext) 
+        return Note(path)
 
-        for ext in ['.md', '.html']:
-            path = os.path.join(notebook, title + ext)
-            self.n.manager.delete_note(path)
+    def delete(self, form):
+        note = self._process_form(form)
+        note.delete()
         return 'Success', 200
 
-    def save(self, data):
-        html = data['html']
+    def save(self, form):
+        html = form['html']
 
         if html:
-            save_as_markdown = data['save_as_markdown']
-            if save_as_markdown:
-                ext = '.md'
-            else:
-                ext = '.html'
+            note = self._process_form(form)
+            path_new = os.path.join(form['new[notebook]'], form['new[title]'] + note.ext)
 
-            path = os.path.join(data['notebook'], data['title'] + ext) 
-            path_new = os.path.join(data['new[notebook]'], data['new[title]'] + ext)
-
-            note = Note(path)
 
             # If the title or notebook has changed,
             # move the note by updating its path.
-            if path != path_new:
+            if note.path.abs != path_new:
                 try:
                     note.move(path_new)
                 except NoteConflictError:
@@ -182,14 +169,12 @@ class Server():
                     self.app.log.debug('Note at {0} already exists.'.format(path_new))
                     return 'Note already exists', 409
 
-            html_ = fromstring(html)
-            html_.rewrite_links(self._rewrite_link(note.resources))
-            html = tostring(html_)
+            html = parsers.rewrite_links(html, self._rewrite_link(note.resources))
 
-            if save_as_markdown:
+            if note.ext == '.md':
                 content = html2md.html_to_markdown(html)
 
-            note.save(content)
+            note.write(content)
             note.clean_resources()
 
             # Update all connected clients.
