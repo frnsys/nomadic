@@ -117,7 +117,7 @@ class Builder():
 
         if raw_html.strip():
             raw_html = parsers.rewrite_links(raw_html, self._rewrite_link(note.path.abs, build_path))
-            content = note_templ.render(html=raw_html, crumbs=crumbs)
+            content = note_templ.render(note=note, html=raw_html, crumbs=crumbs)
 
         # Write the compiled note.
         with open(build_path, 'w') as build_note:

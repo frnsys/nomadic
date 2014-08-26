@@ -106,9 +106,6 @@ def convert(notebook, html_path):
 
     markdown = html2md.html_to_markdown(html)
 
-    # Add in the title.
-    markdown = '# {0}\n\n'.format(title) + markdown
-
     path = os.path.join(nb.path.abs, title + '.md')
     with open(path, 'w') as note:
         note.write(markdown.encode('utf-8'))
