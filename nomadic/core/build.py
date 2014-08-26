@@ -16,7 +16,7 @@ from nomadic.core import Notebook, Note
 from nomadic.util import md2html, parsers
 
 
-File = namedtuple('File', ['title', 'filename'])
+File = namedtuple('File', ['title', 'filename', 'source'])
 
 # Load templates.
 path = os.path.abspath(__file__)
@@ -86,7 +86,7 @@ class Builder():
 
                     self.compile_note(note)
 
-                    file = File(title, compiled_filename)
+                    file = File(title, compiled_filename, path)
                     files.append(file)
 
             # Write the index file for this node.
@@ -159,7 +159,7 @@ class Builder():
             title, ext = os.path.splitext(name)
             if ext in ['.html', '.md']:
                 compiled_filename = title + '.html'
-                file = File(title, compiled_filename)
+                file = File(title, compiled_filename, os.path.join(notebook.path.abs, name))
                 files.append(file)
 
         # Write the index file for this node.
@@ -201,7 +201,11 @@ class Builder():
         listing the specified dirs and files.
         """
         crumbs = self._build_breadcrumbs(path)
-        rendered = notebook_templ.render(dirs=dirs, files=files, crumbs=crumbs)
+
+        # Most recent come first.
+        sorted_files = sorted(files, key=lambda x: os.path.getmtime(x.source), reverse=True)
+
+        rendered = notebook_templ.render(dirs=dirs, files=sorted_files, crumbs=crumbs)
 
         if not os.path.exists(path):
             os.makedirs(path)
