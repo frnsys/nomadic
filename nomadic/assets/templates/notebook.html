@@ -15,7 +15,7 @@
     <ul class="notes">
         {% for file in files %}
             <li>
-                <a href="./{{ file.filename }}">
+                <a href="./{{ file.filename|urlencode }}">
                     <span>{{ file.title }}</span>
                     <p>{{ file.excerpt }}</p>
                 </a>
