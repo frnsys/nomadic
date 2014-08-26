@@ -2,7 +2,9 @@ import html2text
 from lxml.html import builder, fromstring, tostring
 
 
-to_md = html2text.HTML2Text().handle
+h2t = html2text.HTML2Text()
+h2t.body_width = 0 # don't wrap lines
+to_md = h2t.handle
 
 
 def html_to_markdown(html):
