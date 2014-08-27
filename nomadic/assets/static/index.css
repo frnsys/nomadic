@@ -257,6 +257,8 @@ table tr th :last-child, table tr td :last-child {
 
 img {
   max-width: 100%;
+  display: block;
+  margin: 0 auto;
 }
 
 span.frame {
@@ -434,4 +436,19 @@ form[name=search] {
 }
 .crumbs li {
     display: inline-block;
+}
+
+.thumbs {
+    padding-left: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    opacity: 0.4;
+}
+.notes li:hover .thumbs {
+    opacity: 1.0;
+}
+.thumbs img {
+    display: inline;
+    max-height: 28px;
+    vertical-align: middle;
 }

@@ -1,4 +1,5 @@
 import os
+import re
 import urllib
 from HTMLParser import HTMLParser
 
@@ -6,6 +7,10 @@ from colorama import Fore
 from markdown import markdown
 from lxml.html import fromstring, tostring
 
+
+# Markdown regexes
+md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
+md_img_re = re.compile(r'!\[.*\]\(`?([^`\(\)]+)`?\)')
 
 class HTMLRemover(HTMLParser):
     def __init__(self):
@@ -27,6 +32,8 @@ def remove_md(md):
     html = markdown(md)
     return remove_html(html)
 
+def parse_md_images(md):
+    return [img for img in md_img_re.findall(md)]
 
 def rewrite_links(raw_html, rewrite_func):
     """

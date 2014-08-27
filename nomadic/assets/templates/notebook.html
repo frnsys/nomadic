@@ -18,6 +18,13 @@
                 <a href="./{{ file.filename|urlencode }}">
                     <span>{{ file.title }}</span>
                     <p>{{ file.excerpt }}</p>
+                    {% if file.images %}
+                        <ul class="thumbs">
+                            {% for img in file.images %}
+                                <img src={{ img }}>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                 </a>
             </li>
         {% endfor %}

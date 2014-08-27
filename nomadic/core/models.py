@@ -52,6 +52,13 @@ class Note():
             excerpt = excerpt[:char_limit-3] + '...'
         return excerpt
 
+    @property
+    def images(self):
+        if self.ext == '.html':
+            return []
+        elif self.ext == '.md':
+            return parsers.parse_md_images(self.content)
+
 
     @property
     def last_modified(self):

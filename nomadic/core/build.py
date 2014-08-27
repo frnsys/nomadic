@@ -16,7 +16,7 @@ from nomadic.core import Notebook, Note
 from nomadic.util import md2html, parsers
 
 
-File = namedtuple('File', ['title', 'filename', 'source', 'excerpt'])
+File = namedtuple('File', ['title', 'filename', 'source', 'excerpt', 'images'])
 
 # Load templates.
 path = os.path.abspath(__file__)
@@ -82,7 +82,7 @@ class Builder():
 
                     self.compile_note(note)
 
-                    file = File(title, compiled_filename, path, note.excerpt)
+                    file = File(title, compiled_filename, path, note.excerpt, note.images)
                     files.append(file)
 
             # Write the index file for this node.
