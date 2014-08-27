@@ -40,7 +40,7 @@ class IndexTest(NomadicTest):
         self.index.delete_note(note)
         self.assertEqual(self.index.size, self.expected_notes - 1)
 
-        self.assertTrue(not self.index.note_at(note.path.abs))
+        self.assertTrue(not self.index.note_at(note.path.rel))
 
     def test_update_note(self):
         note = Note(_path('my note.md'))
@@ -48,13 +48,13 @@ class IndexTest(NomadicTest):
 
         self.index.update_note(note)
 
-        note_ = self.index.note_at(note.path.abs)
+        note_ = self.index.note_at(note.path.rel)
         self.assertTrue(note_)
         self.assertEqual(note_['content'], u'changed note content')
 
     def test_search(self):
         results = [result for result in self.index.search('hullo')]
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0][0]['path'], _path('some_notebook/a cool note.md'))
+        self.assertEqual(results[0][0]['path'], 'some_notebook/a cool note.md')
 
 

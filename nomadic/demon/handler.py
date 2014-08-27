@@ -175,8 +175,7 @@ class Handler(PatternMatchingEventHandler):
     def update_reference(self, src_filename, src_abs, dest_abs):
         def wrapper(current_dir):
             def update_func(ref):
-                if src_filename not in ref: return ref
-                if quote(src_filename) not in ref: return ref
+                if src_filename not in ref and quote(src_filename) not in ref: return ref
                 if '://' in ref: return ref
 
                 if os.path.isabs(ref):

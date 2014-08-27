@@ -73,24 +73,28 @@ class Server():
         return rewriter
 
     def _build_routes(self):
-        @self.app.route('/<path:note_path>')
+        @self.app.route('/<path:path>')
         def note(path):
-            note = Note(path)
+            note = Note(urllib.unquote(path))
+            print(note.path.abs)
 
             # Convert to build path if appropriate.
             if note.ext in ['.md', '.html']:
-                note_path, _ = self.n.builder.build_path_for_note_path(note_path)
+                note_path = self.n.builder.to_build_path(note.path.abs)
                 with open(note_path, 'r') as note:
                     content = note.read()
             else:
-                content = note.content
+                try:
+                    content = note.content
+                except IOError:
+                    return 'IOError', 404
 
             return content
 
         @self.app.route('/search', methods=['POST'])
         def search():
             q = request.form['query']
-            results = searcher.search(q, self.n.index, html=True)
+            results = self.n.index.search(q, html=True)
             return render_template('results.html', results=results)
 
         @self.app.route('/new')

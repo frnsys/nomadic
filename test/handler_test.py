@@ -3,7 +3,7 @@ import shutil
 from urllib import quote
 from collections import namedtuple
 
-from nomadic.core import Nomadic
+from nomadic.core import Nomadic, Note
 from nomadic.demon.handler import Handler
 from test import NomadicTest, _path, compiled_path
 
@@ -33,78 +33,76 @@ class HandlerTest(NomadicTest):
         self.handler = Handler(self.nomadic, MockServer())
 
     def test_on_created(self):
-        path = _path('a new note.md')
-        with open(path, 'w') as note:
-            note.write('# a new note')
+        note = Note(_path('a new note.md'))
+        note.write('# a new note')
 
-        e = Event(is_directory=False, src_path=path, dest_path=None)
+        e = Event(is_directory=False, src_path=note.path.abs, dest_path=None)
         self.handler.on_created(e)
 
-        self.assertTrue(self.nomadic.index.note_at(path))
+        self.assertTrue(self.nomadic.index.note_at(note.path.rel))
         self.assertTrue(os.path.exists(compiled_path('a new note.html')))
         with open(compiled_path('index.html'), 'r') as index:
-            self.assertTrue('a new note.html' in index.read())
+            self.assertTrue(quote('a new note.html') in index.read())
 
     def test_on_deleted(self):
-        path = _path('my note.md')
+        note = Note(_path('my note.md'))
         path_ = compiled_path('my note.html')
 
-        self.assertTrue(self.nomadic.index.note_at(path))
+        self.assertTrue(self.nomadic.index.note_at(note.path.rel))
         self.assertTrue(os.path.exists(path_))
         with open(compiled_path('index.html'), 'r') as index:
-            self.assertTrue('my note.html' in index.read())
+            self.assertTrue(quote('my note.html') in index.read())
 
-        os.remove(path)
-        e = Event(is_directory=False, src_path=path, dest_path=None)
+        os.remove(note.path.abs)
+        e = Event(is_directory=False, src_path=note.path.abs, dest_path=None)
         self.handler.on_deleted(e)
 
-        self.assertFalse(self.nomadic.index.note_at(path))
+        self.assertFalse(self.nomadic.index.note_at(note.path.rel))
         self.assertFalse(os.path.exists(path_))
         with open(compiled_path('index.html'), 'r') as index:
-            self.assertFalse('my note.html' in index.read())
+            self.assertFalse(quote('my note.html') in index.read())
 
     def test_on_modified(self):
-        path = _path('my note.md')
+        note = Note(_path('my note.md'))
         path_ = compiled_path('my note.html')
 
-        with open(path, 'w') as note:
-            note.write('a changed note')
+        note.write('a changed note')
 
-        e = Event(is_directory=False, src_path=path, dest_path=None)
+        e = Event(is_directory=False, src_path=note.path.abs, dest_path=None)
         self.handler.on_modified(e)
 
-        with open(path_, 'r') as note:
-            self.assertTrue('<p>a changed note</p>' in note.read())
+        with open(path_, 'r') as n:
+            self.assertTrue('<p>a changed note</p>' in n.read())
 
-        note = self.nomadic.index.note_at(path)
+        note = self.nomadic.index.note_at(note.path.rel)
         self.assertEqual('a changed note', note['content'])
 
     def test_on_moved(self):
-        path = _path('my note.md')
+        note = Note(_path('my note.md'))
         path_ = compiled_path('my note.html')
 
-        path_new = _path('some_notebook/my moved note.md')
+        note_new = Note(_path('some_notebook/my moved note.md'))
         path_new_ = compiled_path('some_notebook/my moved note.html')
 
-        self.assertTrue(self.nomadic.index.note_at(path))
+        self.assertTrue(self.nomadic.index.note_at(note.path.rel))
         self.assertTrue(os.path.exists(path_))
 
         with open(compiled_path('index.html'), 'r') as index:
-            self.assertTrue('my note.html' in index.read())
+            self.assertTrue(quote('my note.html') in index.read())
 
-        shutil.move(path, path_new)
-        e = Event(is_directory=False, src_path=path, dest_path=path_new)
+        shutil.move(note.path.abs, note_new.path.abs)
+        e = Event(is_directory=False, src_path=note.path.abs, dest_path=note_new.path.abs)
         self.handler.on_moved(e)
 
-        self.assertFalse(self.nomadic.index.note_at(path))
+        self.assertFalse(self.nomadic.index.note_at(note.path.rel))
         self.assertFalse(os.path.exists(path_))
         with open(compiled_path('index.html'), 'r') as index:
-            self.assertFalse('my note.html' in index.read())
+            self.assertFalse(quote('my note.html') in index.read())
 
-        self.assertTrue(self.nomadic.index.note_at(path_new))
+        self.assertTrue(self.nomadic.index.note_at(note_new.path.rel))
         self.assertTrue(os.path.exists(path_new_))
         with open(compiled_path('some_notebook/index.html'), 'r') as index:
-            self.assertTrue('my moved note.html' in index.read())
+            self.assertTrue(quote('my moved note.html') in index.read())
 
     def test_on_created_directory(self):
         path = _path('new notebook')
@@ -145,11 +143,13 @@ class HandlerTest(NomadicTest):
             self.assertFalse('some_notebook/index.html' in index_html)
             self.assertTrue('moved_notebook/index.html' in index_html)
 
+        old_note = Note(_path('some_notebook/a cool note.md'))
         self.assertFalse(os.path.exists(path_))
-        self.assertFalse(self.nomadic.index.note_at(_path('some_notebook/a cool note.md')))
+        self.assertFalse(self.nomadic.index.note_at(old_note.path.rel))
 
+        new_note = Note(_path('moved_notebook/a cool note.md'))
         self.assertTrue(os.path.exists(path_new_))
-        self.assertTrue(self.nomadic.index.note_at(_path('moved_notebook/a cool note.md')))
+        self.assertTrue(self.nomadic.index.note_at(new_note.path.rel))
 
     def test_update_references_markdown(self):
         path = _path('some_notebook/a cool note.md')

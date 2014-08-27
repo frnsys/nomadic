@@ -4,8 +4,8 @@
     <ul class="results">
         {% for result in results %}
             <li>
-            <a href="{{ result.data['path'] }}">{{ result.data['title'] }}</a>
-                <p>{{ result.highlights|safe }}</p>
+            <a href="{{ result[0]['path'] }}">{{ result[0]['title'] }}</a>
+                <p>{{ result[1]|safe }}</p>
             </li>
         {% endfor %}
     </ul>

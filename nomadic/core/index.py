@@ -12,8 +12,9 @@ import whoosh.index as index
 from whoosh.fields import *
 from whoosh.qparser import QueryParser
 
-from nomadic.core import Notebook
 from nomadic.util import parsers
+from nomadic.core import Notebook
+from nomadic.core.path import Path
 
 
 schema = Schema(title=TEXT(stored=True),
@@ -55,21 +56,25 @@ class Index():
             with self.ix.writer() as writer:
                 # All the note paths in the index.
                 ix_paths = set()
+
+                # The notes to re-index.
                 to_index = set()
 
                 # Loop over the stored fields in the index.
                 for fields in searcher.all_stored_fields():
                     ix_path = fields['path']
+                    path = Path(ix_path)
+
                     ix_paths.add(ix_path)
 
                     # If the file no longer exists...
-                    if not os.path.exists(ix_path):
+                    if not os.path.exists(path.abs):
                         writer.delete_by_term('path', ix_path)
 
                     # If the file has been modified...
                     else:
                         ix_time = fields['last_mod']
-                        mtime = os.path.getmtime(ix_path)
+                        mtime = os.path.getmtime(path.abs)
 
                         if mtime > ix_time:
                             # Delete the existing indexed note
@@ -81,7 +86,7 @@ class Index():
                 # and index queued notes.
                 notes = []
                 for note in self.rootbook.notes:
-                    if note.path.abs in to_index or note.path.abs not in ix_paths:
+                    if note.path.rel in to_index or note.path.rel not in ix_paths:
                         notes.append(note)
 
             self.add_notes(notes)
@@ -112,7 +117,7 @@ class Index():
                 for note in bar:
                     writer.add_document(
                         title    = note.title,
-                        path     = note.path.abs,
+                        path     = note.path.rel,
                         last_mod = note.last_modified,
                         content  = note.plaintext
                     )
@@ -122,7 +127,7 @@ class Index():
         with self.ix.writer() as writer:
             writer.add_document(
                 title    = note.title,
-                path     = note.path.abs,
+                path     = note.path.rel,
                 last_mod = note.last_modified,
                 content  = note.plaintext
             )
@@ -130,7 +135,7 @@ class Index():
 
     def delete_note(self, note):
         with self.ix.writer() as writer:
-            writer.delete_by_term('path', note.path.abs)
+            writer.delete_by_term('path', note.path.rel)
 
 
     def update_note(self, note):

@@ -77,14 +77,14 @@ class BuildTest(NomadicTest):
 
         path = compiled_path('some_notebook/index.html')
         with open(path, 'r') as ix:
-            self.assertTrue(u'a cool note.html' in ix.read())
+            self.assertTrue(quote('a cool note.html') in ix.read())
 
     def test_update_compiled_index(self):
         self.builder.build()
 
         path = compiled_path('some_notebook/index.html')
         with open(path, 'r') as ix:
-            self.assertTrue(u'a new note.html' not in ix.read())
+            self.assertTrue(quote('a new note.html') not in ix.read())
 
         new_note = Note(_path('some_notebook/a new note.md'))
         new_note.write(u'new note')
@@ -94,7 +94,7 @@ class BuildTest(NomadicTest):
         self.builder.index_notebook(notebook)
 
         with open(path, 'r') as ix:
-            self.assertTrue(u'a new note.html' in ix.read())
+            self.assertTrue(quote('a new note.html') in ix.read())
 
     def test_delete_notebook(self):
         self.builder.build()
