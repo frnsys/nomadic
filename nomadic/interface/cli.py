@@ -98,8 +98,8 @@ def convert(notebook, html_path):
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
 
-    evernote.port_evernote(html_path, nb)
-
+    note_path = evernote.port_evernote(html_path, nb)
+    click.edit(filename=note_path)
 
 
 @cli.command()

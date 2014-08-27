@@ -34,9 +34,10 @@ def port_evernote(path, to_notebook):
     # Update resource references.
     markdown = markdown.replace(en_rsrc_rel, quote(n_rsrc_rel.encode('utf-8')))
     markdown = markdown.replace(quote(en_rsrc_rel.encode('utf-8')), quote(n_rsrc_rel.encode('utf-8')))
+    markdown = markdown.replace(quote(en_rsrc_rel.encode('utf-8'), safe=',?'), quote(n_rsrc_rel.encode('utf-8')))
 
     path = os.path.join(to_notebook.path.abs, title + '.md')
     with open(path, 'w') as note:
         note.write(markdown.encode('utf-8'))
 
-
+    return path
