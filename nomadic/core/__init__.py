@@ -1,5 +1,4 @@
-from nomadic.core.note import Note
-from nomadic.core.notebook import Notebook
+from nomadic.core.models import Note, Notebook
 from nomadic.core.index import Index
 from nomadic.core.build import Builder
 

@@ -1,3 +1,5 @@
+import os
+import urllib
 from HTMLParser import HTMLParser
 
 from colorama import Fore
@@ -34,6 +36,35 @@ def rewrite_links(raw_html, rewrite_func):
     html = fromstring(raw_html)
     html.rewrite_links(rewrite_func)
     return tostring(html)
+
+
+def rewrite_external_images(raw_html, note):
+    """
+    Download externally-hosted images to a note's local resources folder
+    and rewrite references to those images.
+    """
+    rsp = note.resources
+    nbp = note.notebook.path.abs
+
+    def rewriter(link):
+        link = link.split('?')[0] # split off ? params
+        if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
+            if not os.path.exists(rsp):
+                os.makedirs(rsp)
+
+            ext = link.split('/')[-1].split('.')[-1]
+            filename = str(hash(link)) + '.' + ext
+
+            save_path = os.path.join(rsp, filename)
+
+            if not os.path.exists(save_path):
+                filename, _ = urllib.urlretrieve(link, save_path)
+
+            # Return relative path.
+            return save_path.replace(nbp, '')
+        return link
+    return rewrite_links(raw_html, rewriter)
+
 
 
 class HighlightParser(HTMLParser):

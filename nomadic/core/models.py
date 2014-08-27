@@ -2,19 +2,19 @@ import os
 import shutil
 
 from nomadic.core.path import Path
-from nomadic.util import pdf, parsers
-
-
-class NoteConflictError(Exception):
-    pass
+from nomadic.core.errors import NoteConflictError
+from nomadic.util import pdf, parsers, valid_notebook, valid_note
 
 
 class Note():
     def __init__(self, path):
         self.path = Path(path)
 
-        _, filename = os.path.split(path)
+        _, filename = os.path.split(self.path.rel)
         self.title, self.ext = os.path.splitext(filename)
+
+        notebook_path = os.path.join(os.path.dirname(self.path.rel), '')
+        self.notebook = Notebook(notebook_path)
 
 
     @property
@@ -38,10 +38,11 @@ class Note():
             elif self.ext == '.md':
                 text = parsers.remove_md(self.content)
 
-        if type(text) is str:
+        if isinstance(text, str):
             text = text.decode('utf-8')
 
         return text
+
 
     @property
     def excerpt(self):
@@ -50,6 +51,7 @@ class Note():
         if len(excerpt) > char_limit:
             excerpt = excerpt[:char_limit-3] + '...'
         return excerpt
+
 
     @property
     def last_modified(self):
@@ -110,3 +112,59 @@ class Note():
                 p = os.path.join(r, name)
                 if os.path.isfile(p) and name not in content:
                     os.remove(p)
+
+
+
+
+
+class Notebook():
+    def __init__(self, path):
+        self.path = Path(path)
+        self.name = os.path.basename(path)
+
+
+    @property
+    def notebooks(self):
+        for root, dirs, _ in self.walk():
+            for dir in dirs:
+                path = os.path.join(root, dir)
+                yield Notebook(path)
+
+
+    @property
+    def notes(self):
+        for root, dirs, files in self.walk():
+            for file in files:
+                path = os.path.join(root, file)
+                yield Note(path)
+
+
+    @property
+    def contents(self):
+        """
+        Lists the names of all files
+        and directories in this notebook,
+        not recursively.
+        """
+        dirs, files = [], []
+        for name in os.listdir(self.path.abs):
+            p = os.path.join(self.path.abs, name)
+            if os.path.isfile(p):
+                files.append(name)
+            else:
+                if valid_notebook(name):
+                    dirs.append(name.decode('utf-8'))
+        return dirs, files
+
+
+    def walk(self):
+        """
+        Walks the notebook, yielding only
+        valid directories and files.
+        """
+
+        for root, dirs, files in os.walk(self.path.abs):
+            if valid_notebook(root):
+                dirs = [d for d in dirs if valid_notebook(d)]
+                files = [f for f in files if valid_note(f)]
+                yield root, dirs, files

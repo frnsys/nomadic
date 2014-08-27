@@ -10,7 +10,7 @@ dir = os.path.dirname(path)
 # We use a copy of the test notes directory
 # so we can reset it at will.
 NOTES_DIR_TEMPLATE = os.path.join(dir, u'notes')
-NOTES_DIR = os.path.join(dir, u'.notes')
+NOTES_DIR = os.path.join(dir, u'.notes', '')
 def _path(path): return os.path.join(NOTES_DIR, path)
 def compiled_path(path): return os.path.join(NOTES_DIR, u'.build', path)
 

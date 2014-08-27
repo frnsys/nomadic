@@ -10,8 +10,9 @@ from flask import Flask, render_template, request, jsonify
 from flask.ext.socketio import SocketIO
 
 from nomadic.util import html2md, parsers
-from nomadic.core import Note
-from nomadic.core.note import NoteConflictError
+from nomadic.core.path import Path
+from nomadic.core.models import Note
+from nomadic.core.errors import NoteConflictError
 from nomadic.demon.logger import log
 
 import os
@@ -33,9 +34,7 @@ class Server():
         self.socketio = SocketIO(self.app)
         self._build_routes()
 
-        # To log errors to stdout.
-        # Can't really use Flask's debug w/ the websocket lib,
-        # but this accomplishes the same thing.
+        # Log to stdout.
         sh = logging.StreamHandler(sys.stdout)
         self.app.logger.addHandler(sh)
 
@@ -46,48 +45,23 @@ class Server():
     def refresh_clients(self):
         self.socketio.emit('refresh')
 
-    def _rewrite_link(self, resources_path):
-        """
-        Creates a link rewriting func for a particular resource path.
-        """
-        def rewriter(link):
-            """
-            This downloads externally-hosted images to a note's local resources folder and
-            rewrites the referencing links to point to the local files.
-            """
-            if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
-                if not os.path.exists(resources_path):
-                    os.makedirs(resources_path)
-
-                ext = link.split('/')[-1].split('.')[-1]
-                filename = str(hash(link)) + '.' + ext
-
-                save_path = os.path.join(resources_path, filename)
-
-                if not os.path.exists(save_path):
-                    filename, _ = urllib.urlretrieve(link, save_path)
-
-                # Return relative path.
-                return save_path.replace(self.n.notes_path, '')
-            return link
-        return rewriter
-
     def _build_routes(self):
         @self.app.route('/<path:path>')
         def note(path):
-            note = Note(urllib.unquote(path))
-            print(note.path.abs)
+            _, ext = os.path.splitext(path)
+            p = Path(urllib.unquote(path))
 
             # Convert to build path if appropriate.
-            if note.ext in ['.md', '.html']:
-                note_path = self.n.builder.to_build_path(note.path.abs)
-                with open(note_path, 'r') as note:
-                    content = note.read()
+            if ext in ['.md', '.html']:
+                path = self.n.builder.to_build_path(p.abs)
             else:
-                try:
-                    content = note.content
-                except IOError:
-                    return 'IOError', 404
+                path = p.abs
+
+            try:
+                with open(path, 'r') as file:
+                    content = file.read()
+            except IOError:
+                return 'IOError', 404
 
             return content
 
@@ -158,10 +132,9 @@ class Server():
     def save(self, form):
         html = form['html']
 
-        if html:
+        if parsers.remove_html(html):
             note = self._process_form(form)
             path_new = os.path.join(form['new[notebook]'], form['new[title]'] + note.ext)
-
 
             # If the title or notebook has changed,
             # move the note by updating its path.
@@ -173,7 +146,7 @@ class Server():
                     self.app.log.debug('Note at {0} already exists.'.format(path_new))
                     return 'Note already exists', 409
 
-            html = parsers.rewrite_links(html, self._rewrite_link(note.resources))
+            html = parsers.rewrite_external_images(html, note)
 
             if note.ext == '.md':
                 content = html2md.html_to_markdown(html)
@@ -185,7 +158,7 @@ class Server():
             self.refresh_clients()
 
             return jsonify({
-                'path': path
+                'path': note.path.abs
             })
         return 'Success', 200
 

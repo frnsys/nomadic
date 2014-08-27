@@ -30,8 +30,7 @@ class Handler(PatternMatchingEventHandler):
 
     def dispatch(self, event):
         """
-        Only dispatch an event
-        if it satisfies our requirements.
+        Only dispatch an event if it satisfies our requirements.
         """
         if event.is_directory \
         or valid_note(event.src_path) \

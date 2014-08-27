@@ -49,8 +49,7 @@ class Builder():
 
     def build(self):
         """
-        Compile all notes into a
-        browsable HTML structure.
+        Compile all notes into a browsable HTML structure.
         """
         rootbook = Notebook(self.notes_path)
         self._prepare_build_dir(reset=True)
@@ -59,14 +58,11 @@ class Builder():
 
     def compile_notebook(self, notebook):
         """
-        Build a notebook, recursively,
-        compiling notes and indexes.
+        Build a notebook, recursively, compiling notes and indexes.
         """
         for root, dirnames, filenames in notebook.walk():
+            dirs, files = [], []
             build_root = root.replace(self.notes_path, self.build_path)
-
-            dirs = []
-            files = []
 
             for dirname in dirnames:
                 build_path = os.path.join(build_root, dirname)
@@ -95,11 +91,8 @@ class Builder():
 
     def compile_note(self, note):
         """
-        Compile a single Markdown or
-        HTML note to the build tree.
-
-        This will overwrite the
-        existing note, if any.
+        Compile a single Markdown or HTML note to the build tree.
+        This will overwrite the existing note, if any.
         """
 
         build_path = self.to_build_path(note.path.abs)

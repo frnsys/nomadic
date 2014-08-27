@@ -1,0 +1,2 @@
+class NoteConflictError(Exception):
+    pass
