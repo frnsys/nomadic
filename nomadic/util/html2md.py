@@ -17,9 +17,13 @@ def html_to_markdown(html):
     will become `<strong>foo</strong>`.
     """
     h = fromstring(html)
-    for span in h.findall('.//span'):
+    for span in h.findall('.//span') + h.findall('.//font'):
         convert_span(span)
     html = tostring(h)
+
+    # Not ideal but works in a pinch
+    html = html.replace('<mark>', '==')
+    html = html.replace('</mark>', '==')
 
     return to_md(html)
 
@@ -30,6 +34,8 @@ def convert_span(span):
     a bold or italic style into
     strong and em tags, respectively
     (nesting them if both are specified).
+
+    Can also handle Evernote highlighting.
     """
     p = span.getparent()
 
@@ -42,6 +48,8 @@ def convert_span(span):
         builders.append(builder.STRONG)
     if 'italic' in style:
         builders.append(builder.EM)
+    if '-evernote-highlight:true' in style:
+        builders.append(highlighter)
 
     if builders:
         children = []
@@ -62,3 +70,6 @@ def convert_span(span):
 
         # Replace the old element with the new one.
         p.replace(span, el)
+
+def highlighter(*children):
+    return builder.E('mark', *children)
