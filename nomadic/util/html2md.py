@@ -1,3 +1,5 @@
+import re
+
 import html2text
 from lxml.html import builder, fromstring, tostring
 
@@ -25,7 +27,15 @@ def html_to_markdown(html):
     html = html.replace('<mark>', '==')
     html = html.replace('</mark>', '==')
 
-    return to_md(html)
+    md = to_md(html)
+
+    # Sometimes html2text returns a ton of extra whitespace.
+    # Clean up lines with only whitespace.
+    # Condense line break streaks of 3 or more.
+    md = re.sub(r'\n([\s\*_]+)\n', '\n\n', md)
+    md = re.sub(r'\n{3,}', '\n\n', md)
+
+    return md
 
 
 def convert_span(span):
@@ -48,7 +58,8 @@ def convert_span(span):
         builders.append(builder.STRONG)
     if 'italic' in style:
         builders.append(builder.EM)
-    if '-evernote-highlight:true' in style:
+    # The latter background color rule is based on how I used to do highlighting in Evernote...
+    if '-evernote-highlight:true' in style or 'background-color: rgb(255, 252, 229);' in style:
         builders.append(highlighter)
 
     if builders:

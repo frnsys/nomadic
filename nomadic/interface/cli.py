@@ -88,7 +88,8 @@ def count():
 @cli.command()
 @click.argument('html_path', type=click.Path())
 @click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
-def convert(notebook, html_path):
+@click.option('--edit', is_flag=True, help='Open the note in an editor after converting.')
+def convert(notebook, edit, html_path):
     """
     Convert an HTML note into a Markdown
     note and save it.
@@ -99,7 +100,9 @@ def convert(notebook, html_path):
         return
 
     note_path = evernote.port_evernote(html_path, nb)
-    click.edit(filename=note_path)
+
+    if edit:
+        click.edit(filename=note_path)
 
 
 @cli.command()
