@@ -155,7 +155,7 @@ class Builder():
                 path = os.path.join(notebook.path.abs, name)
                 note = Note(path)
 
-                file = File(title, compiled_filename, note.path.abs, note.excerpt)
+                file = File(title, compiled_filename, note.path.abs, note.excerpt, note.images)
                 files.append(file)
 
         # Write the index file for this node.
