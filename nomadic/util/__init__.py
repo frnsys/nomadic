@@ -4,10 +4,8 @@ def valid_notebook(path):
     We want to ignore the build and searchindex
     as well as all resource directories.
     """
-    if '.build' in path: return False
-    if '.searchindex' in path: return False
-    if '_resources' in path: return False
-    if '.SyncArchive' in path: return False
+    for excluded in ['.build', '.searchindex', '_resources', '.SyncArchive']:
+        if excluded in path: return False
     return True
 
 

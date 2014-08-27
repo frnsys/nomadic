@@ -124,7 +124,7 @@ def new(notebook, note, rich):
         click.edit(filename=path)
     else:
         # Launch the daemon server's rich editor.
-        click.launch('http://localhost:{0}/new'.format(nomadic.port))
+        click.launch('http://localhost:{0}/new'.format(conf.PORT))
 
 
 def select_notebook(name):
