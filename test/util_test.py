@@ -29,7 +29,8 @@ html = '''
 class html2mdTest(NomadicTest):
     def test_html_to_markdown(self):
         markdown = html2md.html_to_markdown(html)
-        expected = u'_** foobar _ lala ** yum **_ hey hey ** uh oh ** yes **_\n\n'
+        expected = u'_** foobar _ lala ** yum **_ hey hey ** uh oh ** yes **_\n'
+        print(markdown)
         self.assertEqual(markdown, expected)
 
     def test_convert_spans(self):
