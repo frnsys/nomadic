@@ -84,9 +84,12 @@ class Server():
             allowed_content_types = ['image/gif', 'image/jpeg', 'image/png']
             content_type = file.headers['Content-Type']
             if content_type in allowed_content_types:
-                title = request.form['title']
-                notebook = request.form['notebook']
-                path = os.path.join(notebook, title + '.ext') # some arbitrary extension
+                path = os.path.join(request.form['notebook'], request.form['title'] + '.ext') # some arbitrary extension
+                note = Note(path)
+
+                resources = note.resources
+                if not os.path.exists(resources):
+                    os.makedirs(resources)
 
                 # Build a unique filename.
                 _, ext = os.path.splitext(file.filename)
@@ -95,7 +98,6 @@ class Server():
                 if ext == '.jpeg': ext = '.jpg'
                 filename = str(hash(file.filename + str(datetime.utcnow()))) + ext
 
-                resources = self.n.manager.note_resources(path, create=True)
                 save_path = os.path.join(resources, filename)
 
                 file.save(save_path)

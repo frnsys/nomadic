@@ -12,7 +12,7 @@
 
     <select name='notebook'>
         {% for notebook in notebooks %}
-            <option value={{ notebook.path.abs }}>{{ notebook.name }}</option>
+            <option value="{{ notebook.path.abs }}">{{ notebook.name }}</option>
         {% endfor %}
     </select>
 
