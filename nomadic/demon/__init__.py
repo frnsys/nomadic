@@ -42,11 +42,12 @@ def summon(nomadic, port):
                 time.sleep(1)
         except KeyboardInterrupt:
             ob.stop()
+            ob.join()
 
-        ob.join()
     except Exception as e:
         logger.log.exception(e)
         raise
+
     else:
         ob.stop()
         ob.join()
