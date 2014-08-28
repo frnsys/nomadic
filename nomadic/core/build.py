@@ -76,6 +76,9 @@ class Builder():
         crumbs = self._build_breadcrumbs(build_path)
         raw = note.content
 
+        if note.ext == '.pdf':
+            return
+
         if note.ext != '.html':
             raw = md2html.compile_markdown(raw)
 

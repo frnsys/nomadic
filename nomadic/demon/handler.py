@@ -41,7 +41,7 @@ class Handler(PatternMatchingEventHandler):
                 self.n.builder.compile_note(note)
 
     def on_created(self, event):
-        p = event.src_path
+        p = event.src_path.decode('utf-8')
 
         log.debug(u'Created: {0}'.format(p))
         if not event.is_directory:
@@ -60,7 +60,7 @@ class Handler(PatternMatchingEventHandler):
         self.n.builder.index_notebook(parent)
 
     def on_deleted(self, event):
-        p = event.src_path
+        p = event.src_path.decode('utf-8')
 
         log.debug(u'Deleted: {0}'.format(p))
         if not event.is_directory:
@@ -79,8 +79,8 @@ class Handler(PatternMatchingEventHandler):
         self.n.builder.index_notebook(parent)
 
     def on_moved(self, event):
-        src = event.src_path
-        dest = event.dest_path
+        src = event.src_path.decode('utf-8')
+        dest = event.dest_path.decode('utf-8')
 
         log.debug(u'Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:

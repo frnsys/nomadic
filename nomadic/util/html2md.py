@@ -58,8 +58,8 @@ def convert_span(span):
         builders.append(builder.STRONG)
     if 'italic' in style:
         builders.append(builder.EM)
-    # The latter background color rule is based on how I used to do highlighting in Evernote...
-    if '-evernote-highlight:true' in style or 'background-color: rgb(255, 252, 229);' in style:
+    # The latter background color rules are based on how I used to do highlighting in Evernote...
+    if '-evernote-highlight:true' in style or 'background-color: rgb(255, 252, 229);' in style or 'background-color: rgb(242, 250, 111);' in style:
         builders.append(highlighter)
 
     if builders:
