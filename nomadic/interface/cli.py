@@ -50,8 +50,7 @@ def search(query):
 @click.argument('notebook', default='')
 def browse(notebook):
     """
-    Browse through notes
-    via a web browser.
+    Browse through notes via a web browser.
     """
     nb = select_notebook(notebook)
 
@@ -106,8 +105,8 @@ def convert(notebook, edit, html_path):
 
 
 @cli.command()
-@click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
 @click.argument('note')
+@click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
 @click.option('--rich', is_flag=True, help='Create a new "rich" (wysiwyg html) note in a browser editor')
 def new(notebook, note, rich):
     """

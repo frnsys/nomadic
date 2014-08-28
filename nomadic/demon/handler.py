@@ -7,7 +7,6 @@ changes and responds appropriately.
 """
 
 import os
-import re
 from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
@@ -16,17 +15,13 @@ from nomadic.core import Note, Notebook
 from nomadic.util import valid_note, parsers
 from nomadic.demon.logger import log
 
-# Markdown link regex
-md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
-
 class Handler(PatternMatchingEventHandler):
     patterns = ['*'] # match everything b/c we want to match directories as well.
     ignore_patterns = ['*.build*', '*.searchindex*']
 
-    def __init__(self, nomadic, server):
+    def __init__(self, nomadic):
         super(Handler, self).__init__(ignore_directories=False)
         self.n = nomadic
-        self.server = server
 
     def dispatch(self, event):
         """
@@ -38,22 +33,14 @@ class Handler(PatternMatchingEventHandler):
             super(Handler, self).dispatch(event)
 
     def on_modified(self, event):
-        """
-        If a note's contents change...
-        """
         if not event.is_directory:
             note = Note(event.src_path)
             log.debug(u'Modified: {0}'.format(note.path.rel))
             if os.path.exists(note.path.abs):
                 self.n.index.update_note(note)
                 self.n.builder.compile_note(note)
-                self.server.refresh_clients()
 
     def on_created(self, event):
-        """
-        If a new note or notebook
-        is created...
-        """
         p = event.src_path
 
         log.debug(u'Created: {0}'.format(p))
@@ -71,13 +58,8 @@ class Handler(PatternMatchingEventHandler):
         dir = os.path.dirname(p)
         parent = Notebook(dir)
         self.n.builder.index_notebook(parent)
-        self.server.refresh_clients()
 
     def on_deleted(self, event):
-        """
-        If a note or notebook
-        is deleted...
-        """
         p = event.src_path
 
         log.debug(u'Deleted: {0}'.format(p))
@@ -95,13 +77,8 @@ class Handler(PatternMatchingEventHandler):
         dir = os.path.dirname(p)
         parent = Notebook(dir)
         self.n.builder.index_notebook(parent)
-        self.server.refresh_clients()
 
     def on_moved(self, event):
-        """
-        If a note or notebook
-        is moved...
-        """
         src = event.src_path
         dest = event.dest_path
 
@@ -132,7 +109,6 @@ class Handler(PatternMatchingEventHandler):
             dir = os.path.dirname(p)
             parent = Notebook(dir)
             self.n.builder.index_notebook(parent)
-        self.server.refresh_clients()
 
     # TO DO:
     # might need a separate daemon/watcher for this
@@ -148,28 +124,24 @@ class Handler(PatternMatchingEventHandler):
         _, src_filename = os.path.split(src)
         update_func = self.update_reference(src_filename, src_abs, dest_abs)
 
-        for root, dirnames, filenames in self.n.rootbook.walk():
-            for filename in filenames:
-                path = os.path.join(root, filename)
-                note = Note(path)
-
+        for root, notebooks, notes in self.n.rootbook.walk():
+            for note in notes:
                 update_func_ = update_func(root)
-                if note.ext in ['.html', '.md']:
-                    content = note.content
-                    dirty = src_filename in content
+                content = note.content
+                dirty = src_filename in content
 
-                    if dirty:
-                        if note.ext == '.html':
-                            content = parsers.rewrite_links(content, update_func_)
+                if dirty:
+                    if note.ext == '.html':
+                        content = parsers.rewrite_links(content, update_func_)
 
-                        elif note.ext == '.md':
-                            for link in md_link_re.findall(content):
-                                link_ = update_func_(link)
-                                if link != link_:
-                                    content = content.replace(link, link_)
+                    elif note.ext == '.md':
+                        for link in parsers.md_links(content):
+                            link_ = update_func_(link)
+                            if link != link_:
+                                content = content.replace(link, link_)
 
-                        note.write(content.encode('utf-8'))
-                        self.n.builder.compile_note(note)
+                    note.write(content.encode('utf-8'))
+                    self.n.builder.compile_note(note)
 
     def update_reference(self, src_filename, src_abs, dest_abs):
         def wrapper(current_dir):

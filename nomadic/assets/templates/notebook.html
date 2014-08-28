@@ -4,23 +4,23 @@
 {% block content %}
     {{ breadcrumbs(crumbs) }}
 
-    {% if dirs %}
+    {% if notebooks %}
         <ul class="notebooks">
-            {% for dir in dirs %}
-                <li><a href="{{ dir }}/index.html">{{ dir }}</a></li>
+            {% for notebook in notebooks %}
+                <li><a href="{{ notebook.name }}/index.html">{{ notebook.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
 
     <ul class="notes">
-        {% for file in files %}
+        {% for note in notes %}
             <li>
-                <a href="./{{ file.filename|urlencode }}">
-                    <span>{{ file.title }}</span>
-                    <p>{{ file.excerpt }}</p>
-                    {% if file.images %}
+                <a href="./{{ note.buildname|urlencode }}">
+                    <span>{{ note.title }}</span>
+                    <p>{{ note.excerpt }}</p>
+                    {% if note.images %}
                         <ul class="thumbs">
-                            {% for img in file.images %}
+                            {% for img in note.images %}
                                 <img src={{ img }}>
                             {% endfor %}
                         </ul>

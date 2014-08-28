@@ -13,7 +13,3 @@ class Path():
         else:
             self.rel = path
             self.abs = os.path.join(conf.ROOT, path)
-
-    @property
-    def build(self):
-        return self.abs.replace(conf.ROOT, conf.BUILD_ROOT)

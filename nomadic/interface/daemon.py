@@ -12,12 +12,7 @@ def daemon(debug):
     """
 
     nomadic = Nomadic(conf.ROOT)
-
-    # Update the index.
     nomadic.index.update()
-
-    # Build the browsable tree.
     nomadic.builder.build()
 
-    # Start the daemon.
     demon.start(nomadic, conf.PORT, debug=debug)

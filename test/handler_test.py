@@ -10,10 +10,6 @@ from test import NomadicTest, _path, compiled_path
 # Mock the watchdog events.
 Event = namedtuple('Event', ['is_directory', 'src_path', 'dest_path'])
 
-class MockServer():
-    def refresh_clients(self):
-        pass
-
 class HandlerTest(NomadicTest):
     """
     This tests the handler's handling of
@@ -30,7 +26,7 @@ class HandlerTest(NomadicTest):
         self.nomadic.index.reset()
         self.nomadic.builder.build()
 
-        self.handler = Handler(self.nomadic, MockServer())
+        self.handler = Handler(self.nomadic)
 
     def test_on_created(self):
         note = Note(_path('a new note.md'))

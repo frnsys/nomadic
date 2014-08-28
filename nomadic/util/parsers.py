@@ -32,8 +32,11 @@ def remove_md(md):
     html = markdown(md)
     return remove_html(html)
 
-def parse_md_images(md):
+def md_images(md):
     return [img for img in md_img_re.findall(md)]
+
+def md_links(md):
+    return [link for link in md_link_re.findall(md)]
 
 def rewrite_links(raw_html, rewrite_func):
     """

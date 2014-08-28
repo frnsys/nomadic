@@ -12,6 +12,7 @@ class Note():
 
         _, filename = os.path.split(self.path.rel)
         self.title, self.ext = os.path.splitext(filename)
+        self.buildname = self.title + '.html'
 
         notebook_path = os.path.join(os.path.dirname(self.path.rel), '')
         self.notebook = Notebook(notebook_path)
@@ -57,7 +58,7 @@ class Note():
         if self.ext == '.html':
             return []
         elif self.ext == '.md':
-            return parsers.parse_md_images(self.content)
+            return parsers.md_images(self.content)
 
 
     @property
@@ -132,18 +133,18 @@ class Notebook():
 
     @property
     def notebooks(self):
-        for root, dirs, _ in self.walk():
-            for dir in dirs:
-                path = os.path.join(root, dir)
-                yield Notebook(path)
+        # Recursive
+        for root, notebooks, notes in self.walk():
+            for notebook in notebooks:
+                yield notebook
 
 
     @property
     def notes(self):
-        for root, dirs, files in self.walk():
-            for file in files:
-                path = os.path.join(root, file)
-                yield Note(path)
+        # Recursive
+        for root, notebooks, notes in self.walk():
+            for note in notes:
+                yield note
 
 
     @property
@@ -153,15 +154,15 @@ class Notebook():
         and directories in this notebook,
         not recursively.
         """
-        dirs, files = [], []
+        notebooks, notes = [], []
         for name in os.listdir(self.path.abs):
             p = os.path.join(self.path.abs, name)
-            if os.path.isfile(p):
-                files.append(name)
+            if os.path.isfile(p) and valid_note(p):
+                notes.append( Note(p) )
             else:
                 if valid_notebook(name):
-                    dirs.append(name.decode('utf-8'))
-        return dirs, files
+                    notebooks.append( Notebook(p) )
+        return notebooks, notes
 
 
     def walk(self):
@@ -172,6 +173,14 @@ class Notebook():
 
         for root, dirs, files in os.walk(self.path.abs):
             if valid_notebook(root):
-                dirs = [d for d in dirs if valid_notebook(d)]
-                files = [f for f in files if valid_note(f)]
-                yield root, dirs, files
+                notebooks, notes = [], []
+                for dir in dirs:
+                    if valid_notebook(dir):
+                        path = os.path.join(root, dir)
+                        notebooks.append( Notebook(path) )
+                for file in files:
+                    if valid_note(file):
+                        path = os.path.join(root, file)
+                        notes.append( Note(path) )
+
+                yield root, notebooks, notes
