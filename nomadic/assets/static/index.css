@@ -6,6 +6,8 @@ body {
   margin: 0;
   background-color: white;
   color: #333;
+
+  padding-top: 4em;
 }
 
 body > *:first-child {
@@ -394,9 +396,12 @@ mark {
 
 
 .note, .notes {
-    padding: 2em;
     max-width: 640px;
     margin: 0 auto;
+    overflow-x: hidden;
+}
+.note {
+    padding: 4em 0;
 }
 .notes li {
     margin: 2em 0;
@@ -412,10 +417,16 @@ mark {
 }
 .notebooks {
   background: #f6f6f6;
+  position: fixed;
+  z-index: 10;
+  width: 10em;
 }
 .notebooks, .notes, .crumbs, .results {
   padding: 2em;
   list-style-type: none;
+}
+.notes {
+    padding-left: 16em;
 }
 .match {
     background: red;
@@ -424,15 +435,21 @@ mark {
 }
 form[name=search] {
     float: right;
-    position: relative;
+    position: fixed;
     top: 0.8em;
     right: 1em;
+    z-index: 20;
 }
 
 .crumbs {
     padding: 1em;
     margin: 0;
     background: #f4f4f4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
 }
 .crumbs li {
     display: inline-block;
