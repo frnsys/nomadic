@@ -13,8 +13,7 @@ from whoosh.fields import *
 from whoosh.qparser import QueryParser
 
 from nomadic.util import parsers
-from nomadic.core import Notebook
-from nomadic.core.path import Path
+from nomadic.core.models import Note, Notebook, Path
 
 
 schema = Schema(title=TEXT(stored=True),
@@ -104,10 +103,11 @@ class Index():
             results.fragmenter.surround = 100
             for result in results:
                 highlights = result.highlights('content')
+                note = Note(result['path'])
                 if not html:
                     parser.feed(highlights)
                     highlights = parser.get_data()
-                yield result, highlights
+                yield note, highlights
 
 
     def add_notes(self, notes):

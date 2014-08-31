@@ -27,6 +27,8 @@ define([
 
 
         bind_interface: function() {
+            var self = this;
+
             $('.js-show-notebooks, .js-show-notes').on('click', function() {
                 $('.selected-nav').removeClass('selected-nav');
                 $(this).addClass('selected-nav');
@@ -45,6 +47,11 @@ define([
             $('.notebooks').on('click', 'a', function() {
                 $('.js-show-notes').click();
             });
+
+            $('input[name=query]').on('keyup', function() {
+                var query = $(this).val();
+                self.search(query);
+            });
         },
 
 
@@ -58,7 +65,7 @@ define([
         get_notebook: function(path) {
             var self = this;
 
-            self.fetch(path, function(data) {
+            self.fetch(path, '/nb/', function(data) {
                 self.notebook
                     .set({
                         name: data.name,
@@ -74,11 +81,10 @@ define([
         get_note: function(path) {
             var self = this;
 
-            self.fetch(path, function(data) {
+            self.fetch(path, '/n/', function(data) {
                 self.note.set({
                     title: data.title,
-                    html: data.html,
-                    nburl: data.nburl
+                    html: data.html
                 });
 
                 if (self.notebook.get('name') === undefined) {
@@ -87,18 +93,41 @@ define([
             });
         },
 
+        search: function(query) {
+            var self = this;
 
-        fetch: function(path, handler) {
+            $.ajax({
+                url: '/search',
+                type: 'POST',
+                data: {
+                    query: query
+                },
+                success: function(data) {
+                    self.notebook
+                        .set({
+                            name: data.name,
+                            url: data.url
+                        })
+                        .get('notes').reset(data.notes);
+
+                    if (data.notes.length > 0)
+                        self.get_note(data.notes[0].url);
+                }
+            });
+        },
+
+
+        fetch: function(path, endpoint, handler) {
             path = path || '';
 
             $.ajax({
-                url: '/n/' + path,
+                url: endpoint + path,
                 type: 'GET',
                 success: function(data) {
                     handler(data);
 
                 }, error: function(xhr, status, err) {
-                    alert('Error: ' + status);
+                    alert(xhr.status.toString() + ' : ' + xhr.responseText);
                 }
             });
         }

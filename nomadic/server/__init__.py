@@ -37,7 +37,7 @@ class Server():
             This seems necessary to get
             the SocketIO emitting working properly...
             """
-            self.app.logger.debug('User connected.')
+            pass
 
 
     def start(self):

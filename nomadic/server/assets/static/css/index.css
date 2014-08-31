@@ -462,6 +462,12 @@ nav > ul li {
 .notes li {
     margin: 2em 0;
 }
+.notes h6 {
+    margin: 2em 0;
+    background: #777;
+    color: #fff;
+    padding: 0.5em;
+}
 .notes span {
     font-size: 1.2em;
 }

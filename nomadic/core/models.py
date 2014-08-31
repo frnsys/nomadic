@@ -1,9 +1,25 @@
 import os
 import shutil
 
-from nomadic.core.path import Path
+from nomadic import conf
 from nomadic.core.errors import NoteConflictError
 from nomadic.util import pdf, parsers, valid_notebook, valid_note
+
+
+class Path():
+    def __init__(self, path):
+        if isinstance(path, str):
+            path = path.decode('utf-8')
+
+        if os.path.isabs(path):
+            self.abs = path
+            self.rel = os.path.relpath(path, conf.ROOT)
+        else:
+            self.rel = path
+            self.abs = os.path.join(conf.ROOT, path)
+
+
+
 
 
 class Note():
@@ -152,6 +168,18 @@ class Notebook():
         """
         Tree of notebooks under
         this notebook.
+
+        E.g::
+
+            [
+                notebook,
+                notebook
+                [
+                    notebook,
+                    notebook
+                ],
+                notebook
+            ]
         """
         tree = []
 

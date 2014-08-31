@@ -6,9 +6,7 @@ from datetime import datetime
 from flask import Blueprint, Response, render_template, request, jsonify
 
 from nomadic import nomadic
-from nomadic.core.path import Path
-from nomadic.core import Note, Notebook
-from nomadic.server import build
+from nomadic.core.models import Note, Notebook, Path
 from nomadic.util import html2md, md2html, parsers
 
 
@@ -38,20 +36,19 @@ def handle(path=''):
         return 'Not found.', 404
 
 
-@routes.route('/n/')
-@routes.route('/n/<path:path>')
-def n(path=''):
+@routes.route('/nb/')
+@routes.route('/nb/<path:path>')
+def nb(path=''):
     """
     Returns JSON objects representing a Note or a Notebook,
     depending on the specified path.
     """
     path = urllib.unquote(path)
-    p = Path(path)
+    notebook = Notebook(path)
 
-    # Notebook
-    if os.path.isdir(p.abs):
-        notebook = Notebook(path)
+    if os.path.isdir(notebook.path.abs):
         notebooks, notes = notebook.contents
+        sorted_notes = sorted(notes, key=lambda x: x.last_modified, reverse=True)
 
         return jsonify({
             'name': notebook.name,
@@ -61,16 +58,19 @@ def n(path=''):
                     'images': note.images,
                     'excerpt': note.excerpt,
                     'url': note.path.rel
-                } for note in notes],
-            'notebooks': [{
-                    'name': nb.name,
-                    'url': nb.path.rel
-                } for nb in notebooks]
+                } for note in sorted_notes]
         })
 
-    # Note
-    elif os.path.isfile(p.abs):
-        note = Note(p.abs)
+    else:
+        return 'Not found.', 404
+
+
+@routes.route('/n/<path:path>')
+def n(path):
+    path = urllib.unquote(path)
+    note = Note(path)
+
+    if os.path.isfile(note.path.abs):
         content = note.content
 
         if note.ext == '.md':
@@ -90,7 +90,17 @@ def n(path=''):
 def search():
     q = request.form['query']
     results = nomadic.index.search(q, html=True)
-    return render_template('results.html', results=results)
+
+    return jsonify({
+        'name': 'search results',
+        'url': None,
+        'notes': [{
+                'title': note.title,
+                'images': note.images,
+                'excerpt': highlights,
+                'url': note.path.rel
+            } for note, highlights in results]
+    })
 
 
 @routes.route('/new')

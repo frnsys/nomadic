@@ -11,8 +11,8 @@ from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
 
-from nomadic.core import Note, Notebook
 from nomadic.util import valid_note, parsers
+from nomadic.core.models import Note, Notebook
 from nomadic.demon.logger import log
 
 class Handler(PatternMatchingEventHandler):
@@ -46,9 +46,6 @@ class Handler(PatternMatchingEventHandler):
         if not event.is_directory:
             note = Note(p)
             self.n.index.add_note(note)
-        else:
-            notebook = Notebook(p)
-            self.n.index.update()
 
     def on_deleted(self, event):
         p = event.src_path.decode('utf-8')
