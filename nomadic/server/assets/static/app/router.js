@@ -126,6 +126,9 @@ define([
 
         fetch: function(path, endpoint, handler) {
             path = path || '';
+
+            // Undo existing encoding, then encode the whole thing.
+            path = decodeURIComponent(path);
             path = encodeURIComponent(path);
 
             $.ajax({
