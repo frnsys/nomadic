@@ -27,16 +27,30 @@ define([
                 el: $('.notebooks'),
                 collection: notebooks
             });
+
+            $('.js-show-notebooks').on('click', function() {
+                $('.notes').hide();
+                $('.notebooks').show();
+            });
+            $('.js-show-notes').on('click', function() {
+                $('.notes').show();
+                $('.notebooks').hide();
+            });
         },
 
 
         routes: {
-            '*path': 'handle'
+            '*path(/)': 'fetch'
         },
 
-        handle: function(path) {
+        fetch: function(path) {
             var self = this;
             path = path || '';
+
+            // Catch and fix up trailing slashes.
+            if (path[path.length - 1] === '/')
+                path = path.replace(/\/$/, "");
+                self.navigate(path, {replace:true});
 
             $.ajax({
                 url: '/n/' + path,
@@ -49,14 +63,18 @@ define([
                         });
 
                     } else if (data.type === 'notebook') {
-                        var nb = self.notebookView.model;
-                        nb.set({ name: data.name });
-                        nb.get('notes').reset(data.notes);
+                        self.notebookView.model
+                            .set({ name: data.name })
+                            .get('notes').reset(data.notes);
 
                         self.notebooksView.collection.reset(data.notebooks);
+
+                        // Fetch the notebook's first note.
+                        self.fetch(data.notes[0].url);
                     }
+
                 }, error: function(xhr, status, err) {
-                    alert(status);
+                    alert('Error: ' + status);
                 }
             });
         }

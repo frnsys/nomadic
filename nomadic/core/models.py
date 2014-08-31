@@ -47,7 +47,7 @@ class Note():
 
     @property
     def excerpt(self):
-        char_limit = 400
+        char_limit = 200
         excerpt = self.plaintext
         if len(excerpt) > char_limit:
             excerpt = excerpt[:char_limit-3] + '...'

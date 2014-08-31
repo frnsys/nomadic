@@ -1,3 +1,22 @@
+* {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+::-moz-selection {
+    background: $focused;
+    text-shadow: none;
+    color: white;
+}
+
+::selection {
+    background: $focused;
+    text-shadow: none;
+    color: white;
+}
+
+
 body {
   font-family: Helvetica, arial, sans-serif;
   font-size: 14px;
@@ -395,13 +414,47 @@ mark {
 }
 
 
-.note, .notes {
-    max-width: 640px;
-    margin: 0 auto;
+nav {
+    width: 25%;
+    padding: 0.5em 2em 2em 2em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    overflow-y: scroll;
     overflow-x: hidden;
 }
+nav > ul {
+    list-style-type: none;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+nav > ul li {
+    display: inline-block;
+    cursor: pointer;
+    margin: 0 2em;
+}
 .note {
-    padding: 4em 0;
+    width: 75%;
+    margin: 0 auto;
+    overflow-x: hidden;
+    padding: 4em 2em;
+    margin-left: 25%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    overflow-y: scroll;
+    height: 100%;
+}
+.note .content {
+    max-width: 640px;
+    margin: 0 auto;
+}
+.notes > ul,
+.notebooks > ul {
+    padding: 0;
+    list-style-type: none;
 }
 .notes li {
     margin: 2em 0;
@@ -414,15 +467,12 @@ mark {
     color: #aaa;
     font-style: italic;
     font-size: 0.9em;
+    word-wrap: break-word;
 }
 .notebooks {
-  background: #f6f6f6;
-  position: fixed;
-  z-index: 10;
-  width: 10em;
+  display: none;
 }
-.notebooks, .notes > ul, .crumbs, .results {
-  padding: 2em;
+.notebooks > ul, .notes > ul, .crumbs, .results {
   list-style-type: none;
 }
 .match {

@@ -4,7 +4,7 @@
         <li>
             <span><%= note.title %></span>
             <p><%= note.excerpt %></p>
-            <% if (note.images) { %>
+            <% if (note.images.length > 0) { %>
                 <ul class="thumbs">
                     <% for (var j in note.images) { %>
                         <img src="<%= note.images[j] %>">

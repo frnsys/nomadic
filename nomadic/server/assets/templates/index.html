@@ -18,12 +18,18 @@
     </form>
 
     <main role="main">
-        <div class="notebooks"></div>
-        <div class="notes"></div>
+        <nav>
+            <ul>
+                <li class="js-show-notebooks">notebooks</li>
+                <li class="js-show-notes">notes</li>
+            </ul>
+            <div class="notebooks"></div>
+            <div class="notes"></div>
+        </nav>
         <div class="note"></div>
     </main>
 
-    <script type="text/javascript" src="/static/js/vendor/requirejs/require.js" data-main="/static/js/config"></script>
+    <script type="text/javascript" src="/static/vendor/requirejs/require.js" data-main="/static/app/config"></script>
 
 </body>
 </html>
