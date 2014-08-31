@@ -9,7 +9,6 @@ def daemon(debug):
     """
     Launch the Nomadic daemon.
     """
-
     nomadic.index.update()
 
     demon.start(nomadic, conf.PORT, debug=debug)

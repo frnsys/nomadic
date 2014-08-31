@@ -16,7 +16,8 @@ from nomadic.core.models import Note, Notebook
 from nomadic.demon.logger import log
 
 class Handler(PatternMatchingEventHandler):
-    patterns = ['*'] # match everything b/c we want to match directories as well.
+    # Match everything b/c we want to match directories as well.
+    patterns = ['*']
     ignore_patterns = ['*.build*', '*.searchindex*']
 
     def __init__(self, nomadic):
@@ -55,7 +56,6 @@ class Handler(PatternMatchingEventHandler):
             note = Note(p)
             self.n.index.delete_note(note)
         else:
-            notebook = Notebook(p)
             self.n.index.update()
 
     def on_moved(self, event):

@@ -27,31 +27,34 @@ define([
 
 
         bind_interface: function() {
-            var self = this;
+            var self = this,
+                $note_ctrl = $('[data-pane=".note"]'),
+                $notes_ctrl = $('[data-pane=".notes"]');
 
-            $('.js-show-notebooks, .js-show-notes').on('click', function() {
+            $('.controls li').on('click', function() {
+                var cls = $(this).data('pane');
+
                 $('.selected-nav').removeClass('selected-nav');
                 $(this).addClass('selected-nav');
+
+                $('.notebooks, .notes').hide();
+                $('.note').css('z-index', 0);
+                $(cls).show();
             });
 
-            $('.js-show-notebooks').on('click', function() {
-                $('.notes').hide();
-                $('.notebooks').show();
-            });
-
-            $('.js-show-notes').on('click', function() {
-                $('.notes').show();
-                $('.notebooks').hide();
+            $note_ctrl.on('click', function() {
+                $('.note').css('z-index', 2);
             });
 
             $('.notebooks').on('click', 'a', function() {
-                $('.js-show-notes').click();
+                $notes_ctrl.click();
             });
 
             $('input[name=query]').on('keyup', function() {
                 var query = $(this).val();
                 if (query.length >= 3) {
                     self.search(query);
+                    $notes_ctrl.click();
                 }
             });
         },
@@ -64,8 +67,9 @@ define([
         },
 
 
-        get_notebook: function(path) {
-            var self = this;
+        get_notebook: function(path, load_note) {
+            var self = this,
+                load_note = load_note !== false;
 
             self.fetch(path, '/nb/', function(data) {
                 self.notebook
@@ -75,7 +79,8 @@ define([
                     })
                     .get('notes').reset(data.notes);
 
-                self.get_note(data.notes[0].url);
+                if (load_note)
+                    self.get_note(data.notes[0].url);
             });
         },
 
@@ -90,7 +95,7 @@ define([
                 });
 
                 if (self.notebook.get('name') === undefined) {
-                    self.get_notebook(data.nburl);
+                    self.get_notebook(data.nburl, false);
                 }
             });
         },
@@ -121,6 +126,7 @@ define([
 
         fetch: function(path, endpoint, handler) {
             path = path || '';
+            path = encodeURIComponent(path);
 
             $.ajax({
                 url: endpoint + path,

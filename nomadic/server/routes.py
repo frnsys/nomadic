@@ -12,6 +12,9 @@ from nomadic.util import html2md, md2html, parsers
 
 routes = Blueprint('routes', __name__)
 
+def quote(path):
+    return urllib.quote(path.encode('utf-8'))
+
 
 @routes.route('/')
 @routes.route('/<path:path>')
@@ -52,12 +55,12 @@ def nb(path=''):
 
         return jsonify({
             'name': notebook.name,
-            'url': notebook.path.rel,
+            'url': quote(notebook.path.rel),
             'notes': [{
                     'title': note.title,
                     'images': note.images,
                     'excerpt': note.excerpt,
-                    'url': note.path.rel
+                    'url': quote(note.path.rel)
                 } for note in sorted_notes]
         })
 
@@ -79,7 +82,7 @@ def n(path):
         return jsonify({
             'title': note.title,
             'html': content,
-            'nburl': note.notebook.path.rel
+            'nburl': quote(note.notebook.path.rel)
         })
 
     else:
@@ -98,7 +101,7 @@ def search():
                 'title': note.title,
                 'images': [os.path.join(note.notebook.path.rel, image) for image in note.images],
                 'excerpt': highlights,
-                'url': note.path.rel
+                'url': quote(note.path.rel)
             } for note, highlights in results]
     })
 
@@ -142,16 +145,17 @@ def upload():
 
 @routes.route('/note', methods=['POST', 'PUT', 'DELETE'])
 def editor():
+    form = request.form
     ext = '.md' if form['save_as_markdown'] else '.html'
     path = os.path.join(form['notebook'], form['title'] + ext) 
     note = Note(path)
 
     if request.method == 'POST':
-        save(note, request.form)
+        save(note, form)
         return 'Created', 201
 
     elif request.method == 'PUT':
-        save(note, request.form)
+        save(note, form)
         return 'Updated', 200
 
     elif request.method == 'DELETE':
@@ -159,7 +163,7 @@ def editor():
         return 'Deleted', 204
 
 
-def save(self, note, data):
+def save(note, data):
     html = data['html']
 
     if parsers.remove_html(html):
@@ -172,7 +176,6 @@ def save(self, note, data):
                 note.move(path_new)
             except NoteConflictError:
                 # 409 = Conflict
-                self.app.logger.debug('Note at {0} already exists.'.format(path_new))
                 return 'Note already exists', 409
 
         html = parsers.rewrite_external_images(html, note)
@@ -184,7 +187,7 @@ def save(self, note, data):
         note.clean_resources()
 
         # Update all connected clients.
-        self.refresh_clients()
+        #self.refresh_clients()
 
         return jsonify({
             'path': note.path.abs
