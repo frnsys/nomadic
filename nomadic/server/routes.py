@@ -96,7 +96,7 @@ def search():
         'url': None,
         'notes': [{
                 'title': note.title,
-                'images': note.images,
+                'images': [os.path.join(note.notebook.path.rel, image) for image in note.images],
                 'excerpt': highlights,
                 'url': note.path.rel
             } for note, highlights in results]

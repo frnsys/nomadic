@@ -50,7 +50,9 @@ define([
 
             $('input[name=query]').on('keyup', function() {
                 var query = $(this).val();
-                self.search(query);
+                if (query.length >= 3) {
+                    self.search(query);
+                }
             });
         },
 
