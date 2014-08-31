@@ -12,7 +12,6 @@ dir = os.path.dirname(path)
 NOTES_DIR_TEMPLATE = os.path.join(dir, u'notes')
 NOTES_DIR = os.path.join(dir, u'.notes', '')
 def _path(path): return os.path.join(NOTES_DIR, path)
-def compiled_path(path): return os.path.join(NOTES_DIR, u'.build', path)
 
 from nomadic import conf
 conf.ROOT = NOTES_DIR

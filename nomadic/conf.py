@@ -20,7 +20,6 @@ with open(cfg_path, 'r') as cfg_file:
     config.update(user_cfg)
 
 config['root'] = os.path.expanduser(config['root'])
-config['build_root'] = os.path.join(config['root'], u'.build', '')
 
 # Load the config vals onto the module.
 for key, val in config.items():

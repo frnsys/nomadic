@@ -4,11 +4,8 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
-from nomadic import conf
-from nomadic.core import Nomadic
+from nomadic import conf, nomadic
 from nomadic.util import evernote
-
-nomadic = Nomadic(conf.ROOT)
 
 @click.group()
 def cli():
@@ -21,12 +18,11 @@ def search(query):
     Search through notes.
     """
 
-    # Map notes to their temporary ids.
-    note_map = {}
+    results = []
 
-    for idx, (result, highlights) in enumerate(nomadic.index.search(query)):
-        path = result['path']
-        note_map[idx] = path
+    for idx, (note, highlights) in enumerate(nomadic.index.search(query)):
+        path = note.path.rel
+        results.append(path)
 
         # Show all the results.
         header = ('['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
@@ -34,17 +30,18 @@ def search(query):
         echo(highlights)
         echo('\n---')
 
-    if len(note_map) > 0:
+    if len(results) > 0:
         # Ask for an id and open the
         # file in the default editor.
         id = click.prompt('Select a note', type=int)
-        path = note_map[id]
+        path = results[id]
         if os.path.splitext(path)[1] == '.pdf':
             click.launch(path)
         else:
             click.edit(filename=path)
     else:
         echo('\nNo results for ' + Fore.RED + query + Fore.RESET + '\n')
+
 
 @cli.command()
 @click.argument('notebook', default='')
@@ -53,9 +50,7 @@ def browse(notebook):
     Browse through notes via a web browser.
     """
     nb = select_notebook(notebook)
-
-    path = nomadic.builder.to_build_path(nb.path.abs)
-    click.launch(os.path.join(path, 'index.html'))
+    click.launch('http://localhost:{0}/{1}/'.format(conf.PORT, nb.path.rel))
 
 
 @cli.command()
@@ -69,13 +64,6 @@ def index(reset):
     else:
         nomadic.index.update()
 
-
-@cli.command()
-def build():
-    """
-    Re-build the browsable tree.
-    """
-    nomadic.builder.build()
 
 @cli.command()
 def count():

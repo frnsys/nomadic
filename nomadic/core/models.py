@@ -1,9 +1,25 @@
 import os
 import shutil
 
-from nomadic.core.path import Path
+from nomadic import conf
 from nomadic.core.errors import NoteConflictError
 from nomadic.util import pdf, parsers, valid_notebook, valid_note
+
+
+class Path():
+    def __init__(self, path):
+        if isinstance(path, str):
+            path = path.decode('utf-8')
+
+        if os.path.isabs(path):
+            self.abs = path
+            self.rel = os.path.relpath(path, conf.ROOT)
+        else:
+            self.rel = path
+            self.abs = os.path.join(conf.ROOT, path)
+
+
+
 
 
 class Note():
@@ -14,7 +30,7 @@ class Note():
         self.title, self.ext = os.path.splitext(filename)
         self.buildname = self.title + '.html'
 
-        notebook_path = os.path.join(os.path.dirname(self.path.rel), '')
+        notebook_path = os.path.dirname(self.path.rel)
         self.notebook = Notebook(notebook_path)
 
 
@@ -47,7 +63,7 @@ class Note():
 
     @property
     def excerpt(self):
-        char_limit = 400
+        char_limit = 200
         excerpt = self.plaintext
         if len(excerpt) > char_limit:
             excerpt = excerpt[:char_limit-3] + '...'
@@ -145,6 +161,35 @@ class Notebook():
         for root, notebooks, notes in self.walk():
             for note in notes:
                 yield note
+
+
+    @property
+    def tree(self):
+        """
+        Tree of notebooks under
+        this notebook.
+
+        E.g::
+
+            [
+                notebook,
+                notebook
+                [
+                    notebook,
+                    notebook
+                ],
+                notebook
+            ]
+        """
+        tree = []
+
+        notebooks, _ = self.contents
+        for nb in notebooks:
+            tree.append(nb)
+            subtree = nb.tree
+            if subtree:
+                tree.append(subtree)
+        return tree
 
 
     @property

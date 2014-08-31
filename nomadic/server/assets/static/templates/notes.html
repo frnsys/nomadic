@@ -1,0 +1,16 @@
+<% for (var i in notes) { %>
+    <% var note = notes[i]; %>
+    <a href="<%= note.url %>">
+        <li>
+            <span><%= note.title %></span>
+            <p><%= note.excerpt %></p>
+            <% if (note.images.length > 0) { %>
+                <ul class="thumbs">
+                    <% for (var j in note.images) { %>
+                        <img src="<%= note.images[j] %>">
+                    <% } %>
+                </ul>
+            <% } %>
+        </li>
+    </a>
+<% } %>

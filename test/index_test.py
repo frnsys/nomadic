@@ -55,6 +55,6 @@ class IndexTest(NomadicTest):
     def test_search(self):
         results = [result for result in self.index.search('hullo')]
         self.assertEqual(len(results), 1)
-        self.assertEqual(results[0][0]['path'], 'some_notebook/a cool note.md')
+        self.assertEqual(results[0][0].path.rel, 'some_notebook/a cool note.md')
 
 

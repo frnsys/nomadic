@@ -11,12 +11,13 @@ from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
 
-from nomadic.core import Note, Notebook
 from nomadic.util import valid_note, parsers
+from nomadic.core.models import Note, Notebook
 from nomadic.demon.logger import log
 
 class Handler(PatternMatchingEventHandler):
-    patterns = ['*'] # match everything b/c we want to match directories as well.
+    # Match everything b/c we want to match directories as well.
+    patterns = ['*']
     ignore_patterns = ['*.build*', '*.searchindex*']
 
     def __init__(self, nomadic):
@@ -38,7 +39,6 @@ class Handler(PatternMatchingEventHandler):
             log.debug(u'Modified: {0}'.format(note.path.rel))
             if os.path.exists(note.path.abs):
                 self.n.index.update_note(note)
-                self.n.builder.compile_note(note)
 
     def on_created(self, event):
         p = event.src_path.decode('utf-8')
@@ -47,17 +47,6 @@ class Handler(PatternMatchingEventHandler):
         if not event.is_directory:
             note = Note(p)
             self.n.index.add_note(note)
-            self.n.builder.compile_note(note)
-        else:
-            notebook = Notebook(p)
-            self.n.index.update()
-            self.n.builder.compile_notebook(notebook)
-
-        # Update this note/notebook's
-        # parent directory index.
-        dir = os.path.dirname(p)
-        parent = Notebook(dir)
-        self.n.builder.index_notebook(parent)
 
     def on_deleted(self, event):
         p = event.src_path.decode('utf-8')
@@ -66,17 +55,8 @@ class Handler(PatternMatchingEventHandler):
         if not event.is_directory:
             note = Note(p)
             self.n.index.delete_note(note)
-            self.n.builder.delete_note(note)
         else:
-            notebook = Notebook(p)
             self.n.index.update()
-            self.n.builder.delete_notebook(notebook)
-
-        # Update this note/notebook's
-        # parent directory index.
-        dir = os.path.dirname(p)
-        parent = Notebook(dir)
-        self.n.builder.index_notebook(parent)
 
     def on_moved(self, event):
         src = event.src_path.decode('utf-8')
@@ -90,25 +70,12 @@ class Handler(PatternMatchingEventHandler):
             self.n.index.delete_note(src_note)
             self.n.index.add_note(dest_note)
 
-            self.n.builder.delete_note(src_note)
-            self.n.builder.compile_note(dest_note)
         else:
-            src_notebook = Notebook(src)
-            dest_notebook = Notebook(dest)
-
             self.n.index.update()
-            self.n.builder.delete_notebook(src_notebook)
-            self.n.builder.compile_notebook(dest_notebook)
 
         # Update all references to this
         # path in any .md or .html files.
         self.update_references(src, dest)
-
-        # Update the compiled indexes.
-        for p in [src, dest]:
-            dir = os.path.dirname(p)
-            parent = Notebook(dir)
-            self.n.builder.index_notebook(parent)
 
     # TO DO:
     # might need a separate daemon/watcher for this
@@ -141,7 +108,6 @@ class Handler(PatternMatchingEventHandler):
                                 content = content.replace(link, link_)
 
                     note.write(content.encode('utf-8'))
-                    self.n.builder.compile_note(note)
 
     def update_reference(self, src_filename, src_abs, dest_abs):
         def wrapper(current_dir):

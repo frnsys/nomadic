@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% macro render_tree(tree) -%}
+    <ul>
+        {% for notebook in tree %}
+            {% if notebook is iterable %}
+                {{ render_tree(notebook) }}
+            {% else %}
+                <li><a href="{{ notebook.path.rel + '/' }}">{{ notebook.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{%- endmacro %}
+
+{% block content %}
+
+    <main role="main">
+        <div class="controls">
+            <ul>
+                <li data-pane=".notebooks">notebooks</li>
+                <li data-pane=".notes" class="selected-nav">notes</li>
+                <li data-pane=".note">note</li>
+            </ul>
+
+            <form action="/search" method="POST" name="search">
+                <input type="text" name="query" />
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <nav>
+            <div class="notebooks">
+                {{ render_tree(tree) }}
+            </div>
+            <div class="notes"></div>
+        </nav>
+        <div class="note"></div>
+    </main>
+
+    <script type="text/javascript" src="/static/vendor/requirejs/require.js" data-main="/static/app/config"></script>
+
+{% endblock %}

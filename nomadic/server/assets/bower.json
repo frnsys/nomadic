@@ -1,0 +1,11 @@
+{
+  "name": "nomadic",
+  "dependencies": {
+    "requirejs": "latest",
+    "lodash": "latest",
+    "backbone": "latest",
+    "layoutmanager": "latest",
+    "socket.io": "latest",
+    "lodash-template-loader": "latest"
+  }
+}
