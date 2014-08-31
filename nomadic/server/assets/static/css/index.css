@@ -421,12 +421,9 @@ mark {
   z-index: 10;
   width: 10em;
 }
-.notebooks, .notes, .crumbs, .results {
+.notebooks, .notes > ul, .crumbs, .results {
   padding: 2em;
   list-style-type: none;
-}
-.notes {
-    padding-left: 16em;
 }
 .match {
     background: red;

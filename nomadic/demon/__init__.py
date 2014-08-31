@@ -12,7 +12,9 @@ import time
 from watchdog.observers import Observer
 from daemon import DaemonContext
 
-from nomadic.demon import server, handler, logger
+from nomadic.util import logger
+from nomadic.server import Server
+from nomadic.demon.handler import Handler
 
 
 def start(nomadic, port, debug=False):
@@ -29,8 +31,8 @@ def start(nomadic, port, debug=False):
 def summon(nomadic, port):
     try:
         ob = Observer()
-        srvr = server.Server(nomadic, port)
-        hndlr = handler.Handler(nomadic)
+        srvr = Server(port)
+        hndlr = Handler(nomadic)
 
         ob.schedule(hndlr, nomadic.notes_path, recursive=True)
 

@@ -1,0 +1,26 @@
+<h1><%= title %></h1>
+<div><%= html %></div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({ tex2jax: { inlineMath: [['m$','$m'], ["\\(","\\)"]], processEscapes: true } });
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<!--
+<script type="text/javascript" charset="utf-8">
+    $(function() {
+        var socket = io.connect('http://localhost:9137');
+
+        socket.on('connect', function() {
+            // To ensure connection with server.
+            socket.emit('connect');
+        });
+
+        socket.on('refresh', function(msg) {
+            location.reload();
+        });
+
+        MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+    });
+</script>
+-->

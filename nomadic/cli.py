@@ -4,11 +4,8 @@ import click
 from click import echo
 from colorama import Fore, Back, Style
 
-from nomadic import conf
-from nomadic.core import Nomadic
+from nomadic import nomadic
 from nomadic.util import evernote
-
-nomadic = Nomadic(conf.ROOT)
 
 @click.group()
 def cli():
@@ -54,6 +51,7 @@ def browse(notebook):
     """
     nb = select_notebook(notebook)
 
+    # TO DO change this
     path = nomadic.builder.to_build_path(nb.path.abs)
     click.launch(os.path.join(path, 'index.html'))
 
@@ -69,13 +67,6 @@ def index(reset):
     else:
         nomadic.index.update()
 
-
-@cli.command()
-def build():
-    """
-    Re-build the browsable tree.
-    """
-    nomadic.builder.build()
 
 @cli.command()
 def count():

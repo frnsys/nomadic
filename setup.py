@@ -24,7 +24,7 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        nomadic=nomadic:cli
-        nomadic-d=nomadic:daemon
+        nomadic=nomadic.cli:cli
+        nomadic-d=nomadic.daemon:daemon
     ''',
 )

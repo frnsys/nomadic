@@ -4,7 +4,7 @@ def valid_notebook(path):
     We want to ignore the build and searchindex
     as well as all resource directories.
     """
-    for excluded in ['.build', '.searchindex', '_resources', '.SyncArchive', '.SyncID', '.SyncIgnore', '.DS_Store']:
+    for excluded in ['.searchindex', '_resources', '.SyncArchive', '.SyncID', '.SyncIgnore', '.DS_Store']:
         if excluded in path: return False
     return True
 
