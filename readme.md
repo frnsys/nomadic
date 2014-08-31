@@ -29,6 +29,9 @@ I recommend using `nomadic` with [BitTorrent Sync](www.bittorrent.com/sync) to k
 notes synced across devices. With this setup, `nomadic` becomes a decentralized,
 simplified alternative to Evernote.
 
+Since `nomadic` runs a small server for browsing files, you can access your notes remotely
+that way as well.
+
 Power users of Evernote might find it lacking but it's not for them :)
 
 ---
@@ -45,7 +48,7 @@ update those references if the files are moved
 * The rich text editor can **convert and save HTML notes into Markdown**
 * **Auto-recompiling of Markdown** notes and updating of whatever browser is
 viewing the note (i.e. live-ish previews)
-* Automatically builds **a browsable site of all your notes**
+* Serves **a browsable site of all your notes**
 * Complete **command-line interface**
 
 ---
@@ -68,11 +71,11 @@ you.
 
 ### The Daemon
 The daemon watches your notes directory and automatically updates
-the index and compiles notes when they change.
+the index as they change.
 It will also automatically update references to other notes as they
 change.
 
-The daemon also runs a small websockets server which allows for
+The daemon also runs a small server which allows for
 easy browsing/searching through notes as well as a quick way
 of previewing notes as you work on them.
 
@@ -154,7 +157,6 @@ Options:
 
 Commands:
   browse  Browse through notes via a web browser.
-  build   Re-build the browsable tree.
   count   Get the number of notes.
   index   Update or reset the note index.
   new     Create a new note.
@@ -162,16 +164,7 @@ Commands:
 ```
 
 ### Browsing notes
-The `nomadic` daemon compiles your notes into a browsable local
-HTML structure as they change.
-
-It compiles only HTML and Markdown notes.
-
-References to local files are made relative
-to the build directory, so no
-extra files are redundantly copied over.
-
-You can browse this structure by running:
+You can browse this notes site by running:
 
 ```bash
 $ nomadic browse
@@ -228,20 +221,6 @@ To run the included tests:
 $ pip install nose
 $ nosetests test
 ```
-
-## Shortcomings (future to dos?)
-* You have to premeditate syncing. That is, with Evernote, you can
-log into your Evernote account from any computer and access your
-notes without needing to set anything up beforehand. If you're using
-BitTorrent sync, you must set up syncing in advance to access your
-`nomadic` notes. But if you're using a cloud
-service for syncing such as Dropbox, you can just log into that and
-access your notes from anywhere as well. **Update:** this is less of an
-issue now that the daemon runs a small server, so in theory you could
-access your files that way. You'd want to wrap it some authentication
-though.
-
----
 
 ## Acknowledgements
 The CSS stylesheet used for the compiled notes is based on the one from [here](https://gist.github.com/tuzz/3331384).
