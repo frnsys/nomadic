@@ -1,3 +1,15 @@
+{% macro render_tree(tree) -%}
+    <ul>
+        {% for notebook in tree %}
+            {% if notebook is iterable %}
+                {{ render_tree(notebook) }}
+            {% else %}
+                <li><a href="{{ notebook.path.rel + '/' }}">{{ notebook.name }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{%- endmacro %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -21,9 +33,11 @@
         <nav>
             <ul>
                 <li class="js-show-notebooks">notebooks</li>
-                <li class="js-show-notes">notes</li>
+                <li class="js-show-notes selected-nav">notes</li>
             </ul>
-            <div class="notebooks"></div>
+            <div class="notebooks">
+                {{ render_tree(tree) }}
+            </div>
             <div class="notes"></div>
         </nav>
         <div class="note"></div>

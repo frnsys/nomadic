@@ -5,13 +5,13 @@
 }
 
 ::-moz-selection {
-    background: $focused;
+    background: #222;
     text-shadow: none;
     color: white;
 }
 
 ::selection {
-    background: $focused;
+    background: #222;
     text-shadow: none;
     color: white;
 }
@@ -434,6 +434,9 @@ nav > ul li {
     display: inline-block;
     cursor: pointer;
     margin: 0 2em;
+}
+.selected-nav {
+    text-decoration: underline;
 }
 .note {
     width: 75%;

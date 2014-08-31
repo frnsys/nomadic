@@ -27,7 +27,7 @@ def handle(path=''):
     p = Path(urllib.unquote(path))
 
     if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md':
-        return render_template('index.html')
+        return render_template('index.html', tree=nomadic.rootbook.tree)
 
     elif os.path.isfile(p.abs):
         with open(p.abs, 'rb') as file:
@@ -45,26 +45,27 @@ def n(path=''):
     Returns JSON objects representing a Note or a Notebook,
     depending on the specified path.
     """
-    p = Path(urllib.unquote(path))
+    path = urllib.unquote(path)
+    p = Path(path)
 
     # Notebook
     if os.path.isdir(p.abs):
-        notebook = Notebook(p.abs)
+        notebook = Notebook(path)
         notebooks, notes = notebook.contents
 
         return jsonify({
-            'type': 'notebook',
             'name': notebook.name,
+            'url': notebook.path.rel,
             'notes': [{
                     'title': note.title,
-                    'images': [os.path.join(notebook.name, image) for image in note.images],
+                    'images': note.images,
                     'excerpt': note.excerpt,
                     'url': note.path.rel
                 } for note in notes],
             'notebooks': [{
-                    'name': notebook.name,
-                    'url': notebook.path.rel
-                } for notebook in notebooks]
+                    'name': nb.name,
+                    'url': nb.path.rel
+                } for nb in notebooks]
         })
 
     # Note
@@ -76,9 +77,9 @@ def n(path=''):
             content = md2html.compile_markdown(content)
 
         return jsonify({
-            'type': 'note',
             'title': note.title,
-            'html': content
+            'html': content,
+            'nburl': note.notebook.path.rel
         })
 
     else:

@@ -62,20 +62,3 @@ def _write_index(self, path, notebooks, notes):
 
     with open( os.path.join(path, 'index.html'), 'w' ) as index:
         index.write(rendered.encode('utf-8'))
-
-
-def _build_breadcrumbs(self, path):
-    # Get rid of the build path.
-    path = path.replace(self.build_path, '')
-
-    # Create some name for the root notebook.
-    path = os.path.join('notes', path)
-
-    # Split the path into the crumbs.
-    # Filter out any empty crumbs.
-    crumbs = filter(None, path.split('/'))
-
-    # Remove the file extension from the last crumb.
-    crumbs[-1], _ = os.path.splitext(crumbs[-1])
-
-    return crumbs

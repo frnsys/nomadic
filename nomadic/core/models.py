@@ -14,7 +14,7 @@ class Note():
         self.title, self.ext = os.path.splitext(filename)
         self.buildname = self.title + '.html'
 
-        notebook_path = os.path.join(os.path.dirname(self.path.rel), '')
+        notebook_path = os.path.dirname(self.path.rel)
         self.notebook = Notebook(notebook_path)
 
 
@@ -145,6 +145,23 @@ class Notebook():
         for root, notebooks, notes in self.walk():
             for note in notes:
                 yield note
+
+
+    @property
+    def tree(self):
+        """
+        Tree of notebooks under
+        this notebook.
+        """
+        tree = []
+
+        notebooks, _ = self.contents
+        for nb in notebooks:
+            tree.append(nb)
+            subtree = nb.tree
+            if subtree:
+                tree.append(subtree)
+        return tree
 
 
     @property

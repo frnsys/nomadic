@@ -3,8 +3,7 @@ define([
 
     'modules/note',
 
-    'template!notebook',
-    'template!notebooks'
+    'template!notebook'
 ], function(Backbone, Note, notebook_tpl, notebooks_tpl) {
     'use strict';
 
@@ -15,14 +14,10 @@ define([
 
     Notebook.Model = Backbone.Model.extend({
         defaults: {
-            name: '',
+            url: '',
+            name: undefined,
             notes: new Note.Collection()
         }
-    });
-
-
-    Notebook.Collection = Backbone.Collection.extend({
-        model: Notebook.Model
     });
 
 
@@ -42,21 +37,6 @@ define([
             this.notesView.setElement(this.$el.find('ul'));
         }
     });
-
-
-    Notebook.Views.List = Backbone.View.extend({
-        initialize: function(options) {
-            this.collection = options.collection;
-            this.listenTo(this.collection, 'reset', this.render);
-        },
-
-        render: function() {
-            var data = this.collection.toJSON(),
-                html = notebooks_tpl({notebooks: data});
-            this.$el.html(html);
-        }
-    });
-
 
     return Notebook;
 });
