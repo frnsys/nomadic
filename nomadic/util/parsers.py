@@ -70,8 +70,7 @@ def rewrite_external_images(raw_html, note):
             if not os.path.exists(save_path):
                 filename, _ = urllib.urlretrieve(link, save_path)
 
-            # Return relative path.
-            return save_path.replace(nbp, '')
+            return os.path.relpath(save_path, nbp)
         return link
     return rewrite_links(raw_html, rewriter)
 
