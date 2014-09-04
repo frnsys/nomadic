@@ -33,6 +33,41 @@ define([
             var data = this.model.toJSON(),
                 html = note_tpl(data);
             this.$el.html(html);
+        },
+
+        events: {
+            'click .js-edit': 'edit',
+            'click .js-save': 'save',
+            'click .js-cancel': 'cancel'
+        },
+
+        edit: function() {
+            this.$el.find('.plaintext-editor, .js-save, .js-cancel').show();
+            this.$el.find('.content, .js-edit').hide();
+        },
+
+        cancel: function() {
+            this.$el.find('.plaintext-editor, .js-save, .js-cancel').hide();
+            this.$el.find('.content, .js-edit').show();
+        },
+
+        save: function() {
+            var self = this,
+                text = this.$el.find('.plaintext-editor').val();
+            text = $.trim(text);
+
+            $.ajax({
+                url: '/n/' + this.model.get('path'),
+                type: 'PUT',
+                data: {
+                    text: text
+                },
+                success: function(data) {
+                    self.model.set(data);
+                }, error: function(xhr, status, err) {
+                    alert(xhr.status.toString() + ' : ' + xhr.responseText);
+                }
+            });
         }
     });
 

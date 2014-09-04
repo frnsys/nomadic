@@ -91,7 +91,9 @@ define([
             self.fetch(path, '/n/', function(data) {
                 self.note.set({
                     title: data.title,
-                    html: data.html
+                    html: data.html,
+                    path: data.path,
+                    raw: data.raw
                 });
 
                 if (self.notebook.get('name') === undefined) {

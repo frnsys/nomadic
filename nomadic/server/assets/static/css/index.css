@@ -399,13 +399,17 @@ pre code, pre tt {
   border: none;
 }
 
+textarea {
+    display: block;
+    padding: 0.5em 1em;
+}
+
 mark {
     background: #FFFF88;
 }
 
 
 /* ----------------------------------- */
-
 
 .controls {
     position: fixed;
@@ -432,6 +436,16 @@ mark {
 }
 .controls li:last-child {
     display: none;
+}
+.note-controls {
+    text-align: right;
+}
+.note-controls li {
+    color: #e0e0e0;
+    text-decoration: underline;
+    display: inline-block;
+    cursor: pointer;
+    margin-left: 1em;
 }
 form[name=search] {
     float: right;
@@ -466,10 +480,16 @@ nav {
     top: 0;
     overflow-y: scroll;
 }
-.note .content {
+.note .content,
+.plaintext-editor {
     max-width: 640px;
     margin: 0 auto;
     word-break: break-word;
+}
+.plaintext-editor {
+    display: none;
+    width: 100%;
+    height: 100%;
 }
 
 .notes > ul,

@@ -68,22 +68,32 @@ def nb(path=''):
         return 'Not found.', 404
 
 
-@routes.route('/n/<path:path>')
+@routes.route('/n/<path:path>', methods=['GET', 'PUT'])
 def n(path):
     path = urllib.unquote(path)
     note = Note(path)
 
     if os.path.isfile(note.path.abs):
-        content = note.content
+
+        if request.method == 'PUT':
+            text = request.form['text']
+            note.write(text)
+
+        raw = note.content
 
         if note.ext == '.md':
-            content = md2html.compile_markdown(content)
+            content = md2html.compile_markdown(raw)
+        else:
+            content = raw
 
         return jsonify({
             'title': note.title,
             'html': content,
+            'path': path,
+            'raw': raw,
             'nburl': quote(note.notebook.path.rel)
         })
+
 
     else:
         return 'Not found.', 404
