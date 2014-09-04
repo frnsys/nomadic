@@ -27,6 +27,7 @@ define([
     Note.Views.Single = Backbone.View.extend({
         initialize: function() {
             this.listenTo(this.model, 'change', this.render);
+            $(document).on('keydown', this.keydown.bind(this));
         },
 
         render: function() {
@@ -39,6 +40,25 @@ define([
             'click .js-edit': 'edit',
             'click .js-save': 'save',
             'click .js-cancel': 'cancel'
+        },
+
+        keydown: function(e) {
+            if (e.ctrlKey) {
+                switch(e.keyCode) {
+                    case 69: // e
+                        e.preventDefault();
+                        this.edit();
+                        break;
+                    case 88: // x
+                        e.preventDefault();
+                        this.cancel();
+                        break;
+                    case 83: // s
+                        e.preventDefault();
+                        this.save();
+                        break;
+                }
+            }
         },
 
         edit: function() {
@@ -68,6 +88,11 @@ define([
                     alert(xhr.status.toString() + ' : ' + xhr.responseText);
                 }
             });
+        },
+
+        remove: function() {
+            $(document).off('keydown', this.keydown);
+            Backbone.View.prototype.remove.call(this);
         }
     });
 
