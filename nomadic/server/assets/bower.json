@@ -6,6 +6,7 @@
     "backbone": "latest",
     "layoutmanager": "latest",
     "socket.io": "latest",
-    "lodash-template-loader": "latest"
+    "lodash-template-loader": "latest",
+    "highlight": "~7.0.1"
   }
 }

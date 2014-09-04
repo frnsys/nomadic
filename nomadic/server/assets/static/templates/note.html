@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="/static/vendor/highlight/src/styles/arta.css">
+
 <div class="content">
     <h1><%= title %></h1>
     <div><%= html %></div>
@@ -6,9 +8,11 @@
 <script type="text/javascript" charset="utf-8">
     require([
         'socketio',
+        'highlight',
         'mathjax'
-    ], function(io, MathJax) {
+    ], function(io, Highlight, MathJax) {
         var socket = io.connect('http://localhost:9137');
+
 
         socket.on('connect', function() {
             // To ensure connection with server.
@@ -16,7 +20,9 @@
         });
 
         socket.on('refresh', location.reload);
-
+        $('pre code').each(function(i, block) {
+            Highlight.highlightBlock(block);
+        });
         MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
     })
 </script>

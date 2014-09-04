@@ -7,6 +7,8 @@ require.config({
         template: '../vendor/lodash-template-loader/loader',
         underscore: '../vendor/underscore/underscore',
 
+        highlight: '../vendor/highlight/build/highlight.pack',
+
         socketio: '//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min',
         mathjax: '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'
     },
@@ -17,8 +19,15 @@ require.config({
     },
 
     shim: {
+        highlight: {
+            exports: 'Highlight',
+            init: function() {
+                return hljs;
+            }
+        },
+
         mathjax: {
-            exports: "MathJax",
+            exports: 'MathJax',
             init: function () {
                 MathJax.Hub.Config({
                     tex2jax: {

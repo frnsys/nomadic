@@ -60,6 +60,14 @@ viewing the note (i.e. live-ish previews)
 $ git clone https://github.com/ftzeng/nomadic.git
 $ cd nomadic
 $ pip install .
+
+# Install front-end packages.
+$ cd nomadic/server/assets/
+$ bower install
+
+# Build the highlight.js library.
+$ cd static/vendor/highlight
+$ python tools/build.py
 ```
 
 ### Configuration
