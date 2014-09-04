@@ -137,6 +137,10 @@ class Note():
                 if os.path.isfile(p) and name not in content:
                     os.remove(p)
 
+            # Remove the entire directory if empty.
+            if not os.listdir(r):
+                shutil.rmtree(r)
+
 
 
 
