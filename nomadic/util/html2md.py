@@ -1,7 +1,7 @@
 import re
 
 import html2text
-from lxml.html import builder, fromstring, tostring
+from lxml.html import builder, fromstring, tostring, clean
 
 
 h2t = html2text.HTML2Text()
@@ -19,8 +19,11 @@ def html_to_markdown(html):
     will become `<strong>foo</strong>`.
     """
     h = fromstring(html)
+
+    clean_highlighted_code(h)
     for span in h.findall('.//span') + h.findall('.//font'):
         convert_span(span)
+
     html = tostring(h)
 
     # Not ideal but works in a pinch
@@ -36,6 +39,18 @@ def html_to_markdown(html):
     md = re.sub(r'\n{3,}', '\n\n', md)
 
     return md
+
+
+def clean_highlighted_code(html):
+    """
+    Strip HTML from syntax-highlighted
+    code (pre and code tags).
+    """
+    cleaner = clean.Cleaner(allow_tags=['pre'], remove_unknown_tags=False)
+    for el in html.findall('.//pre'):
+        p = el.getparent()
+        cleaned = cleaner.clean_html(el)
+        p.replace(el, cleaned)
 
 
 def convert_span(span):
