@@ -384,6 +384,8 @@ pre code {
   white-space: pre;
   border: none;
   background: transparent;
+  word-break: normal;
+  overflow-x: auto;
 }
 
 pre {

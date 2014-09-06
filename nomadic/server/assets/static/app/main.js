@@ -8,8 +8,13 @@ require(['app', 'router'], function(app, Router) {
     // Relative links will be navigated
     // through the Backbone router.
     // If the link has a `data-bypass` attr,
+    // or opens a new tab,
     // this special behavior will be ignored.
-    $(document).on('click', 'a[href]:not([data-bypass]):not([target=_blank])', function(evt) {
+    // ---
+    // For this application, only links to directories
+    // and markdown (.md) files are handled by the router.
+    var not = ':not([data-bypass]):not([target=_blank])';
+    $(document).on('click', 'a[href$="/"]'+not+',a[href$=".md"]'+not, function(evt) {
         var href = {
             prop: $(this).prop('href'),
             attr: $(this).attr('href')
