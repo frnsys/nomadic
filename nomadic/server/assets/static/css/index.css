@@ -494,13 +494,23 @@ nav {
     height: 100%;
 }
 
-.notes > ul,
-.notebooks > ul {
+.notes ul,
+.notebooks ul {
+    margin: 0;
     padding: 0;
     list-style-type: none;
 }
 .notebooks {
   display: none;
+  padding: 2em 0;
+}
+.notebooks ul {
+    padding-left: 1em;
+    list-style-type: none;
+}
+.notebooks ul ul li:before {
+    content: '├─ ';
+    color: #ccc;
 }
 
 .match {

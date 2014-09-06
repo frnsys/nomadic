@@ -20,12 +20,14 @@ require(['app', 'router'], function(app, Router) {
             attr: $(this).attr('href')
         };
 
+
         var root = location.protocol + '//' + location.host + app.root;
 
-        // Check if the link is relative
+        // Check if the link is part of the site.
         if (href.prop.slice(0, root.length) === root) {
+            var target = href.prop.replace(root, '');
             evt.preventDefault();
-            Backbone.history.navigate(href.attr, true);
+            Backbone.history.navigate(target, true);
         }
     });
 
