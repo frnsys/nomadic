@@ -88,8 +88,6 @@ define([
         get_note: function(path) {
             var self = this;
 
-            console.log(path);
-
             self.fetch(path, '/n/', function(data) {
                 self.note.set({
                     title: data.title,
