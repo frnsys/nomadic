@@ -91,6 +91,18 @@ def convert(notebook, edit, html_path):
     if edit:
         click.edit(filename=note_path)
 
+@cli.command()
+@click.argument('notebook')
+@click.option('--execute', is_flag=True, help='Execute the clean command')
+def clean(notebook, execute):
+    """
+    Removes unreferenced resource folders from a notebook
+    and cleans up it's notes' unreferenced resources.
+    By default, just prints what will be deleted.
+    """
+    nb = select_notebook(notebook)
+    nb.clean_resources(delete=execute)
+
 
 @cli.command()
 @click.argument('note')

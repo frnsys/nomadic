@@ -42,4 +42,4 @@ def port_evernote(path, to_notebook):
     return path
 
 def quote_evernote(text):
-    return quote(text.encode('utf-8'), safe='!,&?\'()').replace('(', '\(').replace(')', '\)').replace('[', '\[').replace(']', '\]')
+    return quote(text.encode('utf-8'), safe='@+!,&?\'()').replace('(', '\(').replace(')', '\)').replace('[', '\[').replace(']', '\]')

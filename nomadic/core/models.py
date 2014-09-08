@@ -1,5 +1,6 @@
 import os
 import shutil
+from urllib import quote
 
 from nomadic import conf
 from nomadic.core.errors import NoteConflictError
@@ -124,22 +125,28 @@ class Note():
             shutil.rmtree(resources)
 
 
-    def clean_resources(self):
+    def clean_resources(self, delete=False):
         """
         Delete resources which are not
         referenced by the note.
         """
+        action = 'Deleting' if delete else 'Will delete'
         r = self.resources
         if os.path.exists(r):
             content = self.content
             for name in os.listdir(r):
                 p = os.path.join(r, name)
-                if os.path.isfile(p) and name not in content:
-                    os.remove(p)
+                if os.path.isfile(p) \
+                    and (name not in content and quote(name) not in content):
+                    print('{0} {1} for {2}'.format(action, name, self.title))
+                    if delete:
+                        os.remove(p)
 
             # Remove the entire directory if empty.
             if not os.listdir(r):
-                shutil.rmtree(r)
+                print(u'{0} resources folder for {1}'.format(action, self.title))
+                if delete:
+                    shutil.rmtree(r)
 
 
 
@@ -212,6 +219,31 @@ class Notebook():
                 if valid_notebook(name):
                     notebooks.append( Notebook(p) )
         return notebooks, notes
+
+
+    def clean_resources(self, delete=False):
+        """
+        Clean up individual notes' resources,
+        and delete resources which no longer
+        have parent notes.
+        """
+        action = 'Deleting' if delete else 'Will delete'
+        r = os.path.join(self.path.abs, '_resources')
+        _, notes = self.contents
+
+        # Delete orphaned resources.
+        note_titles = [note.title for note in notes]
+        if os.path.exists(r):
+            for name in os.listdir(r):
+                if name not in note_titles:
+                    p = os.path.join(r, name)
+                    print(u'{0} resource folder: {1}'.format(action, name))
+                    if delete:
+                        shutil.rmtree(p)
+
+        # Delete unreferenced resources.
+        for note in notes:
+            note.clean_resources(delete=delete)
 
 
     def walk(self):
