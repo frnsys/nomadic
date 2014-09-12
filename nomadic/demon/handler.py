@@ -7,6 +7,7 @@ changes and responds appropriately.
 """
 
 import os
+import shutil
 from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
@@ -65,6 +66,9 @@ class Handler(PatternMatchingEventHandler):
         if not event.is_directory:
             src_note = Note(src)
             dest_note = Note(dest)
+
+            if os.path.exists(src_note.resources):
+                shutil.move(src_note.resources, dest_note.resources)
 
             self.n.index.delete_note(src_note)
             self.n.index.add_note(dest_note)
