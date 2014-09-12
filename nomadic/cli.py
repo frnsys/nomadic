@@ -112,6 +112,10 @@ def new(notebook, note, rich):
     """
     Create a new note.
     """
+
+    if not notebook:
+        notebook = conf.DEFAULT_NOTEBOOK
+
     nb = select_notebook(notebook)
     if nb is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))

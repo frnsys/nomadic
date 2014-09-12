@@ -128,7 +128,8 @@ For example:
 
 ```json
 {
-    "root": "~/Notes"
+    "root": "~/Notes",
+    "default_notebook": "scratch"
 }
 ```
 

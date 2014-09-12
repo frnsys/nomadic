@@ -5,7 +5,8 @@ import json
 # Defaults
 config = {
     'root': '~/nomadic',
-    'port': 9137
+    'port': 9137,
+    'default_notebook': ''
 }
 
 # Create default config if necessary.
