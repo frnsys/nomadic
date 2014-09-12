@@ -225,6 +225,15 @@ dl dd > :last-child {
   margin-bottom: 0;
 }
 
+figure {
+    margin: 1em 0;
+}
+iframe {
+    width: 100%;
+    min-height: 800px;
+    border: 1px solid #eee;
+}
+
 blockquote {
   border-left: 4px solid #dddddd;
   padding: 0 15px;
@@ -465,6 +474,7 @@ nav {
     overflow-y: scroll;
     overflow-x: hidden;
     z-index: 1;
+    border-right: 1px solid #eee;
 }
 .selected-nav {
     text-decoration: underline;

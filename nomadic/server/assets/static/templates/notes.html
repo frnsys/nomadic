@@ -7,7 +7,12 @@
             <% if (note.images.length > 0) { %>
                 <ul class="thumbs">
                     <% for (var j in note.images) { %>
-                        <img src="<%= note.images[j] %>">
+                        <% var ref = note.images[j]; %>
+                        <% if (ref.indexOf('.pdf', ref.length - 4) !== -1) { %>
+                            <span>PDF</span>
+                        <% } else { %>
+                            <img src="<%= ref %>">
+                        <% } %>
                     <% } %>
                 </ul>
             <% } %>
