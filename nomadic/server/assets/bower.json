@@ -7,6 +7,6 @@
     "layoutmanager": "latest",
     "socket.io": "latest",
     "lodash-template-loader": "latest",
-    "highlight": "~7.0.1"
+    "highlight.js": "git://github.com/isagalaev/highlight.js.git#master"
   }
 }

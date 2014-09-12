@@ -68,9 +68,9 @@ $ bower install
 # Build the highlight.js library.
 $ cd static/vendor/highlight
 # ...with all languages
-$ python tools/build3.py
+$ python tools/build.py
 # ...or with only specific languages
-$ python tools/build3.py python ruby javascript scala java bash http sql cs cpp css json objectivec xml markdown apache nginx
+$ python tools/build.py python ruby javascript scala java bash http sql cs cpp css json objectivec xml markdown apache nginx
 ```
 
 ### Configuration
