@@ -521,6 +521,7 @@ nav {
 .notebooks ul ul li:before {
     content: '├─ ';
     color: #ccc;
+    font-family: 'monospace';
 }
 
 .match {

@@ -52,9 +52,13 @@ define([
 
             $('input[name=query]').on('keyup', function() {
                 var query = $(this).val();
+
                 if (query.length >= 3) {
-                    self.search(query);
-                    $notes_ctrl.click();
+                    clearTimeout(self.search_timer);
+                    self.search_timer = setTimeout(function() {
+                        self.search(query);
+                        $notes_ctrl.click();
+                    }, 1200);
                 }
             });
         },
