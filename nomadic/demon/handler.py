@@ -11,9 +11,8 @@ from urllib import quote
 
 from watchdog.events import PatternMatchingEventHandler
 
-from nomadic.util import valid_note, parsers
+from nomadic.util import valid_note, parsers, logger
 from nomadic.core.models import Note, Notebook
-from nomadic.demon.logger import log
 
 class Handler(PatternMatchingEventHandler):
     # Match everything b/c we want to match directories as well.
@@ -43,7 +42,7 @@ class Handler(PatternMatchingEventHandler):
     def on_created(self, event):
         p = event.src_path.decode('utf-8')
 
-        log.debug(u'Created: {0}'.format(p))
+        logger.log.debug(u'Created: {0}'.format(p))
         if not event.is_directory:
             note = Note(p)
             self.n.index.add_note(note)
@@ -51,7 +50,7 @@ class Handler(PatternMatchingEventHandler):
     def on_deleted(self, event):
         p = event.src_path.decode('utf-8')
 
-        log.debug(u'Deleted: {0}'.format(p))
+        logger.log.debug(u'Deleted: {0}'.format(p))
         if not event.is_directory:
             note = Note(p)
             self.n.index.delete_note(note)
@@ -62,7 +61,7 @@ class Handler(PatternMatchingEventHandler):
         src = event.src_path.decode('utf-8')
         dest = event.dest_path.decode('utf-8')
 
-        log.debug(u'Moved: {0} to {1}'.format(src, dest))
+        logger.log.debug(u'Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:
             src_note = Note(src)
             dest_note = Note(dest)

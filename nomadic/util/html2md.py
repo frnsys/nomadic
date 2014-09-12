@@ -77,6 +77,7 @@ def convert_span(span):
     if '-evernote-highlight:true' in style or 'background-color: rgb(255, 252, 229);' in style or 'background-color: rgb(242, 250, 111);' in style:
         builders.append(highlighter)
 
+    tail = span.tail
     if builders:
         children = []
         if span.text is not None:
@@ -88,7 +89,6 @@ def convert_span(span):
                 # or else it won't get added.
                 children.append(builder.SPAN(c.tail))
 
-
         # Recursively apply the builders.
         el = builders[0](*children)
         for b in builders[1:]:
@@ -96,6 +96,10 @@ def convert_span(span):
 
         # Replace the old element with the new one.
         p.replace(span, el)
+
+        # Insert other text.
+        if tail is not None and tail.strip():
+            p.insert(p.index(el) + 1, builder.SPAN(tail))
 
 def highlighter(*children):
     return builder.E('mark', *children)
