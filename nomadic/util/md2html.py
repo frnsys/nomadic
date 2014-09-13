@@ -1,5 +1,5 @@
 import markdown
-from markdown.inlinepatterns import SimpleTagPattern, Pattern
+from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from markdown.util import etree
 from mdx_gfm import GithubFlavoredMarkdownExtension as GFM
 
@@ -13,9 +13,9 @@ def compile_markdown(md):
 
 
 HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
-PDF_RE = r'\!\[(.*)\]\(`?([^`\(\)]+pdf)`?\)' # ![...](path/to/something.pdf)
+PDF_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
 
-class PDFPattern(Pattern):
+class PDFPattern(ImagePattern):
     def handleMatch(self, m):
         src = m.group(3)
         fig = etree.Element('figure')
@@ -37,7 +37,7 @@ class NomadicMD(markdown.Extension):
     """
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(HIGHLIGHT_RE, 'mark')
-        md.inlinePatterns.add('nomadic-highlight', highlight_pattern, '_end')
+        md.inlinePatterns.add('highlight', highlight_pattern, '_end')
 
         pdf_pattern = PDFPattern(PDF_RE)
-        md.inlinePatterns.add('nomadic-pdf', pdf_pattern, '<image_link')
+        md.inlinePatterns.add('pdf_link', pdf_pattern, '_begin')
