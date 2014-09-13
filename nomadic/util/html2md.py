@@ -81,7 +81,16 @@ def convert_span(span):
             or 'background-color: rgb(203, 242, 254);' in style \
             or 'background-color: rgb(253, 246, 184);' in style \
             or 'background-color: rgb(242, 251, 100);' in style \
-            or 'background-color: rgb(255, 248, 177);' in style:
+            or 'background-color: rgb(255, 248, 177);' in style \
+            or 'background-color: rgb(246, 245, 154);'  in style \
+            or 'background-color: rgb(255, 249, 177);' in style \
+            or 'background-color: rgb(247, 250, 132);' in style \
+            or 'background-color: rgb(255, 249, 173);' in style \
+            or 'background-color: rgb(246, 245, 154);' in style \
+            or 'background-color: rgb(255, 211, 227);' in style \
+            or 'background-color:rgb(255, 250, 165);' in style \
+            or 'background-color: rgb(255, 255, 204);' in style:
+
         builders.append(highlighter)
 
     tail = span.tail
