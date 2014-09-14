@@ -83,8 +83,13 @@ define([
                     })
                     .get('notes').reset(data.notes);
 
-                if (load_note)
+                if (data.notes.length === 0) {
+                    $('[data-pane=".notebooks"]').click();
+                    $('.note').html('No notes here :)');
+
+                } else if (load_note) {
                     self.get_note(data.notes[0].url);
+                }
             });
         },
 
