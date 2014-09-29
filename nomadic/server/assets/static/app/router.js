@@ -101,7 +101,7 @@ define([
                 self.note.set({
                     title: data.title,
                     html: data.html,
-                    path: data.path,
+                    path: self.encode(data.path),
                     raw: data.raw
                 });
 
@@ -138,9 +138,7 @@ define([
         fetch: function(path, endpoint, handler) {
             path = path || '';
 
-            // Undo existing encoding, then encode the whole thing.
-            path = decodeURIComponent(path);
-            path = encodeURIComponent(path);
+            path = this.encode(path);
 
             $.ajax({
                 url: endpoint + path,
@@ -152,6 +150,13 @@ define([
                     alert(xhr.status.toString() + ' : ' + xhr.responseText);
                 }
             });
+        },
+
+        encode: function(path) {
+            // Undo existing encoding, then encode the whole thing.
+            path = decodeURIComponent(path);
+            path = encodeURIComponent(path);
+            return path;
         }
     });
 
