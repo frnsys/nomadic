@@ -36,7 +36,7 @@ class Handler(PatternMatchingEventHandler):
     def on_modified(self, event):
         if not event.is_directory:
             note = Note(event.src_path)
-            log.debug(u'Modified: {0}'.format(note.path.rel))
+            logger.log.debug(u'Modified: {0}'.format(note.path.rel))
             if os.path.exists(note.path.abs):
                 self.n.index.update_note(note)
 
