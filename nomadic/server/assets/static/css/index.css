@@ -38,7 +38,7 @@ body > *:last-child {
 }
 
 a {
-  color: #4183C4;
+  color: #5B92E5;
   text-decoration: none;
 }
 
@@ -437,7 +437,7 @@ mark {
     float: left;
     width: 25%;
     padding: 0.8em 0;
-    background: #777;
+    background: #111;
     color: #fff;
 }
 .controls li {
@@ -461,6 +461,16 @@ mark {
 form[name=search] {
     float: right;
     margin: 0.8em 2em 0 0;
+}
+input[type=text] {
+    border: 1px solid #AAA;
+    padding: 0.4em;
+}
+button {
+    padding: 0.4em 1em 0.5em;
+    border: none;
+    color: #fff;
+    background: #536CEE;
 }
 
 nav {
@@ -535,7 +545,7 @@ nav {
 }
 .notes h6 {
     margin: 2em 0;
-    background: #777;
+    background: #536CEE;
     color: #fff;
     padding: 0.5em;
 }
