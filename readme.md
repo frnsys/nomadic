@@ -145,6 +145,18 @@ $ pkill -f nomadic-d
 $ launchctl start com.nomadic
 ```
 
+### Custom CSS
+You can specify a custom stylesheet to override the default one.
+In your config, specify the path to that stylesheet:
+
+```json
+{
+    ...
+    "override_stylesheet": "~/path/to/my/styles.css"
+    ...
+}
+```
+
 
 ---
 

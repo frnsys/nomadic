@@ -3,9 +3,9 @@ import urllib
 import mimetypes
 from datetime import datetime
 
-from flask import Blueprint, Response, render_template, request, jsonify
+from flask import Blueprint, Response, render_template, request, jsonify, current_app
 
-from nomadic import nomadic
+from nomadic import nomadic, conf
 from nomadic.core.models import Note, Notebook, Path
 from nomadic.util import html2md, md2html, parsers
 
@@ -14,6 +14,22 @@ routes = Blueprint('routes', __name__)
 
 def quote(path):
     return urllib.quote(path.encode('utf-8'))
+
+
+@routes.route('/override.css')
+def stylesheet():
+    """
+    A stylesheet the user can specify in their config
+    which will be loaded after the default one.
+    """
+    stylesheet = ''
+    if conf.OVERRIDE_STYLESHEET:
+        try:
+            with open(conf.OVERRIDE_STYLESHEET, 'r') as f:
+                stylesheet = f.read()
+        except:
+            current_app.logger.error('Specified override stylesheet was not found.')
+    return Response(stylesheet, mimetype='text/css')
 
 
 @routes.route('/')

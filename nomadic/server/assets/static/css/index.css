@@ -462,7 +462,7 @@ form[name=search] {
     float: right;
     margin: 0.8em 2em 0 0;
 }
-input[type=text] {
+input[type=text], select {
     border: 1px solid #AAA;
     padding: 0.4em;
 }

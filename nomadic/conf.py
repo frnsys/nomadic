@@ -6,7 +6,8 @@ import json
 config = {
     'root': '~/nomadic',
     'port': 9137,
-    'default_notebook': ''
+    'default_notebook': '',
+    'override_stylesheet': ''
 }
 
 # Create default config if necessary.
@@ -20,7 +21,9 @@ with open(cfg_path, 'r') as cfg_file:
     user_cfg = json.load(cfg_file)
     config.update(user_cfg)
 
-config['root'] = os.path.expanduser(config['root'])
+# Expand user paths.
+for key in ['root', 'override_stylesheet']:
+    config[key] = os.path.expanduser(config[key])
 
 # Load the config vals onto the module.
 for key, val in config.items():
