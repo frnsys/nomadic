@@ -29,7 +29,7 @@ require.config({
             init: function () {
                 MathJax.Hub.Config({
                     tex2jax: {
-                        inlineMath: [['m$','$m'], ["\\(","\\)"]],
+                        inlineMath: [['::','::'], ["\\(","\\)"]],
                         processEscapes: true
                     }
                 });
