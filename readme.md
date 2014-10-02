@@ -1,10 +1,14 @@
 # nomadic
 
+![](screenshots/01.png)
+(more screenshots at the end)
+
 I wasn't able to find a satisfactory way to use Evernote in Linux,
 which led me to reconsider my Evernote usage in general.
 
 `nomadic` leverages other tools I use daily to create a replacement
 for my Evernote usage.
+
 
 `nomadic` supports a simple directory structure of HTML, Markdown, txt, and
 pdf notes and any other files which may need to be referenced. `nomadic`
@@ -248,3 +252,12 @@ $ nosetests test
 
 ## Acknowledgements
 The CSS stylesheet used for the compiled notes is based on the one from [here](https://gist.github.com/tuzz/3331384).
+
+
+## Screenshots
+
+![](screenshots/01.png)
+![](screenshots/02.png)
+![](screenshots/03.png)
+![](screenshots/04.png)
+![](screenshots/05.png)
