@@ -1,3 +1,6 @@
+import re
+import string
+
 import markdown
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from markdown.util import etree
@@ -8,12 +11,13 @@ def compile_markdown(md):
     """
     Compiles markdown to html.
     """
-    # toc = table of contents extension
-    return markdown.markdown(md, extensions=[GFM(), NomadicMD(), 'markdown.extensions.footnotes'], lazy_ol=False)
+
+    mjh = MathJaxHandler()
+    md = mjh.extract(md)
+    md = markdown.markdown(md, extensions=[GFM(), NomadicMD(), 'markdown.extensions.footnotes'], lazy_ol=False)
+    return mjh.restore(md)
 
 
-HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
-PDF_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
 
 class PDFPattern(ImagePattern):
     def handleMatch(self, m):
@@ -29,15 +33,42 @@ class PDFPattern(ImagePattern):
 
         return fig
 
+
 class NomadicMD(markdown.Extension):
     """
     An extension that supports:
     - highlighting with the <mark> tag.
     - pdf embedding with the <iframe> tag.
     """
+    HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
+    PDF_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
+
     def extendMarkdown(self, md, md_globals):
-        highlight_pattern = SimpleTagPattern(HIGHLIGHT_RE, 'mark')
+        highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
         md.inlinePatterns.add('highlight', highlight_pattern, '_end')
 
-        pdf_pattern = PDFPattern(PDF_RE)
+        pdf_pattern = PDFPattern(self.PDF_RE)
         md.inlinePatterns.add('pdf_link', pdf_pattern, '_begin')
+
+
+class MathJaxHandler():
+    """
+    This extracts all MathJax from the markdown and re-injects it after
+    markdown processing is finished. This is so markdown doesn't mess with it.
+
+    There might be a better way of handling MathJax buuuut this will do for now.
+    """
+    MATHJAX_RE = re.compile(r'\${2}.+?\${2}', re.DOTALL)
+    PLACEHOLDER = '<MATHJAXHOLDER>'
+
+    def extract(self, doc):
+        self.formulae = []
+        for match in self.MATHJAX_RE.findall(doc):
+            self.formulae.append(match)
+            doc = doc.replace(match, self.PLACEHOLDER)
+        return doc
+
+    def restore(self, doc):
+        for i, match in enumerate(re.findall(self.PLACEHOLDER, doc)):
+            doc = string.replace(doc, match, self.formulae[i], maxreplace=1)
+        return doc
