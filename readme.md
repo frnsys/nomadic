@@ -256,20 +256,20 @@ The CSS stylesheet used for the compiled notes is based on the one from [here](h
 
 ## Screenshots
 
+#### blockquotes and images
 ![](screenshots/01.png)
-blockquotes and images
 
+#### embedded pdfs
 ![](screenshots/02.png)
-embedded pdfs
 
+#### you can copy and paste articles easily through the web editor
 ![](screenshots/03.png)
-you can copy and paste articles easily through the web editor
 
+#### highlighting support
 ![](screenshots/04.png)
-highlighting support
 
+#### nice images
 ![](screenshots/05.png)
-nice images
 
+#### code and mathjax galore
 ![](screenshots/06.png)
-code and mathjax galore
