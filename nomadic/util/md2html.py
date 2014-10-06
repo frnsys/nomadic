@@ -59,11 +59,12 @@ class MathJaxHandler():
     There might be a better way of handling MathJax buuuut this will do for now.
     """
     MATHJAX_RE = re.compile(r'\${2}.+?\${2}', re.DOTALL)
+    MATHJAX_INLINE_RE = re.compile(r'\:{2}.+?\:{2}', re.DOTALL)
     PLACEHOLDER = '<MATHJAXHOLDER>'
 
     def extract(self, doc):
         self.formulae = []
-        for match in self.MATHJAX_RE.findall(doc):
+        for match in self.MATHJAX_RE.findall(doc) + self.MATHJAX_INLINE_RE.findall(doc):
             self.formulae.append(match)
             doc = doc.replace(match, self.PLACEHOLDER)
         return doc
