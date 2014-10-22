@@ -76,6 +76,7 @@ class Note():
             return []
         elif self.ext == '.md':
             return parsers.md_images(self.content)
+        return []
 
 
     @property
