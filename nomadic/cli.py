@@ -38,7 +38,7 @@ def search(query):
         if os.path.splitext(path)[1] == '.pdf':
             click.launch(path)
         else:
-            click.edit(filename=path)
+            click.edit(filename=os.path.join(conf.ROOT, path))
     else:
         echo('\nNo results for ' + Fore.RED + query + Fore.RESET + '\n')
 
