@@ -26,7 +26,7 @@ def search(query):
 
         # Show all the results.
         header = ('['+Fore.GREEN+'{0}'+Fore.RESET+'] ').format(idx)
-        echo('\n' + header + Back.BLUE + Fore.WHITE + path + Back.RESET + Fore.RESET)
+        echo('\n' + header + Fore.BLUE + path + Fore.RESET)
         echo(highlights)
         echo('\n---')
 
