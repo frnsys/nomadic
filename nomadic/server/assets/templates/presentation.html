@@ -1,0 +1,119 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <style>
+        html, body {
+            padding: 0 1em;
+            font-family: "Helvetica Neue", "Helvetica", "Arial", "sans-serif";
+        }
+        img {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .slide {
+            border-bottom: 1px solid #eee;
+        }
+        .slide:last-child {
+            border-bottom: none;
+        }
+
+        /* Vertically center */
+        .slide-inner {
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+
+    <main role="main">
+        <div class="note" id="note">
+            {{ html }}
+        </div>
+        <div id="presentation">
+        </div>
+    </main>
+
+    <script type="text/javascript">
+        var nodes = document.getElementById('note').childNodes,
+            out = document.getElementById('presentation'),
+            els = [[]];
+
+        function build_slide(elms) {
+            var slide = document.createElement('div'),
+                inner = document.createElement('div');
+
+            slide.className = 'slide';
+            inner.className = 'slide-inner';
+
+            for(var j=0; j<elms.length; j++) {
+                inner.appendChild(elms[j]);
+            }
+            slide.appendChild(inner);
+            out.appendChild(slide);
+        }
+
+        function resize_slides() {
+            var slides = document.getElementsByClassName('slide'),
+                win_height = window.innerHeight;
+            for (var i=0; i<slides.length; i++) {
+                var slide_height = slides[i].clientHeight;
+                if (slide_height > win_height) {
+                    var scale = win_height/slide_height,
+                        transform = 'scale(' + scale + ')';
+                    slides[i].style.webkitTransform = transform;
+                    slides[i].style.mozTransform    = transform;
+                    slides[i].style.transform       = transform;
+                }
+                slides[i].style.height = win_height + "px";
+            }
+        }
+        window.onresize = resize_slides();
+
+        // Build slides out of the note html, interpreting `hr` as a slide break.
+        for (var i=0; i<nodes.length; i++) {
+            if (nodes[i].nodeName.toLowerCase() == 'hr') {
+                els.push([]);
+            } else {
+                els[els.length - 1].push(nodes[i]);
+            }
+        }
+        for (var i=0; i<els.length; i++) {
+            build_slide(els[i]);
+        }
+        document.getElementById('note').style.display = 'none';
+        resize_slides();
+
+        // Key navigation.
+        document.onkeydown = function(e) {
+            var slides = document.getElementsByClassName('slide'),
+                curr_slide;
+            for (var i=0; i<slides.length; i++) {
+                var y   = window.pageYOffset,
+                    wh  = window.outerHeight,
+                    h   = slides[i].offsetHeight,
+                    top = slides[i].offsetTop;
+                if (top + h >= y + wh/2 && top + h <= y + wh ||
+                    top <= y + wh/2 && top > y) {
+                    curr_slide = i;
+                    break;
+                }
+            }
+
+            e = e || window.event;
+            switch(e.which || e.keyCode) {
+                case 40: // down
+                    if (i < slides.length - 1)
+                        window.scrollTo(0, slides[i+1].offsetTop);
+                    e.preventDefault();
+                    break;
+                case 38: // up
+                    if (i > 0)
+                        window.scrollTo(0, slides[i-1].offsetTop);
+                    e.preventDefault();
+                    break;
+            }
+        }
+    </script>
+
+{% endblock %}

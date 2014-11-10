@@ -5,7 +5,7 @@ from click import echo
 from colorama import Fore, Back, Style
 
 from nomadic import conf, nomadic
-from nomadic.util import evernote
+from nomadic.util import evernote, presentation
 
 @click.group()
 def cli():
@@ -131,6 +131,16 @@ def new(notebook, note, rich):
     else:
         # Launch the daemon server's rich editor.
         click.launch('http://localhost:{0}/new'.format(conf.PORT))
+
+
+@cli.command()
+@click.argument('note')
+@click.argument('outdir')
+def export_presentation(note, outdir):
+    """
+    Export a note as a portable presentation.
+    """
+    presentation.compile_presentation(note, outdir)
 
 
 def select_notebook(name):

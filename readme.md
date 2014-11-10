@@ -54,6 +54,7 @@ update those references if the files are moved
 viewing the note (i.e. live-ish previews)
 * Serves **a browsable site of all your notes**
 * Complete **command-line interface**
+* Export notes as portable **presentations**
 
 ---
 
@@ -119,7 +120,7 @@ $ cp scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
 Then you can start the daemon:
 
 ```bash
-$ launchctl load ~/Library/LaunchAgents/com.nomadic.plist 
+$ launchctl load ~/Library/LaunchAgents/com.nomadic.plist
 ```
 
 ---
@@ -184,11 +185,14 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  browse  Browse through notes via a web browser.
-  count   Get the number of notes.
-  index   Update or reset the note index.
-  new     Create a new note.
-  search  Search through notes.
+  browse               Browse through notes via a web browser.
+  clean                Removes unreferenced resource folders from a...
+  convert              Convert an HTML note into a Markdown note and...
+  count                Get the number of notes.
+  export_presentation  Export a note as a portable presentation.
+  index                Update or reset the note index.
+  new                  Create a new note.
+  search               Search through notes.
 ```
 
 ### Browsing notes
@@ -231,6 +235,22 @@ If you are going to be referencing other files in your notes,
 you should put them in a directory called `_resources` in
 that note's notebook directory. `nomadic` recognizes these
 directories and handles them specially.
+
+### Presentations
+You can export a note to a presentation format pretty easily.
+For example:
+
+```bash
+$ nomadic export_presentation path/to/some_note.md ~/Desktop/
+```
+
+This compiles the note to the specified folder, copying over images. The presentation
+can be opened in any browser.
+
+The compiled HTML includes a script which breaks the note into slides according
+to `<hr>` tags (specified in Markdown as `---`, `***`, or `___`). Slides resize to take
+up the full window height, and any slides that are too tall are automatically scaled down.
+You can use the up/down arrow keys to navigate.
 
 ---
 

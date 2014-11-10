@@ -173,7 +173,7 @@ def upload():
 def editor():
     form = request.form
     ext = '.md' if form['save_as_markdown'] else '.html'
-    path = os.path.join(form['notebook'], form['title'] + ext) 
+    path = os.path.join(form['notebook'], form['title'] + ext)
     note = Note(path)
 
     if request.method == 'POST':
