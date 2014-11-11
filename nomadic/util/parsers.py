@@ -10,7 +10,7 @@ from lxml.html import fromstring, tostring
 
 # Markdown regexes
 md_link_re = re.compile(r'\[.*\]\(`?([^`\(\)]+)`?\)')
-md_img_re = re.compile(r'!\[.*\]\(`?([^`\(\)]+)`?\)')
+md_img_re = re.compile(r'!\[.*?\]\(`?([^`\(\)]+)`?\)')
 
 class HTMLRemover(HTMLParser):
     def __init__(self):
