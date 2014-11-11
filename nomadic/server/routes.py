@@ -43,7 +43,7 @@ def handle(path=''):
     """
     p = Path(urllib.unquote(path))
 
-    if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md':
+    if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md' or path == 'recent/':
         return render_template('index.html', tree=nomadic.rootbook.tree)
 
     elif os.path.isfile(p.abs):
@@ -62,16 +62,27 @@ def nb(path=''):
     Returns JSON objects representing a Note or a Notebook,
     depending on the specified path.
     """
-    path = urllib.unquote(path)
-    notebook = Notebook(path)
 
-    if os.path.isdir(notebook.path.abs):
-        notebooks, notes = notebook.contents
-        sorted_notes = sorted(notes, key=lambda x: x.last_modified, reverse=True)
+    # The `recent` path is a special case.
+    if path == 'recent':
+        name = 'most recently modified'
+        sorted_notes = nomadic.rootbook.recent_notes[:20]
+        url = 'recent'
 
+    else:
+        path = urllib.unquote(path)
+        notebook = Notebook(path)
+        name = notebook.name
+        url = quote(notebook.path.rel)
+
+        if os.path.isdir(notebook.path.abs):
+            notebooks, notes = notebook.contents
+            sorted_notes = sorted(notes, key=lambda x: x.last_modified, reverse=True)
+
+    if sorted_notes:
         return jsonify({
-            'name': notebook.name,
-            'url': quote(notebook.path.rel),
+            'name': name,
+            'url': url,
             'notes': [{
                     'title': note.title,
                     'images': note.images,

@@ -252,6 +252,10 @@ to `<hr>` tags (specified in Markdown as `---`, `***`, or `___`). Slides resize 
 up the full window height, and any slides that are too tall are automatically scaled down.
 You can use the up/down arrow keys to navigate.
 
+### Tips
+
+- You can view the 20 most recently modified notes using the `/recent/` path in the web browser.
+
 ---
 
 ## Development

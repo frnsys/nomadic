@@ -1,5 +1,6 @@
 import os
 import shutil
+import operator
 from urllib import quote
 
 from nomadic import conf
@@ -173,6 +174,17 @@ class Notebook():
         for root, notebooks, notes in self.walk():
             for note in notes:
                 yield note
+
+    @property
+    def recent_notes(self):
+        """
+        Return all notes in this notebook, recursively,
+        sorted by last modified (most recent first).
+        """
+        return sorted(
+                [n for n in self.notes],
+                key=operator.attrgetter('last_modified'),
+                reverse=True)
 
 
     @property
