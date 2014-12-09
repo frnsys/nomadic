@@ -28,8 +28,8 @@ class Note():
     def __init__(self, path):
         self.path = Path(path)
 
-        _, filename = os.path.split(self.path.rel)
-        self.title, self.ext = os.path.splitext(filename)
+        _, self.filename = os.path.split(self.path.rel)
+        self.title, self.ext = os.path.splitext(self.filename)
         self.buildname = self.title + '.html'
 
         notebook_path = os.path.dirname(self.path.rel)

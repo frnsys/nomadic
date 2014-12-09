@@ -5,6 +5,7 @@ from click import echo
 from colorama import Fore, Back, Style
 
 from nomadic import conf, nomadic
+from nomadic.core.models import Note
 from nomadic.util import evernote, presentation
 
 @click.group()
@@ -140,7 +141,19 @@ def export_presentation(note, outdir):
     """
     Export a note as a portable presentation.
     """
-    presentation.compile_presentation(note, outdir)
+    n = Note(note)
+    presentation.compile_presentation(n)
+
+@cli.command()
+@click.argument('note')
+@click.argument('outdir')
+def watch_presentation(note, outdir):
+    """
+    Watches a presentation note and its resources directory
+    and exports an updated version on changes.
+    """
+    n = Note(note)
+    presentation.watch_presentation(n, outdir)
 
 
 def select_notebook(name):
