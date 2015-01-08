@@ -97,17 +97,21 @@ class Index():
         """
         parser = parsers.HighlightParser()
         with self.ix.searcher() as searcher:
-            query = QueryParser('content', self.ix.schema).parse(query)
-            results = searcher.search(query, limit=None)
-            results.fragmenter.charlimit = None
-            results.fragmenter.surround = 100
-            for result in results:
-                highlights = result.highlights('content')
-                note = Note(result['path'])
-                if not html:
-                    parser.feed(highlights)
-                    highlights = parser.get_data()
-                yield note, highlights
+            # To prevent duplicate results.
+            result_ids = []
+            for field in ['content', 'title']:
+                q  = QueryParser(field, self.ix.schema).parse(query)
+                results = searcher.search(q, limit=None)
+                results.fragmenter.charlimit = None
+                results.fragmenter.surround = 100
+                for result in [r for r in results if r.docnum not in result_ids]:
+                    result_ids.append(result.docnum)
+                    highlights = result.highlights('content')
+                    note = Note(result['path'])
+                    if not html:
+                        parser.feed(highlights)
+                        highlights = parser.get_data()
+                    yield note, highlights
 
 
     def add_notes(self, notes):
