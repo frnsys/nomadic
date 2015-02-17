@@ -72,6 +72,7 @@ $ bower install
 
 # Build the highlight.js library.
 $ cd static/vendor/highlight
+$ npm install
 # ...with all languages
 $ node tools/build.js
 # ...or with only specific languages
