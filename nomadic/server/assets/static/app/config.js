@@ -1,6 +1,6 @@
 require.config({
     paths: {
-        lodash: '../vendor/lodash/lodash.min',
+        lodash: '../vendor/lodash/dist/lodash.min',
         backbone: '../vendor/backbone/backbone',
         jquery: '../vendor/jquery/dist/jquery.min',
         layoutmanager: '../vendor/layoutmanager/backbone.layoutmanager',
