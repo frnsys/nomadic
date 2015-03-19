@@ -50,10 +50,10 @@ def rewrite_links(raw_html, rewrite_func):
 
 def rewrite_external_images(raw_html, note):
     """
-    Download externally-hosted images to a note's local resources folder
+    Download externally-hosted images to a note's local assets folder
     and rewrite references to those images.
     """
-    rsp = note.resources
+    rsp = note.assets
     nbp = note.notebook.path.abs
 
     def rewriter(link):

@@ -50,7 +50,7 @@ def watch_presentation(note, outdir):
 
     def handle_event(event):
         _, filename = path.split(event.src_path)
-        if n.filename == filename or path.normpath(event.src_path) == path.normpath(n.resources):
+        if n.filename == filename or path.normpath(event.src_path) == path.normpath(n.assets):
             compile_presentation(n, outdir)
     handler.on_any_event = handle_event
 

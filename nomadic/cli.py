@@ -6,7 +6,6 @@ from colorama import Fore, Back, Style
 
 from nomadic import conf, nomadic
 from nomadic.core.models import Note
-from nomadic.util import evernote, presentation
 
 @click.group()
 def cli():
@@ -74,35 +73,16 @@ def count():
     echo('You have ' + Fore.GREEN + str(nomadic.index.size) + Fore.RESET + ' notes.')
 
 @cli.command()
-@click.argument('html_path', type=click.Path())
-@click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
-@click.option('--edit', is_flag=True, help='Open the note in an editor after converting.')
-def convert(notebook, edit, html_path):
-    """
-    Convert an HTML note into a Markdown
-    note and save it.
-    """
-    nb = select_notebook(notebook)
-    if nb is None:
-        echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
-        return
-
-    note_path = evernote.port_evernote(html_path, nb)
-
-    if edit:
-        click.edit(filename=note_path)
-
-@cli.command()
 @click.argument('notebook')
 @click.option('--execute', is_flag=True, help='Execute the clean command')
 def clean(notebook, execute):
     """
-    Removes unreferenced resource folders from a notebook
-    and cleans up it's notes' unreferenced resources.
+    Removes unreferenced asset folders from a notebook
+    and cleans up it's notes' unreferenced assets.
     By default, just prints what will be deleted.
     """
     nb = select_notebook(notebook)
-    nb.clean_resources(delete=execute)
+    nb.clean_assets(delete=execute)
 
 
 @cli.command()
@@ -132,28 +112,6 @@ def new(notebook, note, rich):
     else:
         # Launch the daemon server's rich editor.
         click.launch('http://localhost:{0}/new'.format(conf.PORT))
-
-
-@cli.command()
-@click.argument('note')
-@click.argument('outdir')
-def export_presentation(note, outdir):
-    """
-    Export a note as a portable presentation.
-    """
-    n = Note(note)
-    presentation.compile_presentation(n)
-
-@cli.command()
-@click.argument('note')
-@click.argument('outdir')
-def watch_presentation(note, outdir):
-    """
-    Watches a presentation note and its resources directory
-    and exports an updated version on changes.
-    """
-    n = Note(note)
-    presentation.watch_presentation(n, outdir)
 
 
 def select_notebook(name):

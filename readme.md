@@ -22,7 +22,7 @@ notes
 ├── economics
 │   ├── more economics notes.pdf
 │   ├── my economics notes.md
-│   └── _resources
+│   └── assets
 │       └── some image.png
 ├── programming
 │   └── scala guide.html
@@ -187,7 +187,7 @@ Options:
 
 Commands:
   browse               Browse through notes via a web browser.
-  clean                Removes unreferenced resource folders from a...
+  clean                Removes unreferenced asset folders from a...
   convert              Convert an HTML note into a Markdown note and...
   count                Get the number of notes.
   export_presentation  Export a note as a portable presentation.
@@ -233,7 +233,7 @@ files.
 
 ### Adding other files (images, etc)
 If you are going to be referencing other files in your notes,
-you should put them in a directory called `_resources` in
+you should put them in a directory called `assets` in
 that note's notebook directory. `nomadic` recognizes these
 directories and handles them specially.
 

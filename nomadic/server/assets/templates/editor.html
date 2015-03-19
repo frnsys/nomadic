@@ -3,8 +3,8 @@
 {% block content %}
 
     <script src="/static/vendor/jquery/dist/jquery.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css"> 
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/bootstrap/3.0.1/css/bootstrap.min.css">
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.2/summernote.css">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.5.2/summernote.min.js"></script>
@@ -38,7 +38,7 @@
                 html = $editor.code();
 
             function destroy() {
-                if (confirm('Are you sure you want to delete this note and its resources?')) {
+                if (confirm('Are you sure you want to delete this note and its assets?')) {
                     var data = {
                         title: title,
                         notebook: notebook
@@ -85,7 +85,7 @@
                             html = data.html;
 
                             if (old_title !== title) {
-                                update_resource_references(old_title, title);
+                                update_asset_references(old_title, title);
                             }
                         },
                         error: function(jqxhr, textStatus, err) {
@@ -136,12 +136,12 @@
                 }
             }, 1000);
 
-            // Re-write all references to the old resources folder
-            // to point to the new resources folder.
-            function update_resource_references(old_title, new_title) {
+            // Re-write all references to the old assets folder
+            // to point to the new assets folder.
+            function update_asset_references(old_title, new_title) {
                 var html = $editor.code(),
-                    old_ref = '_resources/'+old_title,
-                    new_ref = '_resources/'+new_title;
+                    old_ref = 'assets/'+old_title,
+                    new_ref = 'assets/'+new_title;
 
                 html = html.replace(old_ref, new_ref);
                 $editor.code(html);

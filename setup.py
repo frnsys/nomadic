@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='nomadic',
-    version='0.4.0',
+    version='0.5.0',
     description='a lightweight note management system.',
     url='https://github.com/ftzeng/nomadic',
     author='Francis Tseng',
@@ -25,6 +25,7 @@ setup(
     entry_points='''
         [console_scripts]
         nomadic=nomadic.cli:cli
+        nomadic-t=nomadic.tools:tools
         nomadic-d=nomadic.daemon:daemon
     ''',
 )

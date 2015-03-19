@@ -23,7 +23,7 @@ def port_evernote(path, to_notebook):
     with open(path, 'r') as html_file:
         html = html_file.read()
 
-    n_rsrc_rel = u'_resources/{0}'.format(title)
+    n_rsrc_rel = u'assets/{0}'.format(title)
     n_rsrc_abs = os.path.join(to_notebook.path.abs, n_rsrc_rel)
 
     if os.path.exists(en_rsrc_abs):
@@ -31,7 +31,7 @@ def port_evernote(path, to_notebook):
 
     markdown = html2md.html_to_markdown(html)
 
-    # Update resource references.
+    # Update asset references.
     markdown = markdown.replace(en_rsrc_rel, quote(n_rsrc_rel.encode('utf-8')))
     markdown = markdown.replace(quote_evernote(en_rsrc_rel), quote(n_rsrc_rel.encode('utf-8')))
 

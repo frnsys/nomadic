@@ -86,14 +86,14 @@ class Note():
 
 
     @property
-    def resources(self, create=False):
+    def assets(self, create=False):
         notebook, filename = os.path.split(self.path.abs)
-        resources = os.path.join(notebook, '_resources', self.title, '')
+        assets = os.path.join(notebook, 'assets', self.title, '')
 
-        if create and not os.path.exists(resources):
-            os.makedirs(resources)
+        if create and not os.path.exists(assets):
+            os.makedirs(assets)
 
-        return resources
+        return assets
 
 
     def write(self, content):
@@ -110,8 +110,8 @@ class Note():
         if os.path.exists(self.path.abs):
             shutil.move(self.path.abs, to_note.path.abs)
 
-        if os.path.exists(self.resources):
-            shutil.move(self.resources, to_note.resources)
+        if os.path.exists(self.assets):
+            shutil.move(self.assets, to_note.assets)
 
         self.path = to_note.path
         self.title = to_note.title
@@ -122,18 +122,18 @@ class Note():
         if os.path.exists(self.path.abs):
             os.remove(self.path.abs)
 
-        resources = self.resources
-        if os.path.exists(resources):
-            shutil.rmtree(resources)
+        assets = self.assets
+        if os.path.exists(assets):
+            shutil.rmtree(assets)
 
 
-    def clean_resources(self, delete=False):
+    def clean_assets(self, delete=False):
         """
-        Delete resources which are not
+        Delete assets which are not
         referenced by the note.
         """
         action = 'Deleting' if delete else 'Will delete'
-        r = self.resources
+        r = self.assets
         if os.path.exists(r):
             content = self.content
             for name in os.listdir(r):
@@ -146,7 +146,7 @@ class Note():
 
             # Remove the entire directory if empty.
             if not os.listdir(r):
-                print(u'{0} resources folder for {1}'.format(action, self.title))
+                print(u'{0} assets folder for {1}'.format(action, self.title))
                 if delete:
                     shutil.rmtree(r)
 
@@ -234,29 +234,29 @@ class Notebook():
         return notebooks, notes
 
 
-    def clean_resources(self, delete=False):
+    def clean_assets(self, delete=False):
         """
-        Clean up individual notes' resources,
-        and delete resources which no longer
+        Clean up individual notes' assets,
+        and delete assets which no longer
         have parent notes.
         """
         action = 'Deleting' if delete else 'Will delete'
-        r = os.path.join(self.path.abs, '_resources')
+        r = os.path.join(self.path.abs, 'assets')
         _, notes = self.contents
 
-        # Delete orphaned resources.
+        # Delete orphaned assets.
         note_titles = [note.title for note in notes]
         if os.path.exists(r):
             for name in os.listdir(r):
                 if name not in note_titles:
                     p = os.path.join(r, name)
-                    print(u'{0} resource folder: {1}'.format(action, name))
+                    print(u'{0} asset folder: {1}'.format(action, name))
                     if delete:
                         shutil.rmtree(p)
 
-        # Delete unreferenced resources.
+        # Delete unreferenced assets.
         for note in notes:
-            note.clean_resources(delete=delete)
+            note.clean_assets(delete=delete)
 
 
     def walk(self):

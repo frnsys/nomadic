@@ -67,8 +67,8 @@ class Handler(PatternMatchingEventHandler):
             src_note = Note(src)
             dest_note = Note(dest)
 
-            if os.path.exists(src_note.resources):
-                shutil.move(src_note.resources, dest_note.resources)
+            if os.path.exists(src_note.assets):
+                shutil.move(src_note.assets, dest_note.assets)
 
             self.n.index.delete_note(src_note)
             self.n.index.add_note(dest_note)

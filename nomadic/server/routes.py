@@ -160,9 +160,9 @@ def upload():
         path = os.path.join(request.form['notebook'], request.form['title'] + '.ext') # some arbitrary extension
         note = Note(path)
 
-        resources = note.resources
-        if not os.path.exists(resources):
-            os.makedirs(resources)
+        assets = note.assets
+        if not os.path.exists(assets):
+            os.makedirs(assets)
 
         # Build a unique filename.
         _, ext = os.path.splitext(file.filename)
@@ -171,7 +171,7 @@ def upload():
         if ext == '.jpeg': ext = '.jpg'
         filename = str(hash(file.filename + str(datetime.utcnow()))) + ext
 
-        save_path = os.path.join(resources, filename)
+        save_path = os.path.join(assets, filename)
 
         file.save(save_path)
         return save_path.replace(server.n.notes_path, ''), 200
@@ -221,7 +221,7 @@ def save(note, data):
             content = html2md.html_to_markdown(html)
 
         note.write(content)
-        note.clean_resources()
+        note.clean_assets()
 
         # Update all connected clients.
         #self.refresh_clients()

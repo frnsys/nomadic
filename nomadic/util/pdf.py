@@ -7,6 +7,9 @@ from pdfminer.pdfpage import PDFPage, PDFTextExtractionNotAllowed
 
 
 def pdf_text(pdf_file):
+    """
+    Extracts text from a PDF.
+    """
     rsrcmgr = PDFResourceManager(caching=True)
     outp = StringIO()
     device = TextConverter(rsrcmgr, outp, codec='utf-8', laparams=LAParams())
