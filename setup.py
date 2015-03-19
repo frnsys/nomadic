@@ -22,7 +22,6 @@ setup(
         'python-daemon',
         'watchdog',
         'flask',
-        'flask-socketio'
     ],
     entry_points='''
         [console_scripts]
@@ -30,4 +29,9 @@ setup(
         nomadic-t=nomadic.tools:tools
         nomadic-d=nomadic.daemon:daemon
     ''',
+
+    # Note: this also requires flask-socketio and py-gfm.
+    # These should be installed from git:
+    # pip install git+git://github.com/dart-lang/py-gfm
+    # pip install git+git://github.com/ftzeng/Flask-SocketIO
 )
