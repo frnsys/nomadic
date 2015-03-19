@@ -21,7 +21,8 @@ setup(
         'gfm',
         'python-daemon',
         'watchdog',
-        'flask'
+        'flask',
+        'flask-socketio'
     ],
     entry_points='''
         [console_scripts]
