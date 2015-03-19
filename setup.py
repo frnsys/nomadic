@@ -20,7 +20,8 @@ setup(
         'pdfminer',
         'gfm',
         'python-daemon',
-        'watchdog'
+        'watchdog',
+        'flask'
     ],
     entry_points='''
         [console_scripts]
