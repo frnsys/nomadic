@@ -4,3 +4,5 @@
 *.swp
 vendor/
 dist/
+.sass-cache/
+*.map

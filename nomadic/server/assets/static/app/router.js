@@ -113,6 +113,7 @@ define([
 
         search: function(query) {
             var self = this;
+            $('[name=query]').addClass('loading');
 
             $.ajax({
                 url: '/search',
@@ -121,6 +122,7 @@ define([
                     query: query
                 },
                 success: function(data) {
+                    $('[name=query]').removeClass('loading');
                     self.notebook
                         .set({
                             name: data.name,
