@@ -525,7 +525,7 @@ nav {
 .loading {
   animation: pulse 1.5s ease-out infinite; }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 1280px) {
   .note {
     width: 100%;
     margin-left: 0;
@@ -560,6 +560,9 @@ nav {
     width: 100%; }
 
   nav {
-    margin-top: 6em; } }
+    margin-top: 6em; }
+
+  .note {
+    padding: 8em 4em 4em 4em; } }
 
 /*# sourceMappingURL=index.css.map */
