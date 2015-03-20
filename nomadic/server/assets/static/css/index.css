@@ -192,9 +192,12 @@ iframe {
   border: 1px solid #eee; }
 
 blockquote {
-  border-left: 4px solid #dddddd;
-  padding: 0 15px;
-  color: #777777; }
+  color: #222;
+  margin-left: 0;
+  padding-left: 2em;
+  border-left: 8px solid #222;
+  padding: 2em;
+  background: #f0f0f0; }
 
 blockquote > :first-child {
   margin-top: 0; }
