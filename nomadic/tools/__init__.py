@@ -1,7 +1,7 @@
 import click
 
 from nomadic.core.models import Note
-from nomadic.tools import presentation, wordpress, book
+from nomadic.tools import presentation, wordpress
 
 @click.group()
 def tools():
@@ -15,7 +15,7 @@ def export_presentation(note, outdir):
     Export a note as a portable presentation.
     """
     n = Note(note)
-    presentation.compile_presentation(n)
+    presentation.compile_presentation(n, outdir)
 
 
 @tools.command()
