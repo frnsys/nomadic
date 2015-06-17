@@ -1,6 +1,4 @@
 import re
-import string
-
 import markdown
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from markdown.util import etree
@@ -73,5 +71,5 @@ class MathJaxHandler():
 
     def restore(self, doc):
         for i, match in enumerate(re.findall(self.PLACEHOLDER, doc)):
-            doc = string.replace(doc, match, self.formulae[i], maxreplace=1)
+            doc = str.replace(doc, match, self.formulae[i], 1)
         return doc
