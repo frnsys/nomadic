@@ -39,7 +39,7 @@ class NomadicMD(markdown.Extension):
     - pdf embedding with the <iframe> tag.
     """
     HIGHLIGHT_RE = r'(={2})(.+?)(={2})' # ==highlight==
-    PDF_RE = r'\!\[(.*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
+    PDF_RE = r'\!\[([^\[\]]*)\]\(`?(?:<.*>)?([^`\(\)]+pdf)(?:</.*>)?`?\)' # ![...](path/to/something.pdf)
 
     def extendMarkdown(self, md, md_globals):
         highlight_pattern = SimpleTagPattern(self.HIGHLIGHT_RE, 'mark')
@@ -71,5 +71,5 @@ class MathJaxHandler():
 
     def restore(self, doc):
         for i, match in enumerate(re.findall(self.PLACEHOLDER, doc)):
-            doc = str.replace(doc, match, self.formulae[i], 1)
+            doc = doc.replace(match, self.formulae[i], 1)
         return doc
