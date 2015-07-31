@@ -56,8 +56,8 @@ class MathJaxHandler():
 
     There might be a better way of handling MathJax buuuut this will do for now.
     """
-    # matching `:: ::`, ignoring anything in backticks.
-    MATHJAX_RE = re.compile(r'(?<!`)[\:\$]{2}.+?[\:\$]{2}(?!`)', re.DOTALL)
+    # matching `$`, ignoring anything in backticks.
+    MATHJAX_RE = re.compile(r'(?<!`)[\$]{2}.+?[\$]{2}(?!`)', re.DOTALL)
     PLACEHOLDER = '<MATHJAXHOLDER>'
 
     def extract(self, doc):
