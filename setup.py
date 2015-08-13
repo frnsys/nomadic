@@ -1,9 +1,8 @@
-from sys import platform
 from setuptools import setup
 
 setup(
     name='nomadic',
-    version='0.5.0',
+    version='0.6.0',
     description='a lightweight note management system.',
     url='https://github.com/ftzeng/nomadic',
     author='Francis Tseng',
