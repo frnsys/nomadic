@@ -22,6 +22,7 @@ setup(
         'python-daemon',
         'watchdog',
         'flask',
+        'pyyaml',
     ],
     entry_points='''
         [console_scripts]

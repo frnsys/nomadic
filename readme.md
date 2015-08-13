@@ -61,6 +61,7 @@ viewing the note (i.e. live-ish previews)
 ## Setup
 
 ### Installation
+
 ```bash
 $ git clone https://github.com/ftzeng/nomadic.git
 $ cd nomadic
@@ -71,7 +72,7 @@ $ cd nomadic/server/assets/
 $ bower install
 
 # Build the highlight.js library.
-$ cd static/vendor/highlight
+$ cd static/vendor/highlight.js
 $ npm install
 # ...with all languages
 $ node tools/build.js
@@ -80,10 +81,8 @@ $ node tools/build.js python ruby javascript scala java bash http sql cs cpp css
 ```
 
 ### Configuration
-Create a config file (optional) at `~/.nomadic` in JSON format. See
-[Configuration](#configuration) for more details.
-If you don't create this config file, `nomadic` will create one for
-you.
+Create a config file (optional) at `~/.nomadic` in YAML format. See [Configuration](#configuration) for more details.
+If you don't create this config file, `nomadic` will create one for you.
 
 
 ### The Daemon
@@ -132,15 +131,12 @@ start `nomadic` without a config, one will be created for you.
 
 For example:
 
-```json
-{
-    "root": "~/Notes",
-    "default_notebook": "scratch"
-}
+```yaml
+root: ~/Notes
+default_notebook: scratch
 ```
 
-Whenever you change this file, you must restart
-the `nomadic` daemon:
+Whenever you change this file, you must restart the `nomadic` daemon:
 
 ```bash
 # Linux (Upstart)
@@ -155,12 +151,10 @@ $ launchctl start com.nomadic
 You can specify a custom stylesheet to override the default one.
 In your config, specify the path to that stylesheet:
 
-```json
-{
-    ...
-    "override_stylesheet": "~/path/to/my/styles.css"
-    ...
-}
+```yaml
+...
+override_stylesheet: ~/path/to/my/styles.css
+...
 ```
 
 
