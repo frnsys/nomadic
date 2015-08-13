@@ -32,7 +32,7 @@ def summon(nomadic, port):
     try:
         ob = Observer()
         srvr = Server(port)
-        hndlr = Handler(nomadic)
+        hndlr = Handler(nomadic, srvr)
 
         ob.schedule(hndlr, nomadic.notes_path, recursive=True)
 

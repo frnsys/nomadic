@@ -1,35 +1,32 @@
 <link rel="stylesheet" href="/static/vendor/highlight.js/src/styles/obsidian.css">
 
-<ul class="note-controls">
-    <li class="js-edit">edit</li>
-    <li class="js-save" style="display:none;">save</li>
-    <li class="js-cancel" style="display:none;">cancel</li>
-</ul>
 <textarea class="plaintext-editor"><%= raw %></textarea>
 
 <div class="content">
-    <h1><%= title %></h1>
-    <div><%= html %></div>
+  <h1><%= title %></h1>
+  <div><%= html %></div>
 </div>
 
 <script type="text/javascript" charset="utf-8">
-    require([
-        'socketio',
-        'highlight',
-        'mathjax'
-    ], function(io, Highlight, MathJax) {
-        var socket = io.connect('http://localhost:9137');
+  require([
+    'socketio',
+    'highlight',
+    'mathjax'
+  ], function(io, Highlight, MathJax) {
+    var socket = io.connect('http://localhost:9137');
 
+    socket.on('connect', function() {
+      // To ensure connection with server.
+      socket.emit('connect');
+    });
 
-        socket.on('connect', function() {
-            // To ensure connection with server.
-            socket.emit('connect');
-        });
+    socket.on('refresh', function() {
+      location.reload();
+    });
 
-        socket.on('refresh', location.reload);
-        $('pre code').each(function(i, block) {
-            Highlight.highlightBlock(block);
-        });
-        MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
-    })
+    $('pre code').each(function(i, block) {
+      Highlight.highlightBlock(block);
+    });
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+  })
 </script>

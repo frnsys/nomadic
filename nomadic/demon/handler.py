@@ -13,16 +13,17 @@ from urllib import quote
 from watchdog.events import PatternMatchingEventHandler
 
 from nomadic.util import valid_note, parsers, logger
-from nomadic.core.models import Note, Notebook
+from nomadic.core.models import Note
 
 class Handler(PatternMatchingEventHandler):
     # Match everything b/c we want to match directories as well.
     patterns = ['*']
     ignore_patterns = ['*.build*', '*.searchindex*']
 
-    def __init__(self, nomadic):
+    def __init__(self, nomadic, server):
         super(Handler, self).__init__(ignore_directories=False)
         self.n = nomadic
+        self.server = server
 
     def dispatch(self, event):
         """
@@ -47,6 +48,9 @@ class Handler(PatternMatchingEventHandler):
         if not event.is_directory:
             note = Note(p)
             self.n.index.add_note(note)
+
+            # Reload note clients to reflect changes
+            self.server.refresh_clients()
 
     def on_deleted(self, event):
         p = event.src_path.decode('utf-8')
