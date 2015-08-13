@@ -36,12 +36,6 @@ define([
             this.$el.html(html);
         },
 
-        events: {
-            'click .js-edit': 'edit',
-            'click .js-save': 'save',
-            'click .js-cancel': 'cancel'
-        },
-
         keydown: function(e) {
             if (e.ctrlKey) {
                 switch(e.keyCode) {
@@ -62,13 +56,13 @@ define([
         },
 
         edit: function() {
-            this.$el.find('.plaintext-editor, .js-save, .js-cancel').show();
-            this.$el.find('.content, .js-edit').hide();
+            this.$el.find('.plaintext-editor').show().focus();
+            this.$el.find('.content').hide();
         },
 
         cancel: function() {
-            this.$el.find('.plaintext-editor, .js-save, .js-cancel').hide();
-            this.$el.find('.content, .js-edit').show();
+            this.$el.find('.plaintext-editor').hide();
+            this.$el.find('.content').show();
         },
 
         save: function() {

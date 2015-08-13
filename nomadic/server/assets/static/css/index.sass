@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Libre+Baskerville:400,400italic,700|Source+Sans+Pro:700)
+@import url(http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,400italic,600italic)
 
 // ========================================== Mixins
 @mixin vendor($name, $argument)
@@ -11,7 +11,8 @@
 @mixin transition($target: all, $duration: 0.2s)
   @include vendor(transition, $target $duration ease-in-out)
 
-$search_color: #658ECC
+$viewer_width: 720px
+$highlight_color: #FFE26F
 
 
 *
@@ -21,30 +22,28 @@ $search_color: #658ECC
 
 
 ::-moz-selection
-  background: #333
+  background: $highlight_color
   text-shadow: none
-  color: white
-
+  color: #333
 
 ::selection
-  background: #222
+  background: $highlight_color
   text-shadow: none
-  color: white
+  color: #333
 
 
 
 body
-  font-family: 'Libre Baskerville', serif
+  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
   font-size: 14px
   line-height: 1.6
   padding: 0
   margin: 0
   background-color: white
   color: #333
-  padding-top: 4em
 
 
-h1, h2, h3, h4, h5, h6, .notes span, .controls, .notebooks, .note-controls
+h1, h2, h3, h4, h5, h6, .notes span, .notebooks, .breadcrumbs, input
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
 
 body > *:first-child
@@ -446,50 +445,20 @@ mark
 
 /* ----------------------------------- */
 
-.controls
-  position: fixed
-  top: 0
-  left: 0
-  right: 0
-  z-index: 20
-  ul
-    list-style-type: none
-    text-align: center
-    margin: 0
-    padding: 0
-    width: 25%
-    padding: 0.8em 0
-    background: #111
-    color: #fff
-  li
-    display: inline-block
-    cursor: pointer
-    margin: 0 2em
-    &:last-child
-      display: none
-
-.note-controls
-  text-align: right
-  li
-    color: #e0e0e0
-    text-decoration: underline
-    display: inline-block
-    cursor: pointer
-    margin-left: 1em
-
-form[name=search] input
+input
   @include transition(background)
-  background: #222
-  color: #fff
+  background: none
+  border: 1px solid #eeeeee
+  color: #222
   height: 2.3em
   font-size: 1.4em
   padding: 0.6em 0.8em
-  border: none
-  width: 25%
-  &:focus
-    background: $search_color
+  width: 100%
 
-
+.breadcrumbs
+  max-width: $viewer_width
+  margin: 0 auto
+  padding: 2em 3em
 
 button
   padding: 0.4em 1em
@@ -497,44 +466,23 @@ button
   color: #fff
   background: #536CEE
 
-nav
-  width: 25%
-  margin: 6em 0 0 0
-  padding: 0em 2em 6em 2em
-  position: fixed
-  top: 0
-  left: 0
-  height: 100%
-  overflow-y: scroll
-  overflow-x: hidden
-  z-index: 1
-  border-right: 1px solid #eee
-
-.selected-nav
-  text-decoration: underline
-
-.note
-  width: 75%
+.viewer
+  max-width: $viewer_width
+  padding: 1em 3em
   margin: 0 auto
-  overflow-x: hidden
-  padding: 4em
-  margin-left: 25%
-  height: 100%
-  position: absolute
-  left: 0
-  top: 0
-  overflow-y: scroll
+  > div
+    display: none
 
 .note .content,
 .plaintext-editor
-  max-width: 640px
   margin: 0 auto
   word-break: break-word
 
 .plaintext-editor
   display: none
   width: 100%
-  height: 100%
+  max-width: 100%
+  min-height: 480px
 
 .notes ul,
 .notebooks ul
@@ -542,16 +490,18 @@ nav
   padding: 0
   list-style-type: none
 
+.notes--list
+  margin-top: 2em
+
 .notebooks
-  display: none
-  padding: 2em 0
+  margin: 0 auto
   ul
-    padding-left: 1em
-    list-style-type: none
     ul li:before
       content: '├─ '
       color: #ccc
       font-family: 'monospace'
+    ul
+      padding-left: 1em
   li
     margin: 0.8em 0
     a
@@ -570,12 +520,13 @@ nav
 
 
 .notes
+  max-width: 720px
+  margin: 0 auto
   li
     margin: 2em 0
     &:hover .thumbs
       opacity: 1.0
   h6
-    margin: 2em 0
     background: #536CEE
     color: #fff
     padding: 0.5em
@@ -598,62 +549,62 @@ nav
     max-height: 28px
     vertical-align: middle
 
+.protips
+  opacity: 0.5
+  position: fixed
+  right: 2em
+  bottom: 2em
+  width: 20em
+  height: 12em
+  font-size: 0.8em
+  list-style-type: none
+  text-align: center
+  ul, h6
+    padding: 0
+    margin: 0
+  li
+    display: inline-block
+    margin: 0.5em 0
+    width: 5.5em
 
-@-webkit-keyframes bounce
-  0%
-    background: #222
-  50%
-    background: $search_color
-  100%
-    background: #222
+.key
+  display: inline-block
+  padding: 0.1em 0.65em 0.2em
+  border: 1px solid #aaa
 
 @keyframes pulse
   0%
-    background: #222
+    background: #fafafa
   50%
-    background: $search_color
+    background: #ffffff
   100%
-    background: #222
+    background: #fafafa
 
 .loading
   animation: pulse 1.5s ease-out infinite
 
-
-@media screen and (max-width: 1280px)
-  .note
-    width: 100%
-    margin-left: 0
-    background: #fff
-
-  .notes li
-    background: #fff
-    padding: 2em 2.2em 2.4em 2.2em
-    box-shadow: 3px 3px #658ECC
-
-  nav
-    width: 100%
-    background: rgba(0, 0, 16, 0.8)
-    margin-top: 3em
-
-  .controls
-    background: #111
-    ul
-      width: auto
-      float: left
-    li
-      float: left
-      &:last-child
-        display: inline-block
-
-  form[name=search] input
-    width: 16em
-    float: right
+nav
+  max-width: $viewer_width
+  margin: 0 auto
+  display: none
+  padding: 0.5em 3em 1em 3em
+  overflow: hidden
+  ul
+    padding: 0
+    margin: 0
+    list-style-type: none
+  li
+    width: 33.33%
+    background: #f1f1f1
+    padding: 0.5em
+    float: left
+    text-align: center
+    cursor: pointer
+    &:hover
+      background: #eaeaea
 
 @media screen and (max-width: 620px)
-  form[name=search] input,
-  .controls ul
-    width: 100%
+  .protips
+    display: none
   nav
-    margin-top: 6em
-  .note
-    padding: 8em 4em 4em 4em
+    display: block
