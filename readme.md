@@ -292,3 +292,9 @@ The CSS stylesheet used for the compiled notes is based on the one from [here](h
 
 #### code and mathjax galore
 ![](screenshots/06.png)
+
+#### list and filter your notebooks
+![](screenshots/07.png)
+
+#### search your notes
+![](screenshots/08.png)
