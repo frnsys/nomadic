@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import Blueprint, Response, render_template, request, jsonify, current_app
 
 from nomadic import nomadic, conf
+from nomadic.core.errors import NoteConflictError
 from nomadic.core.models import Note, Notebook, Path
 from nomadic.util import html2md, md2html, parsers
 
@@ -44,7 +45,8 @@ def handle(path=''):
     p = Path(urllib.unquote(path))
 
     if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md' or path == 'recent/':
-        return render_template('index.html', tree=nomadic.rootbook.tree)
+        recent = Notebook('recent')
+        return render_template('index.html', tree=[recent] + nomadic.rootbook.tree)
 
     elif os.path.isfile(p.abs):
         with open(p.abs, 'rb') as file:
@@ -79,20 +81,19 @@ def nb(path=''):
             notebooks, notes = notebook.contents
             sorted_notes = sorted(notes, key=lambda x: x.last_modified, reverse=True)
 
-    if sorted_notes:
-        return jsonify({
-            'name': name,
-            'url': url,
-            'notes': [{
-                    'title': note.title,
-                    'images': note.images,
-                    'excerpt': note.excerpt,
-                    'url': quote(note.path.rel)
-                } for note in sorted_notes]
-        })
+        else:
+            return 'Not found.', 404
 
-    else:
-        return 'Not found.', 404
+    return jsonify({
+        'name': name,
+        'url': url,
+        'notes': [{
+                'title': note.title,
+                'images': [os.path.join('/', note.notebook.path.rel, image) for image in note.images],
+                'excerpt': note.excerpt,
+                'url': quote(note.path.rel)
+            } for note in sorted_notes]
+    })
 
 
 @routes.route('/n/<path:path>', methods=['GET', 'PUT'])
@@ -136,7 +137,7 @@ def search():
         'url': None,
         'notes': [{
                 'title': note.title,
-                'images': [os.path.join(note.notebook.path.rel, image) for image in note.images],
+                'images': [os.path.join('/', note.notebook.path.rel, image) for image in note.images],
                 'excerpt': highlights,
                 'url': quote(note.path.rel)
             } for note, highlights in results]
