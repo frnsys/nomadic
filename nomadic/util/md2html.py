@@ -1,4 +1,3 @@
-import re
 import markdown
 from markdown.inlinepatterns import SimpleTagPattern, ImagePattern
 from markdown.util import etree
@@ -9,11 +8,7 @@ def compile_markdown(md):
     """
     Compiles markdown to html.
     """
-
-    mjh = MathJaxHandler()
-    md = mjh.extract(md)
-    md = markdown.markdown(md, extensions=[GFM(), NomadicMD(), 'markdown.extensions.footnotes'], lazy_ol=False)
-    return mjh.restore(md)
+    return markdown.markdown(md, extensions=[GFM(), NomadicMD(), MathJaxExtension(), 'markdown.extensions.footnotes'], lazy_ol=False)
 
 
 
@@ -49,27 +44,19 @@ class NomadicMD(markdown.Extension):
         md.inlinePatterns.add('pdf_link', pdf_pattern, '_begin')
 
 
-class MathJaxHandler():
-    """
-    This extracts all MathJax from the markdown and re-injects it after
-    markdown processing is finished. This is so markdown doesn't mess with it.
+"""
+From <https://github.com/mayoff/python-markdown-mathjax>
+"""
+class MathJaxPattern(markdown.inlinepatterns.Pattern):
+    def __init__(self):
+        markdown.inlinepatterns.Pattern.__init__(self, r'(?<!\\)(\$\$?)(.+?)\2')
 
-    There might be a better way of handling MathJax buuuut this will do for now.
-    """
-    # matching `$`, ignoring anything in backticks.
-    MATHJAX_RE = re.compile(r'(?<!`)[\$]{2}.+?[\$]{2}(?!`)', re.DOTALL)
-    PLACEHOLDER = '<MATHJAXHOLDER>'
+    def handleMatch(self, m):
+        node = markdown.util.etree.Element('mathjax')
+        node.text = markdown.util.AtomicString(m.group(2) + m.group(3) + m.group(2))
+        return node
 
-    def extract(self, doc):
-        self.formulae = []
-
-        for match in self.MATHJAX_RE.findall(doc):
-            self.formulae.append(match)
-            doc = doc.replace(match, self.PLACEHOLDER)
-        return doc
-
-
-    def restore(self, doc):
-        for i, match in enumerate(re.findall(self.PLACEHOLDER, doc)):
-            doc = doc.replace(match, self.formulae[i], 1)
-        return doc
+class MathJaxExtension(markdown.Extension):
+    def extendMarkdown(self, md, md_globals):
+        # Needs to come before escape matching because \ is pretty important in LaTeX
+        md.inlinePatterns.add('mathjax', MathJaxPattern(), '<escape')
