@@ -229,7 +229,7 @@ class Notebook():
             if os.path.isfile(p) and valid_note(p):
                 notes.append( Note(p) )
             else:
-                if valid_notebook(name):
+                if valid_notebook(p):
                     notebooks.append( Notebook(p) )
         return notebooks, notes
 
@@ -269,8 +269,8 @@ class Notebook():
             if valid_notebook(root):
                 notebooks, notes = [], []
                 for dir in dirs:
-                    if valid_notebook(dir):
-                        path = os.path.join(root, dir)
+                    path = os.path.join(root, dir)
+                    if valid_notebook(path):
                         notebooks.append( Notebook(path) )
                 for file in files:
                     if valid_note(file):

@@ -11,16 +11,18 @@
 
     <link rel="stylesheet" type="text/css" href="/static/css/editor.css">
 
-    <select name='notebook'>
-        {% for notebook in notebooks %}
-            <option value="{{ notebook.path.abs }}">{{ notebook.name }}</option>
-        {% endfor %}
-    </select>
+    <div class="editor-controls">
+      <select name='notebook'>
+          {% for notebook in notebooks %}
+              <option value="{{ notebook.path.abs }}">{{ notebook.name }}</option>
+          {% endfor %}
+      </select>
 
-    <input type="text" name="title" value="{{ title }}" />
-    <input type="checkbox" name="save_as_markdown" checked> Save as Markdown
+      <input type="text" name="title" value="{{ title }}" />
+      <input type="checkbox" name="save_as_markdown" checked> <span>Save as Markdown</span>
 
-    <button class='js-delete'>Delete</button>
+      <button class='js-delete'>Delete</button>
+    </div>
 
     <div id="editor"></div>
 
