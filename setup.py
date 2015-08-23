@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='nomadic',
-    version='0.7.0',
+    version='0.7.1',
     description='a lightweight note management system.',
     url='https://github.com/ftzeng/nomadic',
     author='Francis Tseng',
