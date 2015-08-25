@@ -22,6 +22,7 @@ setup(
         'watchdog',
         'flask',
         'pyyaml',
+        'py-gfm',
     ],
     entry_points='''
         [console_scripts]
