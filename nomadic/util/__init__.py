@@ -2,8 +2,7 @@ import os
 
 def valid_notebook(path):
     """
-    We want to ignore the build and searchindex
-    as well as all resource directories.
+    We want to ignore the build and all resource directories.
     """
     if not os.path.isdir(path):
         return False
@@ -12,7 +11,7 @@ def valid_notebook(path):
     if path.strip('/').split('/')[-1][0] in ['.', '_']:
         return False
 
-    for excluded in ['.searchindex', '_resources', 'assets', '.SyncArchive', '.SyncID', '.SyncIgnore', '.sync', '.DS_Store', '.swp', '.swo', '.stfolder', '.git']:
+    for excluded in ['_resources', 'assets', '.SyncArchive', '.SyncID', '.SyncIgnore', '.sync', '.DS_Store', '.swp', '.swo', '.stfolder', '.git']:
         if excluded in path: return False
     return True
 
