@@ -1,11 +1,12 @@
 import click
-
 from nomadic.core.models import Note
-from nomadic.tools import presentation, wordpress
+from nomadic.tools import presentation
+
 
 @click.group()
 def tools():
     pass
+
 
 @tools.command()
 @click.argument('note')
@@ -28,13 +29,3 @@ def watch_presentation(note, outdir):
     """
     n = Note(note)
     presentation.watch_presentation(n, outdir)
-
-
-@tools.command()
-@click.argument('note')
-def fix_wordpress(note):
-    """
-    Fixes wordpress-embedded mathjax.
-    """
-    n = Note(note)
-    wordpress.fix_mathjax(n)
