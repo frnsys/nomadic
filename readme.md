@@ -133,7 +133,6 @@ For example:
 
 ```yaml
 root: ~/Notes
-default_notebook: scratch
 ```
 
 Whenever you change this file, you must restart the `nomadic` daemon:

@@ -1,11 +1,9 @@
 import os
-
 import click
 from click import echo
-from colorama import Fore, Back, Style
-
+from colorama import Fore, Back
 from nomadic import conf, nomadic
-from nomadic.core.models import Note
+
 
 @click.group()
 def cli():
@@ -87,15 +85,11 @@ def clean(notebook, execute):
 
 @cli.command()
 @click.argument('note')
-@click.option('-N', 'notebook', default='', help='The notebook to create the note in.')
 @click.option('--rich', is_flag=True, help='Create a new "rich" (wysiwyg html) note in a browser editor')
 def new(notebook, note, rich):
     """
     Create a new note.
     """
-
-    if not notebook:
-        notebook = conf.DEFAULT_NOTEBOOK
 
     nb = select_notebook(notebook)
     if nb is None:

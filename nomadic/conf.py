@@ -6,7 +6,6 @@ import yaml
 config = {
     'root': '~/nomadic',
     'port': 9137,
-    'default_notebook': '',
     'override_stylesheet': ''
 }
 
