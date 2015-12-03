@@ -34,7 +34,7 @@ $highlight_color: #FFE26F
 
 
 body
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
+  font-family: "ttyp0", "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
   font-size: 14px
   line-height: 1.6
   padding: 0
@@ -44,7 +44,7 @@ body
 
 
 h1, h2, h3, h4, h5, h6, .notes span, .notebooks, .breadcrumbs, input
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
+  font-family: "ttyp0", "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif
 
 body > *:first-child
   margin-top: 0 !important
@@ -470,19 +470,17 @@ button
   max-width: $viewer_width
   padding: 1em 3em
   margin: 0 auto
-  > div
-    display: none
 
-.note .content,
-.plaintext-editor
+.note .content
   margin: 0 auto
   word-break: break-word
 
-.plaintext-editor
-  display: none
-  width: 100%
-  max-width: 100%
-  min-height: 480px
+.note-path
+  margin: 3em 0 2em 0
+  padding: 1.5em 0 0 0
+  color: #b0b0b0
+  border-top: 1px solid #c0c0c0
+  font-weight: normal
 
 .notes ul,
 .notebooks ul
@@ -503,7 +501,7 @@ button
     ul
       padding-left: 1em
   li
-    margin: 0.8em 0
+    margin: 0.2em 0
     a
       @include transition
       background: #fff
@@ -512,12 +510,10 @@ button
         background: #5B92E5
         color: #fff
 
-
 .match
   background: #FFD600
   color: #333
   padding: 0 0.2em
-
 
 .notes
   max-width: 720px
@@ -532,10 +528,10 @@ button
     padding: 0.5em
   span
     font-size: 1.2em
+    font-weight: bold
   p
     margin-top: 0
     color: #aaa
-    font-style: italic
     font-size: 0.9em
     word-wrap: break-word
 
@@ -548,24 +544,6 @@ button
     display: inline
     max-height: 28px
     vertical-align: middle
-
-.protips
-  opacity: 0.5
-  position: fixed
-  right: 2em
-  bottom: 2em
-  width: 20em
-  height: 12em
-  font-size: 0.8em
-  list-style-type: none
-  text-align: center
-  ul, h6
-    padding: 0
-    margin: 0
-  li
-    display: inline-block
-    margin: 0.5em 0
-    width: 5.5em
 
 .key
   display: inline-block
@@ -586,7 +564,6 @@ button
 nav
   max-width: $viewer_width
   margin: 0 auto
-  display: none
   padding: 0.5em 3em 1em 3em
   overflow: hidden
   ul
@@ -594,17 +571,15 @@ nav
     margin: 0
     list-style-type: none
   li
-    width: 33.33%
-    background: #f1f1f1
-    padding: 0.5em
+    width: 50%
     float: left
     text-align: center
     cursor: pointer
+    border: 2px solid #f1f1f1
+    a
+      display: block
+      padding: 0.5em
     &:hover
-      background: #eaeaea
-
-@media screen and (max-width: 620px)
-  .protips
-    display: none
-  nav
-    display: block
+      background: #fcfcfc
+    &:last-child
+      border-left: none

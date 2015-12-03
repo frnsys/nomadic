@@ -6,7 +6,7 @@ from nomadic.util import md2html
 
 dir = os.path.dirname(os.path.abspath(__file__))
 env = environment.Environment()
-env.loader = FileSystemLoader(os.path.join(dir, '../server/assets/templates'))
+env.loader = FileSystemLoader(os.path.join(dir, '../server/assets/templates/export'))
 
 
 def compile_note(note, outdir, templ):

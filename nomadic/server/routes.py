@@ -2,24 +2,32 @@ import os
 import mimetypes
 from urllib import parse
 from datetime import datetime
-
-from flask import Blueprint, Response, render_template, request, jsonify, current_app
-
 from nomadic import nomadic, conf
 from nomadic.core.errors import NoteConflictError
 from nomadic.core.models import Note, Notebook, Path
 from nomadic.util import html2md, md2html, parsers
+from flask import Blueprint, Response, render_template, request, jsonify, current_app, url_for
 
 
 routes = Blueprint('routes', __name__)
 
-def quote(path):
-    return parse.quote(path)
+
+def breadcrumbs(path):
+    """generates breadcrumbs for a given path"""
+    breadcrumbs = []
+    url = '/'
+    for part in path.strip('/').split('/'):
+        if part.endswith('.md'):
+            url += part
+        else:
+            url += part + '/'
+        breadcrumbs.append((url_for('routes.handle', path=url), part))
+    return breadcrumbs
+
 
 @routes.route('/override.css')
 def stylesheet():
-    """
-    A stylesheet the user can specify in their config
+    """a stylesheet the user can specify in their config
     which will be loaded after the default one.
     """
     stylesheet = ''
@@ -36,16 +44,17 @@ def stylesheet():
 @routes.route('/<path:path>')
 def handle(path=''):
     """
-    Primary route.
-    - If the path looks like a Note or a Notebook, serves the index page
-    to let Backbone do the routing.
-    - Otherwise, serves the file content.
+    - if the path looks like a note, serve the note
+    - if the path looks like a notebook, server the notebook
+    - otherwise, serves the file content.
     """
     p = Path(parse.unquote(path))
 
-    if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md' or path == 'recent/':
-        recent = Notebook('recent')
-        return render_template('index.html', tree=[recent] + nomadic.rootbook.tree)
+    if os.path.isdir(p.abs) or path == 'recent/':
+        return view_notebook(path)
+
+    elif os.path.splitext(p.abs)[1] == '.md':
+        return view_note(path)
 
     elif os.path.isfile(p.abs):
         with open(p.abs, 'rb') as file:
@@ -56,102 +65,94 @@ def handle(path=''):
         return 'Not found.', 404
 
 
-@routes.route('/nb/')
-@routes.route('/nb/<path:path>')
-def nb(path=''):
-    """
-    Returns JSON objects representing a Note or a Notebook,
-    depending on the specified path.
-    """
+@routes.route('/notebooks')
+def view_notebooks():
+    recent = Notebook('recent')
+    return render_template('notebooks.html', tree=[recent] + nomadic.rootbook.tree)
 
+
+def view_notebook(path):
+    """returns a notebook at the specified path"""
     # The `recent` path is a special case.
     if path == 'recent':
         name = 'most recently modified'
         sorted_notes = nomadic.rootbook.recent_notes[:20]
-        url = 'recent'
 
     else:
         path = parse.unquote(path)
         notebook = Notebook(path)
         name = notebook.name
-        url = quote(notebook.path.rel)
 
         if os.path.isdir(notebook.path.abs):
             notebooks, notes = notebook.contents
             sorted_notes = sorted(notes, key=lambda x: x.last_modified, reverse=True)
-
         else:
             return 'Not found.', 404
 
-    return jsonify({
-        'name': name,
-        'url': url,
-        'notes': [{
+    return render_template('notebook.html',
+        notebook={
+            'name': name,
+            'notes': [{
                 'title': note.title,
                 'images': [os.path.join('/', note.notebook.path.rel, image) for image in note.images],
                 'excerpt': note.excerpt,
-                'url': quote(note.path.rel)
-            } for note in sorted_notes]
-    })
+                'url': parse.quote(note.path.rel)
+            } for note in sorted_notes],
+        }, breadcrumbs=breadcrumbs(path))
 
 
-@routes.route('/n/<path:path>', methods=['GET', 'PUT'])
-def n(path):
+def view_note(path):
     path = parse.unquote(path)
     note = Note(path)
 
     if os.path.isfile(note.path.abs):
-
-        if request.method == 'PUT':
-            text = request.form['text']
-            note.write(text)
-
-        raw = note.content
-
         if note.ext == '.md':
-            content = md2html.compile_markdown(raw)
+            content = md2html.compile_markdown(note.content)
         else:
-            content = raw
+            content = note.content
 
-        return jsonify({
-            'title': note.title,
-            'html': content,
-            'path': path,
-            'raw': raw,
-            'nburl': quote(note.notebook.path.rel)
-        })
-
-
+        return render_template('note.html',
+            note={
+                'title': note.title,
+                'html': content,
+                'path': path,
+            }, breadcrumbs=breadcrumbs(path))
     else:
         return 'Not found.', 404
 
 
-@routes.route('/search', methods=['POST'])
+@routes.route('/search')
 def search():
-    q = request.form['query']
-    results = nomadic.search(q, delimiters=('<b class="match">', '</b>'))
+    q = request.args.get('query', None)
+    if q is not None:
+        name = 'search results'
+        results = nomadic.search(q, delimiters=('<b class="match">', '</b>'))
+    else:
+        name = 'search'
+        results = []
 
-    return jsonify({
-        'name': 'search results',
-        'url': None,
-        'notes': [{
+    return render_template('notebook.html',
+        notebook={
+            'name': name,
+            'notes': [{
                 'title': note.title,
                 'images': [os.path.join('/', note.notebook.path.rel, image) for image in note.images],
-                'excerpt': highlights,
-                'url': quote(note.path.rel)
+                'excerpt': '<br>'.join(highlights),
+                'url': parse.quote(note.path.rel)
             } for note, highlights in results]
-    })
+        }, breadcrumbs=[])
 
 
 @routes.route('/new')
 def new():
-    # A unique default title to save without conflicts.
+    # a unique default title to save without conflicts.
     default_title = datetime.utcnow()
     return render_template('editor.html', notebooks=nomadic.rootbook.notebooks, title=default_title)
 
 
 @routes.route('/upload', methods=['POST'])
 def upload():
+    """for uploading images from the editor"""
     file = request.files['file']
 
     allowed_content_types = ['image/gif', 'image/jpeg', 'image/png']
@@ -174,7 +175,7 @@ def upload():
         save_path = os.path.join(assets, filename)
 
         file.save(save_path)
-        return save_path.replace(server.n.notes_path, ''), 200
+        return save_path.replace(conf.ROOT, ''), 200
 
     else:
         return 'Content type of {0} not allowed'.format(content_type), 415
@@ -182,6 +183,7 @@ def upload():
 
 @routes.route('/note', methods=['POST', 'PUT', 'DELETE'])
 def editor():
+    """endpoints for the editor"""
     form = request.form
     ext = '.md'
     path = os.path.join(form['notebook'], form['title'] + ext)
@@ -201,6 +203,7 @@ def editor():
 
 
 def save(note, data):
+    """for use with the editor"""
     html = data['html']
 
     if parsers.remove_html(html):

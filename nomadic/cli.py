@@ -16,7 +16,8 @@ def cli():
 
 @cli.command()
 @click.argument('query')
-def search(query):
+@click.option('--browser', is_flag=True, help='open with browser, only for non-pdfs')
+def search(query, browser):
     """search through notes"""
     results = []
 
@@ -36,11 +37,14 @@ def search(query):
         # file in the default editor.
         id = click.prompt('Select a note', type=int)
         path = results[id]
-        path = os.path.join(conf.ROOT, path)
+        abs_path = os.path.join(conf.ROOT, path)
         if os.path.splitext(path)[1] == '.pdf':
-            click.launch(path)
+            click.launch(abs_path)
         else:
-            click.edit(filename=path)
+            if not browser:
+                click.edit(filename=abs_path)
+            else:
+                click.launch('http://localhost:{0}/{1}'.format(conf.PORT, path))
     else:
         echo('\nNo results for ' + Fore.RED + query + Fore.RESET + '\n')
 
@@ -55,7 +59,7 @@ def browse(notebook):
 
 @cli.command()
 @click.argument('notebook')
-@click.option('--execute', is_flag=True, help='Execute the clean command')
+@click.option('--execute', is_flag=True, help='execute the clean command')
 def clean(notebook, execute):
     """remove unreferenced asset folders from a notebook,
     and clean up its notes' unreferenced assets;
@@ -66,7 +70,7 @@ def clean(notebook, execute):
 
 @cli.command()
 @click.argument('note')
-@click.option('--rich', is_flag=True, help='Create a new "rich" (wysiwyg html) note in a browser editor')
+@click.option('--rich', is_flag=True, help='create a new "rich" (wysiwyg html) note in a browser editor')
 def new(notebook, note, rich):
     """create a new note"""
     nb = select_notebook(notebook)
@@ -97,7 +101,7 @@ def export(note, outdir, watch, presentation):
     if presentation:
         f = partial(compile_note, outdir=outdir, templ='presentation')
     else:
-        f = partial(compile_note, outdir=outdir, templ='exported')
+        f = partial(compile_note, outdir=outdir, templ='default')
     watch_note(n, f) if watch else f(n)
 
 

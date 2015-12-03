@@ -1,0 +1,41 @@
+{% extends 'layout.html' %}
+
+{% macro render_tree(tree) -%}
+  <ul>
+    {% for notebook in tree %}
+      {% if notebook is iterable %}
+        {{ render_tree(notebook) }}
+      {% else %}
+        <li><a href="/{{ notebook.path.rel + '/' }}">{{ notebook.name }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{%- endmacro %}
+
+{% block content %}
+  <div class="notebooks">
+    <form name="notebook">
+      <input type="text" name="notebook" placeholder="filter notebooks" />
+    </form>
+    {{ render_tree(tree) }}
+  </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+  $(function() {
+    // really simple live filtering
+    $('input[name=notebook]').on('keyup', function() {
+      var query = $(this).val();
+      $('.notebooks a').each(function() {
+        var notebook = $(this).text();
+        if (notebook.indexOf(query) > -1) {
+          $(this).parent().show();
+        } else {
+          $(this).parent().hide();
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
