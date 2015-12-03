@@ -1,11 +1,3 @@
-"""
-Handler
-=======================
-
-Watches the notes directory for any file system
-changes and responds appropriately.
-"""
-
 import os
 import shutil
 from urllib.parse import quote
@@ -15,7 +7,10 @@ from nomadic.core.models import Note
 
 
 class Handler(PatternMatchingEventHandler):
-    # Match everything b/c we want to match directories as well.
+    """watches the notes directory for any file system changes
+    and responds appropriately."""
+
+    # match everything b/c we want to match directories as well.
     patterns = ['*']
     ignore_patterns = ['*.build*']
 

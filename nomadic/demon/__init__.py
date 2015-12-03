@@ -1,11 +1,3 @@
-"""
-Demon
-=======================
-
-Manages the filesystem handler
-and background server.
-"""
-
 import time
 from watchdog.observers import Observer
 from nomadic.util import logger
@@ -14,6 +6,8 @@ from nomadic.demon.handler import Handler
 
 
 def start(nomadic, port):
+    """start the daemon;
+    i.e. run the server and the file system handler/watcher"""
     logger.log.debug('nomadic daemon started.')
     try:
         ob = Observer()

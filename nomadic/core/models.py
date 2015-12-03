@@ -44,8 +44,8 @@ class Note():
             return note.read()
 
     @property
-    def excerpt(self):
-        char_limit = 200
+    def excerpt(self, char_limit=200):
+        """a plaintext excerpt of the note's contents"""
         excerpt = self.plaintext
         if len(excerpt) > char_limit:
             excerpt = excerpt[:char_limit-3] + '...'
@@ -53,6 +53,7 @@ class Note():
 
     @property
     def images(self):
+        """paths to images referenced in this note"""
         if self.ext == '.md':
             return parsers.md_images(self.content)
         return []
@@ -63,6 +64,7 @@ class Note():
 
     @property
     def assets(self, create=False):
+        """path to the note's assets"""
         notebook, filename = os.path.split(self.path.abs)
         assets = os.path.join(notebook, 'assets', self.title, '')
 
@@ -76,6 +78,7 @@ class Note():
             note.write(content.decode('utf-8'))
 
     def move(self, dest):
+        """move the note and its assets"""
         to_note = Note(dest)
 
         if os.path.exists(to_note.path.abs):
@@ -92,6 +95,7 @@ class Note():
         self.ext = to_note.ext
 
     def delete(self):
+        """deletes the note and its assets"""
         if os.path.exists(self.path.abs):
             os.remove(self.path.abs)
 
@@ -100,10 +104,8 @@ class Note():
             shutil.rmtree(assets)
 
     def clean_assets(self, delete=False):
-        """
-        Delete assets which are not
-        referenced by the note.
-        """
+        """delete assets which are not referenced by the note.
+        only actually deletes if `delete=True`"""
         action = 'Deleting' if delete else 'Will delete'
         r = self.assets
         if os.path.exists(r):
@@ -130,6 +132,7 @@ class Notebook():
 
     @property
     def notebooks(self):
+        """sub-notebooks of this notebook"""
         # Recursive
         for root, notebooks, notes in self.walk():
             for notebook in notebooks:
@@ -137,6 +140,7 @@ class Notebook():
 
     @property
     def notes(self):
+        """all notes, recursively, for this notebook"""
         # Recursive
         for root, notebooks, notes in self.walk():
             for note in notes:
@@ -144,10 +148,8 @@ class Notebook():
 
     @property
     def recent_notes(self):
-        """
-        Return all notes in this notebook, recursively,
-        sorted by last modified (most recent first).
-        """
+        """all notes in this notebook, recursively,
+        sorted by last modified (most recent first)"""
         return sorted(
                 [n for n in self.notes],
                 key=operator.attrgetter('last_modified'),
@@ -155,9 +157,7 @@ class Notebook():
 
     @property
     def tree(self):
-        """
-        Tree of notebooks under
-        this notebook.
+        """get tree structure of this notebook's sub-notebooks
 
         E.g::
 
@@ -183,11 +183,8 @@ class Notebook():
 
     @property
     def contents(self):
-        """
-        Lists the names of all files
-        and directories in this notebook,
-        not recursively.
-        """
+        """names of all files and directories
+        in this notebook, _not_ recursively"""
         notebooks, notes = [], []
         for name in os.listdir(self.path.abs):
             p = os.path.join(self.path.abs, name)
@@ -199,11 +196,9 @@ class Notebook():
         return notebooks, notes
 
     def clean_assets(self, delete=False):
-        """
-        Clean up individual notes' assets,
-        and delete assets which no longer
-        have parent notes.
-        """
+        """clean up individual notes' assets,
+        and delete assets which no longer have parent notes.
+        only actually deletes if `delete=True`"""
         action = 'Deleting' if delete else 'Will delete'
         r = os.path.join(self.path.abs, 'assets')
         _, notes = self.contents
@@ -223,11 +218,8 @@ class Notebook():
             note.clean_assets(delete=delete)
 
     def walk(self):
-        """
-        Walks the notebook, yielding only
-        valid directories and files.
-        """
-
+        """walks the notebook, yielding only
+        valid directories and files."""
         for root, dirs, files in os.walk(self.path.abs):
             if valid_notebook(root):
                 notebooks, notes = [], []
