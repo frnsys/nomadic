@@ -85,7 +85,6 @@ def search_pdf(query, window):
             line = proc.stdout.readline().strip()
             if not line and proc.poll() is not None:
                 break
-            print(line)
             note_path, match = line.split(b'\x00', 1)
             note_path = note_path.decode('utf-8').replace(notes_path, '').strip('/')
             matches[note_path].append(match.decode('utf-8'))

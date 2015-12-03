@@ -47,9 +47,6 @@ def handle(path=''):
     - if the path looks like a notebook, server the notebook
     - otherwise, serves the file content.
     """
-    print("_________________")
-    print(path)
-    print("_________________")
     p = Path(parse.unquote(path))
 
     if os.path.isdir(p.abs) or path == 'recent/':

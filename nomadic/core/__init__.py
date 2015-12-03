@@ -1,6 +1,12 @@
+import html
 from nomadic.core.models import Note, Notebook
 from nomadic.core.search import search, search_pdf
 
+def _process(text, escape=False):
+    text = text.decode('utf-8')
+    if escape:
+        return html.escape(text)
+    return text
 
 class Nomadic():
     def __init__(self, notes_path):
@@ -13,6 +19,12 @@ class Nomadic():
         delimiters -> what to surround matches with
         """
 
+        # check if the delimiters look like html delimiters
+        html_delim = True
+        for d in delimiters:
+            if not(d.startswith('<') and d.endswith('>')):
+                html_delim = False
+
         results = []
         for note_path, matches in search(query).items():
             note = Note(note_path)
@@ -21,11 +33,12 @@ class Nomadic():
                 for start, end in positions:
                     frm = max(0, start - window)
                     to = min(len(text), start + end + window)
-                    snippet = text[frm:start].decode('utf-8') + \
+                    snippet = \
+                        _process(text[frm:start], escape=html_delim) + \
                         delimiters[0] + \
-                        text[start:start+end].decode('utf-8') + \
+                        _process(text[start:start+end], escape=html_delim) + \
                         delimiters[1] + \
-                        text[start+end:to].decode('utf-8')
+                        _process(text[start+end:to], escape=html_delim)
 
                     if frm > 0:
                         snippet = '...{}'.format(snippet)
