@@ -7,7 +7,7 @@ class Nomadic():
         self.notes_path = notes_path
         self.rootbook = Notebook(notes_path)
 
-    def search(self, query, delimiters=('<b>','</b>'), window=150):
+    def search(self, query, delimiters=('<b>','</b>'), window=150, include_pdf=False):
         """search across txt/md and pdf files
         window -> num characters to show before/after match
         delimiters -> what to surround matches with
@@ -17,15 +17,15 @@ class Nomadic():
         for note_path, matches in search(query).items():
             note = Note(note_path)
             highlights = []
-            # results.append((Note(note_path), [text for text, _ in matches]))
             for text, positions in matches:
                 for start, end in positions:
                     frm = max(0, start - window)
                     to = min(len(text), start + end + window)
-                    # TODO this isn't quite right
-                    # it may be because positions are based on byte string
-                    # representation and not unicode?
-                    snippet = text[frm:start] + delimiters[0] + text[start:start+end] + delimiters[1] + text[start+end:to]
+                    snippet = text[frm:start].decode('utf-8') + \
+                        delimiters[0] + \
+                        text[start:start+end].decode('utf-8') + \
+                        delimiters[1] + \
+                        text[start+end:to].decode('utf-8')
 
                     if frm > 0:
                         snippet = '...{}'.format(snippet)
@@ -34,8 +34,9 @@ class Nomadic():
                     highlights.append(snippet)
             results.append((note, highlights))
 
-        # we don't get match positions for pdfs, unfortunately
-        for note_path, matches in search_pdf(query, window).items():
-            note = Note(note_path)
-            results.append((note, matches))
+        if include_pdf:
+            # we don't get match positions for pdfs, unfortunately
+            for note_path, matches in search_pdf(query, window).items():
+                note = Note(note_path)
+                results.append((note, matches))
         return results

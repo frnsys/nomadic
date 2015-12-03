@@ -20,11 +20,6 @@
     });
     MathJax.Hub.Startup.onload();
 
-    var socket = io();
-    socket.on('refresh', function() {
-      location.reload();
-    });
-
     $('pre code').each(function(i, block) {
       hljs.highlightBlock(block);
     });

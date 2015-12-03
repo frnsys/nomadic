@@ -28,13 +28,6 @@ class Handler(PatternMatchingEventHandler):
         and (not hasattr(event, 'dest_path') or valid_note(event.dest_path)):
             super().dispatch(event)
 
-    def on_created(self, event):
-        p = event.src_path
-        logger.log.debug('Created: {0}'.format(p))
-        if not event.is_directory:
-            # reload note clients to reflect changes
-            self.server.refresh_clients()
-
     def on_moved(self, event):
         src = event.src_path
         dest = event.dest_path

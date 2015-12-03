@@ -32,7 +32,8 @@ def search(query):
                                 stdout=subprocess.PIPE)
 
         while True:
-            line = proc.stdout.readline().decode('utf-8').strip()
+            byte_line = proc.stdout.readline()
+            line = byte_line.decode('utf-8').strip()
             if not line and proc.poll() is not None:
                 break
 
@@ -47,13 +48,16 @@ def search(query):
 
             # parse the result lines
             else:
-                match_info, match = line.split(':', 1)
+                match_info, match = byte_line.split(b':', 1)
                 match_locations = []
-                if ';' in match_info:
-                    line_num, match_locs = match_info.split(';')
-                    for mloc in match_locs.split(','):
-                        start, end = mloc.split(' ')
+                if b';' in match_info:
+                    line_num, match_locs = match_info.split(b';')
+                    for mloc in match_locs.split(b','):
+                        start, end = mloc.split(b' ')
                         match_locations.append((int(start), int(end)))
+
+                # match locations are for the byte string,
+                # so don't decode the match
                 matches[note_path].append((match, match_locations))
         return matches
 
@@ -71,18 +75,20 @@ def search_pdf(query, window):
         # -i        case insensitive
         # -R        recursive search
         # -C n      num of chars for context
-        proc = subprocess.Popen(['pdfgrep', '-i', '-R', '-C {}'.format(window),
+        # -Z        use null bytes as filename/content separator
+        proc = subprocess.Popen(['pdfgrep', '-i', '-R', '-Z', '-C {}'.format(window),
                                 query, notes_path],
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.DEVNULL)
 
         while True:
-            line = proc.stdout.readline().decode('utf-8').strip()
+            line = proc.stdout.readline().strip()
             if not line and proc.poll() is not None:
                 break
-            note_path, match = line.split(':', 1)
-            note_path = note_path.replace(notes_path, '').strip('/')
-            matches[note_path].append(match)
+            print(line)
+            note_path, match = line.split(b'\x00', 1)
+            note_path = note_path.decode('utf-8').replace(notes_path, '').strip('/')
+            matches[note_path].append(match.decode('utf-8'))
         return matches
     except FileNotFoundError:
         raise MissingDependencyException('pdfgrep is not installed')

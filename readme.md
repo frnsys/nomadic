@@ -37,12 +37,10 @@ that way as well.
 
 * Supports **GitHub-Flavored** markdown
 * Supports **MathJax** syntax
-* Supports **references to images** and other files, and will automatically
-update those references if the files are moved
+* Supports **references to images** and other files, and will automatically update those references if the files are moved
 * **Full-text search** (across txt, markdown, and even pdf files)
 * A **rich text editor** (in-browser) for dumping in web clippings (external images are automatically saved locally)
 * The rich text editor can **convert and save HTML notes into markdown**
-* **Auto-recompiling of markdown** notes and updating of whatever browser is viewing the note (i.e. live-ish previews)
 * Serves **a browsable site of all your notes**
 * Complete **command-line interface**
 * Export notes as portable **presentations** or as standalone html documents
@@ -72,9 +70,21 @@ $ node tools/build.js python ruby javascript scala java bash http sql cs cpp css
 
 # install search dependencies
 # ubuntu:
-sudo apt-get install silversearcher-ag pdfgrep
+sudo apt-get install silversearcher-ag
 # osx:
-brew install the_silver_searcher pdfgrep
+brew install the_silver_searcher
+
+# pdf search support is optional
+# ubuntu (package manager's version may be out of date, must be >= 1.4):
+sudo apt-get install libpoppler-cpp-dev
+git clone https://gitlab.com/pdfgrep/pdfgrep.git /tmp/pdfgrep
+cd /tmp/pdfgrep
+bash autogen.sh
+./configure
+make
+sudo make install
+# osx
+brew install pdfgrep
 ```
 
 ### Configuration

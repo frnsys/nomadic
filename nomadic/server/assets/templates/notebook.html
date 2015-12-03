@@ -28,7 +28,7 @@
 {% block content %}
   <div class="notes">
     <form action="/search" method="GET" name="search">
-      <input type="text" name="query" placeholder="search all notes" />
+      <input type="text" name="query" placeholder="search all notes" autofocus/>
     </form>
     <div class="notes--list">{{ render_notebook(notebook) }}</div>
   </div>

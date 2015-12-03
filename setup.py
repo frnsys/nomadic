@@ -22,7 +22,6 @@ setup(
         'pyyaml',
         'py-gfm',
         'html2text',
-        'flask-socketio',
     ],
     entry_points='''
         [console_scripts]

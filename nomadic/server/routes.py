@@ -1,12 +1,11 @@
 import os
-import mimetypes
 from urllib import parse
 from datetime import datetime
 from nomadic import nomadic, conf
 from nomadic.core.errors import NoteConflictError
 from nomadic.core.models import Note, Notebook, Path
 from nomadic.util import html2md, md2html, parsers
-from flask import Blueprint, Response, render_template, request, jsonify, current_app, url_for
+from flask import Blueprint, Response, render_template, request, jsonify, current_app, url_for, send_file
 
 
 routes = Blueprint('routes', __name__)
@@ -48,6 +47,9 @@ def handle(path=''):
     - if the path looks like a notebook, server the notebook
     - otherwise, serves the file content.
     """
+    print("_________________")
+    print(path)
+    print("_________________")
     p = Path(parse.unquote(path))
 
     if os.path.isdir(p.abs) or path == 'recent/':
@@ -57,9 +59,9 @@ def handle(path=''):
         return view_note(path)
 
     elif os.path.isfile(p.abs):
-        with open(p.abs, 'rb') as file:
-            type, enc = mimetypes.guess_type(p.abs)
-            return Response(file.read(), mimetype=type)
+        # with open(p.abs, 'rb') as file:
+            # return send_file(p.abs)
+        return send_file(open(p.abs, ('rb')))
 
     else:
         return 'Not found.', 404
@@ -74,7 +76,7 @@ def view_notebooks():
 def view_notebook(path):
     """returns a notebook at the specified path"""
     # The `recent` path is a special case.
-    if path == 'recent':
+    if path == 'recent/':
         name = 'most recently modified'
         sorted_notes = nomadic.rootbook.recent_notes[:20]
 
@@ -124,9 +126,18 @@ def view_note(path):
 @routes.route('/search')
 def search():
     q = request.args.get('query', None)
+
+
     if q is not None:
         name = 'search results'
-        results = nomadic.search(q, delimiters=('<b class="match">', '</b>'))
+        if '--include_pdf' in q:
+            q = q.replace('--include_pdf', '')
+            include_pdf = True
+        else:
+            include_pdf = False
+        results = nomadic.search(q,
+                                 delimiters=('<b class="match">', '</b>'),
+                                 include_pdf=include_pdf)
     else:
         name = 'search'
         results = []
@@ -225,9 +236,6 @@ def save(note, data):
 
         note.write(content)
         note.clean_assets()
-
-        # Update all connected clients.
-        #self.refresh_clients()
 
         return jsonify({
             'path': note.path.abs

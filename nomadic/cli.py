@@ -17,11 +17,14 @@ def cli():
 @cli.command()
 @click.argument('query')
 @click.option('--browser', is_flag=True, help='open with browser, only for non-pdfs')
-def search(query, browser):
+@click.option('--include-pdf', is_flag=True, help='include pdfs in search (slower)')
+def search(query, browser, include_pdf):
     """search through notes"""
     results = []
 
-    for idx, (note, highlights) in enumerate(nomadic.search(query, delimiters=(Fore.RED, Fore.RESET))):
+    for idx, (note, highlights) in enumerate(nomadic.search(query,
+                                                            delimiters=(Fore.RED, Fore.RESET),
+                                                            include_pdf=include_pdf)):
         path = note.path.rel
         results.append(path)
 
