@@ -1,6 +1,6 @@
 import os
-import urllib
 import mimetypes
+from urllib import parse
 from datetime import datetime
 
 from flask import Blueprint, Response, render_template, request, jsonify, current_app
@@ -14,8 +14,7 @@ from nomadic.util import html2md, md2html, parsers
 routes = Blueprint('routes', __name__)
 
 def quote(path):
-    return urllib.quote(path.encode('utf-8'))
-
+    return parse.quote(path)
 
 @routes.route('/override.css')
 def stylesheet():
@@ -42,7 +41,7 @@ def handle(path=''):
     to let Backbone do the routing.
     - Otherwise, serves the file content.
     """
-    p = Path(urllib.unquote(path))
+    p = Path(parse.unquote(path))
 
     if os.path.isdir(p.abs) or os.path.splitext(p.abs)[1] == '.md' or path == 'recent/':
         recent = Notebook('recent')
@@ -72,7 +71,7 @@ def nb(path=''):
         url = 'recent'
 
     else:
-        path = urllib.unquote(path)
+        path = parse.unquote(path)
         notebook = Notebook(path)
         name = notebook.name
         url = quote(notebook.path.rel)
@@ -98,7 +97,7 @@ def nb(path=''):
 
 @routes.route('/n/<path:path>', methods=['GET', 'PUT'])
 def n(path):
-    path = urllib.unquote(path)
+    path = parse.unquote(path)
     note = Note(path)
 
     if os.path.isfile(note.path.abs):
@@ -130,7 +129,7 @@ def n(path):
 @routes.route('/search', methods=['POST'])
 def search():
     q = request.form['query']
-    results = nomadic.index.search(q, html=True)
+    results = nomadic.search(q, delimiters=('<b class="match">', '</b>'))
 
     return jsonify({
         'name': 'search results',
@@ -184,7 +183,7 @@ def upload():
 @routes.route('/note', methods=['POST', 'PUT', 'DELETE'])
 def editor():
     form = request.form
-    ext = '.md' if form['save_as_markdown'] else '.html'
+    ext = '.md'
     path = os.path.join(form['notebook'], form['title'] + ext)
     note = Note(path)
 

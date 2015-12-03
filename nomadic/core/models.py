@@ -1,18 +1,14 @@
 import os
 import shutil
 import operator
-from urllib import quote
-
+from urllib.parse import quote
 from nomadic import conf
 from nomadic.core.errors import NoteConflictError
-from nomadic.util import pdf, parsers, valid_notebook, valid_note
+from nomadic.util import parsers, valid_notebook, valid_note
 
 
 class Path():
     def __init__(self, path):
-        if isinstance(path, str):
-            path = path.decode('utf-8')
-
         if os.path.isabs(path):
             self.abs = path
             self.rel = os.path.relpath(path, conf.ROOT)
@@ -21,47 +17,31 @@ class Path():
             self.abs = os.path.join(conf.ROOT, path)
 
 
-
-
-
 class Note():
     def __init__(self, path):
         self.path = Path(path)
 
         _, self.filename = os.path.split(self.path.rel)
         self.title, self.ext = os.path.splitext(self.filename)
-        self.buildname = self.title + '.html'
 
         notebook_path = os.path.dirname(self.path.rel)
         self.notebook = Notebook(notebook_path)
 
+    @property
+    def plaintext(self):
+        if self.ext == '.pdf':
+            return self.content
+
+        elif self.ext == '.md':
+            return parsers.remove_md(self.content)
 
     @property
     def content(self):
         if self.ext == '.pdf':
-            return pdf.pdf_text(self.path.abs)
+            return '[PDF]'
 
-        with open(self.path.abs, 'rb') as note:
-            return note.read().decode('utf-8')
-
-
-    @property
-    def plaintext(self):
-        text = u''
-        if self.ext == '.pdf':
-            text = self.content
-
-        else:
-            if self.ext == '.html':
-                text = parsers.remove_html(self.content)
-            elif self.ext == '.md':
-                text = parsers.remove_md(self.content)
-
-        if isinstance(text, str):
-            text = text.decode('utf-8')
-
-        return text
-
+        with open(self.path.abs, 'r') as note:
+            return note.read()
 
     @property
     def excerpt(self):
@@ -73,17 +53,13 @@ class Note():
 
     @property
     def images(self):
-        if self.ext == '.html':
-            return []
-        elif self.ext == '.md':
+        if self.ext == '.md':
             return parsers.md_images(self.content)
         return []
-
 
     @property
     def last_modified(self):
         return os.path.getmtime(self.path.abs)
-
 
     @property
     def assets(self, create=False):
@@ -95,11 +71,9 @@ class Note():
 
         return assets
 
-
     def write(self, content):
         with open(self.path.abs, 'w') as note:
-            note.write(content.encode('utf-8'))
-
+            note.write(content.decode('utf-8'))
 
     def move(self, dest):
         to_note = Note(dest)
@@ -117,7 +91,6 @@ class Note():
         self.title = to_note.title
         self.ext = to_note.ext
 
-
     def delete(self):
         if os.path.exists(self.path.abs):
             os.remove(self.path.abs)
@@ -125,7 +98,6 @@ class Note():
         assets = self.assets
         if os.path.exists(assets):
             shutil.rmtree(assets)
-
 
     def clean_assets(self, delete=False):
         """
@@ -146,12 +118,9 @@ class Note():
 
             # Remove the entire directory if empty.
             if not os.listdir(r):
-                print(u'{0} assets folder for {1}'.format(action, self.title))
+                print('{0} assets folder for {1}'.format(action, self.title))
                 if delete:
                     shutil.rmtree(r)
-
-
-
 
 
 class Notebook():
@@ -159,14 +128,12 @@ class Notebook():
         self.path = Path(path)
         self.name = os.path.basename(path)
 
-
     @property
     def notebooks(self):
         # Recursive
         for root, notebooks, notes in self.walk():
             for notebook in notebooks:
                 yield notebook
-
 
     @property
     def notes(self):
@@ -185,7 +152,6 @@ class Notebook():
                 [n for n in self.notes],
                 key=operator.attrgetter('last_modified'),
                 reverse=True)
-
 
     @property
     def tree(self):
@@ -215,7 +181,6 @@ class Notebook():
                 tree.append(subtree)
         return tree
 
-
     @property
     def contents(self):
         """
@@ -233,7 +198,6 @@ class Notebook():
                     notebooks.append( Notebook(p) )
         return notebooks, notes
 
-
     def clean_assets(self, delete=False):
         """
         Clean up individual notes' assets,
@@ -250,14 +214,13 @@ class Notebook():
             for name in os.listdir(r):
                 if name not in note_titles:
                     p = os.path.join(r, name)
-                    print(u'{0} asset folder: {1}'.format(action, name))
+                    print('{0} asset folder: {1}'.format(action, name))
                     if delete:
                         shutil.rmtree(p)
 
         # Delete unreferenced assets.
         for note in notes:
             note.clean_assets(delete=delete)
-
 
     def walk(self):
         """

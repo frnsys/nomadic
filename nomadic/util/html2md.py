@@ -71,7 +71,6 @@ def convert_span(span):
     if 'italic' in style:
         builders.append(builder.EM)
 
-    tail = span.tail
     if builders:
         children = []
         if span.text is not None:
@@ -89,10 +88,4 @@ def convert_span(span):
             el = b(el)
 
         # Replace the old element with the new one.
-        print('before', tostring(p).decode('utf8').replace('\n', '').replace(' ', ''))
         p.replace(span, el)
-        print('after', tostring(p).decode('utf8').replace('\n', '').replace(' ', ''))
-
-        # Insert other text.
-        if tail is not None and tail.strip():
-            p.insert(p.index(el) + 1, builder.SPAN(tail))

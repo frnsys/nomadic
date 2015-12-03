@@ -13,13 +13,7 @@
     'highlight',
     'mathjax'
   ], function(io, Highlight, MathJax) {
-    var socket = io.connect('http://localhost:9137');
-
-    socket.on('connect', function() {
-      // To ensure connection with server.
-      socket.emit('connect');
-    });
-
+    var socket = io();
     socket.on('refresh', function() {
       location.reload();
     });

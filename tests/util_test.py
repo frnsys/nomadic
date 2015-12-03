@@ -1,10 +1,6 @@
-import shutil
-from os.path import exists
-
-from nomadic.util import html2md
-from test import NomadicTest
-
 from lxml.html import fromstring, tostring
+from nomadic.util import html2md
+from tests import NomadicTest
 
 
 html = '''
@@ -29,7 +25,7 @@ html = '''
 class html2mdTest(NomadicTest):
     def test_html_to_markdown(self):
         markdown = html2md.html_to_markdown(html)
-        expected = u'_** foobar _ lala ** yum **_ hey hey ** uh oh ** yes **_\n'
+        expected = '_** foobar _ lala ** yum **_ hey hey ** uh oh ** yes **_\n'
         print(markdown)
         self.assertEqual(markdown, expected)
 
@@ -60,7 +56,11 @@ class html2mdTest(NomadicTest):
         h = fromstring(html)
         for span in h.findall('.//span'):
             html2md.convert_span(span)
-        result = tostring(h)
+        result = tostring(h).decode('utf-8')
 
         results = [x.replace('\n', '').replace(' ', '') for x in [result, expected]]
+        print('=========')
+        print(results[0])
+        print('=========')
+        print(results[1])
         self.assertEqual(results[0], results[1])

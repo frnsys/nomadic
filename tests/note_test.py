@@ -1,8 +1,7 @@
-import shutil
 from os.path import exists
 
 from nomadic.core import Note
-from test import NomadicTest, _path
+from tests import NomadicTest, _path
 
 
 class NoteTest(NomadicTest):
@@ -54,19 +53,13 @@ class NoteTest(NomadicTest):
         note_asset = _path('assets/my note/foo.jpg')
 
         self.assertTrue(exists(note_asset))
-
-        note.clean_assets()
-
+        note.clean_assets(delete=True)
         self.assertFalse(exists(note_asset))
 
     def test_content_pdf(self):
         note = Note(_path('womp.pdf'))
-        self.assertEqual(note.content, 'I\'m a PDF')
+        self.assertEqual(note.content, '[PDF]')
 
     def test_plaintext_markdown(self):
         note = Note(_path('my note.md'))
         self.assertEqual(note.plaintext, 'HEY HI\nfoo bar qua')
-
-    def test_plaintext_html(self):
-        note = Note(_path('test.html'))
-        self.assertEqual(note.plaintext, 'Test HTML\n\n\n\n\n    This is a test')

@@ -18,10 +18,6 @@ def valid_notebook(path):
 
 def valid_note(path):
     """
-    Only certain filetypes qualify as notes,
-    and we want to ignore ones named 'index.html'
-    since they may be build indexes.
-
-    When indexing files, pdfs are also included.
+    Only certain filetypes qualify as notes.
     """
-    return path.endswith(('.html', '.md', '.txt', '.pdf')) and 'index.html' not in path
+    return path.endswith(('.md', '.txt', '.pdf'))

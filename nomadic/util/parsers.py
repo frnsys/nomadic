@@ -1,9 +1,6 @@
-import os
 import re
-import urllib
 from markdown import markdown
 from html.parser import HTMLParser
-from lxml.html import fromstring, tostring
 
 
 # Markdown regexes
@@ -40,40 +37,3 @@ def md_images(md):
 
 def md_links(md):
     return [link for link in md_link_re.findall(md)]
-
-
-def rewrite_links(raw_html, rewrite_func):
-    """
-    Take an HTML input string, rewrite links according
-    to the `rewrite_func`, return the rewritten HTML string.
-    """
-    html = fromstring(raw_html)
-    html.rewrite_links(rewrite_func)
-    return tostring(html)
-
-
-def rewrite_external_images(raw_html, note):
-    """
-    Download externally-hosted images to a note's local assets folder
-    and rewrite references to those images.
-    """
-    rsp = note.assets
-    nbp = note.notebook.path.abs
-
-    def rewriter(link):
-        link = link.split('?')[0] # split off ? params
-        if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
-            if not os.path.exists(rsp):
-                os.makedirs(rsp)
-
-            ext = link.split('/')[-1].split('.')[-1]
-            filename = str(hash(link)) + '.' + ext
-
-            save_path = os.path.join(rsp, filename)
-
-            if not os.path.exists(save_path):
-                filename, _ = urllib.urlretrieve(link, save_path)
-
-            return os.path.relpath(save_path, nbp)
-        return link
-    return rewrite_links(raw_html, rewriter)

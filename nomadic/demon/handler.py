@@ -8,20 +8,19 @@ changes and responds appropriately.
 
 import os
 import shutil
-from urllib import quote
-
+from urllib.parse import quote
 from watchdog.events import PatternMatchingEventHandler
-
 from nomadic.util import valid_note, parsers, logger
 from nomadic.core.models import Note
+
 
 class Handler(PatternMatchingEventHandler):
     # Match everything b/c we want to match directories as well.
     patterns = ['*']
-    ignore_patterns = ['*.build*', '*.searchindex*']
+    ignore_patterns = ['*.build*']
 
     def __init__(self, nomadic, server):
-        super(Handler, self).__init__(ignore_directories=False)
+        super().__init__(ignore_directories=False)
         self.n = nomadic
         self.server = server
 
@@ -32,41 +31,20 @@ class Handler(PatternMatchingEventHandler):
         if event.is_directory \
         or valid_note(event.src_path) \
         and (not hasattr(event, 'dest_path') or valid_note(event.dest_path)):
-            super(Handler, self).dispatch(event)
-
-    def on_modified(self, event):
-        if not event.is_directory:
-            note = Note(event.src_path)
-            logger.log.debug(u'Modified: {0}'.format(note.path.rel))
-            if os.path.exists(note.path.abs):
-                self.n.index.update_note(note)
+            super().dispatch(event)
 
     def on_created(self, event):
-        p = event.src_path.decode('utf-8')
-
-        logger.log.debug(u'Created: {0}'.format(p))
+        p = event.src_path
+        logger.log.debug('Created: {0}'.format(p))
         if not event.is_directory:
-            note = Note(p)
-            self.n.index.add_note(note)
-
-            # Reload note clients to reflect changes
+            # reload note clients to reflect changes
             self.server.refresh_clients()
 
-    def on_deleted(self, event):
-        p = event.src_path.decode('utf-8')
-
-        logger.log.debug(u'Deleted: {0}'.format(p))
-        if not event.is_directory:
-            note = Note(p)
-            self.n.index.delete_note(note)
-        else:
-            self.n.index.update()
-
     def on_moved(self, event):
-        src = event.src_path.decode('utf-8')
-        dest = event.dest_path.decode('utf-8')
+        src = event.src_path
+        dest = event.dest_path
 
-        logger.log.debug(u'Moved: {0} to {1}'.format(src, dest))
+        logger.log.debug('Moved: {0} to {1}'.format(src, dest))
         if not event.is_directory:
             src_note = Note(src)
             dest_note = Note(dest)
@@ -74,19 +52,13 @@ class Handler(PatternMatchingEventHandler):
             if os.path.exists(src_note.assets):
                 shutil.move(src_note.assets, dest_note.assets)
 
-            self.n.index.delete_note(src_note)
-            self.n.index.add_note(dest_note)
-
-        else:
-            self.n.index.update()
-
-        # Update all references to this
-        # path in any .md or .html files.
+        # update all references to this
+        # path in any .md files.
         self.update_references(src, dest)
 
     # TO DO:
     # might need a separate daemon/watcher for this
-    # since a file of any type, not just html/md/txt/pdf,
+    # since a file of any type, not just md/txt/pdf,
     # could be referenced and moved.
     def update_references(self, src, dest):
         """
@@ -105,10 +77,7 @@ class Handler(PatternMatchingEventHandler):
                 dirty = src_filename in content
 
                 if dirty:
-                    if note.ext == '.html':
-                        content = parsers.rewrite_links(content, update_func_)
-
-                    elif note.ext == '.md':
+                    if note.ext == '.md':
                         for link in parsers.md_links(content):
                             link_ = update_func_(link)
                             if link != link_:

@@ -19,8 +19,6 @@
       </select>
 
       <input type="text" name="title" value="{{ title }}" />
-      <input type="checkbox" name="save_as_markdown" checked> <span>Save as Markdown</span>
-
       <button class='js-delete'>Delete</button>
     </div>
 
@@ -61,7 +59,6 @@
                     html: $editor.code(),
                     title: title,
                     notebook: notebook,
-                    save_as_markdown: $('input[name=save_as_markdown]').is(':checked'),
 
                     // New values, so we can
                     // move/remove the old note.

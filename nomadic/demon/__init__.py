@@ -6,29 +6,15 @@ Manages the filesystem handler
 and background server.
 """
 
-import sys
 import time
-
 from watchdog.observers import Observer
-from daemon import DaemonContext
-
 from nomadic.util import logger
 from nomadic.server import Server
 from nomadic.demon.handler import Handler
 
 
-def start(nomadic, port, debug=False):
+def start(nomadic, port):
     logger.log.debug('nomadic daemon started.')
-
-    if debug:
-        summon(nomadic, port)
-
-    else:
-        with DaemonContext(stdout=sys.stdout):
-            summon(nomadic, port)
-
-
-def summon(nomadic, port):
     try:
         ob = Observer()
         srvr = Server(port)

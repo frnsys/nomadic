@@ -36,10 +36,11 @@ def search(query):
         # file in the default editor.
         id = click.prompt('Select a note', type=int)
         path = results[id]
+        path = os.path.join(conf.ROOT, path)
         if os.path.splitext(path)[1] == '.pdf':
             click.launch(path)
         else:
-            click.edit(filename=os.path.join(conf.ROOT, path))
+            click.edit(filename=path)
     else:
         echo('\nNo results for ' + Fore.RED + query + Fore.RESET + '\n')
 
@@ -89,14 +90,14 @@ def new(notebook, note, rich):
 @click.argument('note')
 @click.argument('outdir')
 @click.option('--watch', is_flag=True, help='watch the note for changes')
-@click.option('--presentation', is_flag=True, help='compile as a presentation')
-def compile(note, outdir, watch, presentation):
-    """compile a note to html"""
+@click.option('--presentation', is_flag=True, help='export as a presentation')
+def export(note, outdir, watch, presentation):
+    """export a note to html"""
     n = Note(note)
     if presentation:
         f = partial(compile_note, outdir=outdir, templ='presentation')
     else:
-        f = partial(compile_note, outdir=outdir, templ='compiled')
+        f = partial(compile_note, outdir=outdir, templ='exported')
     watch_note(n, f) if watch else f(n)
 
 

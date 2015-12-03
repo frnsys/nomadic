@@ -9,8 +9,8 @@ dir = os.path.dirname(path)
 
 # We use a copy of the test notes directory
 # so we can reset it at will.
-NOTES_DIR_TEMPLATE = os.path.join(dir, u'notes')
-NOTES_DIR = os.path.join(dir, u'.notes', '')
+NOTES_DIR_TEMPLATE = os.path.join(dir, 'notes')
+NOTES_DIR = os.path.join(dir, '.notes', '')
 def _path(path): return os.path.join(NOTES_DIR, path)
 
 from nomadic import conf
@@ -24,7 +24,7 @@ class NomadicTest(unittest.TestCase):
         """
         try:
             self._pre_setup()
-            super(NomadicTest, self).__call__(result)
+            super().__call__(result)
         finally:
             self._post_teardown()
 
