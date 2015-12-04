@@ -20,7 +20,7 @@ class HandlerTest(NomadicTest):
     """
     def setUp(self):
         self.nomadic = Nomadic(self.notes_dir)
-        self.handler = Handler(self.nomadic, server=None)
+        self.handler = Handler(self.nomadic)
 
     def test_update_references_markdown(self):
         path = _path('some_notebook/a cool note.md')

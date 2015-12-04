@@ -28,8 +28,4 @@ setup(
         nomadic=nomadic.cli:cli
         nomadic-d=nomadic.daemon:daemon
     ''',
-
-    # At the moment, gevent must be installed from git for python 3
-    # compatibility.
-    # pip install git+git://github.com/gevent/gevent
 )
