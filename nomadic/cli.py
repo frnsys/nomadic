@@ -7,6 +7,7 @@ from nomadic import conf, nomadic
 from nomadic.core import Note
 from nomadic.util.compile import compile_note
 from nomadic.util.watch import watch_note
+from nomadic.util import html2md, parsers, clipboard
 
 
 @click.group()
@@ -16,8 +17,8 @@ def cli():
 
 @cli.command()
 @click.argument('query')
-@click.option('--browser', is_flag=True, help='open with browser, only for non-pdfs')
-@click.option('--include-pdf', is_flag=True, help='include pdfs in search (slower)')
+@click.option('-b', '--browser', is_flag=True, help='open with browser, only for non-pdfs')
+@click.option('-p', '--include-pdf', is_flag=True, help='include pdfs in search (slower)')
 def search(query, browser, include_pdf):
     """search through notes"""
     results = []
@@ -62,7 +63,7 @@ def browse(notebook):
 
 @cli.command()
 @click.argument('notebook')
-@click.option('--execute', is_flag=True, help='execute the clean command')
+@click.option('-x', '--execute', is_flag=True, help='execute the clean command')
 def clean(notebook, execute):
     """remove unreferenced asset folders from a notebook,
     and clean up its notes' unreferenced assets;
@@ -73,31 +74,26 @@ def clean(notebook, execute):
 
 @cli.command()
 @click.argument('note')
-@click.option('--rich', is_flag=True, help='create a new "rich" (wysiwyg html) note in a browser editor')
-def new(notebook, note, rich):
+def new(notebook, note):
     """create a new note"""
     nb = select_notebook(notebook)
     if nb is None:
         echo('The notebook `{0}` doesn\'t exist.'.format(notebook))
         return
 
-    if not rich:
-        # Assume Markdown if no ext specified.
-        _, ext = os.path.splitext(note)
-        if not ext: note += '.md'
+    # Assume Markdown if no ext specified.
+    _, ext = os.path.splitext(note)
+    if not ext: note += '.md'
 
-        path = os.path.join(nb.path.abs, note)
-        click.edit(filename=path)
-    else:
-        # Launch the daemon server's rich editor.
-        click.launch('http://localhost:{0}/new'.format(conf.PORT))
+    path = os.path.join(nb.path.abs, note)
+    click.edit(filename=path)
 
 
 @cli.command()
 @click.argument('note')
 @click.argument('outdir')
-@click.option('--watch', is_flag=True, help='watch the note for changes')
-@click.option('--presentation', is_flag=True, help='export as a presentation')
+@click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
+@click.option('-p', '--presentation', is_flag=True, help='export as a presentation')
 def export(note, outdir, watch, presentation):
     """export a note to html"""
     n = Note(note)
@@ -106,6 +102,43 @@ def export(note, outdir, watch, presentation):
     else:
         f = partial(compile_note, outdir=outdir, templ='default')
     watch_note(n, f) if watch else f(n)
+
+
+@cli.command()
+@click.option('-s', '--save', help='note path to save to. will download images')
+@click.option('-e', '--edit', is_flag=True, help='edit the note after saving')
+@click.option('-b', '--browser', is_flag=True, help='open the note in the browser after saving')
+@click.option('-o', '--overwrite', is_flag=True, help='overwrite existing note')
+def clip(save, edit, browser, overwrite):
+    """convert html in the clipboard to markdown"""
+    html = clipboard.get_clipboard_html()
+    if html is None:
+        click.echo('No html in the clipboard')
+        return
+
+    if save is None:
+        content = html2md.html_to_markdown(html).strip()
+        click.echo(content)
+
+    else:
+        if not save.endswith('.md'):
+            click.echo('Note must have extension ".md"')
+            return
+        note = Note(save)
+        if os.path.exists(note.path.abs) and not overwrite:
+            click.echo('Note already exists at "{}" (specify `--overwrite` to overwrite)'.format(note.path.abs))
+            return
+
+        html = parsers.rewrite_external_images(html, note)
+        content = html2md.html_to_markdown(html).strip()
+        note.write(content)
+        note.clean_assets()
+
+        if browser:
+            click.launch('http://localhost:{0}/{1}'.format(conf.PORT, note.path.rel))
+
+        if edit:
+            click.edit(filename=note.path.abs)
 
 
 def select_notebook(name):

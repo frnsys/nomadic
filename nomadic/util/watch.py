@@ -5,6 +5,8 @@ from watchdog.observers import Observer
 
 
 def watch_note(note, handle_func):
+    """watch a single note for changes,
+    call `handle_func` on change"""
     ob = Observer()
     handler = FileSystemEventHandler()
 

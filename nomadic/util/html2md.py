@@ -5,6 +5,7 @@ from lxml.html import builder, fromstring, tostring, clean
 
 h2t = html2text.HTML2Text()
 h2t.body_width = 0 # don't wrap lines
+h2t.ul_item_mark = '-'
 to_md = h2t.handle
 
 

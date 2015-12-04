@@ -12,17 +12,15 @@ through either the command line or a simple web interface.
 
 For example:
 
-```bash
-notes
-├── economics
-│   ├── more economics notes.pdf
-│   ├── my economics notes.md
-│   └── assets
-│       └── some image.png
-├── programming
-│   └── scala guide.md
-└── some note.md
-```
+    notes
+    ├── economics
+    │   ├── more economics notes.pdf
+    │   ├── my economics notes.md
+    │   └── assets
+    │       └── some image.png
+    ├── programming
+    │   └── scala guide.md
+    └── some note.md
 
 I recommend using `nomadic` with [SyncThing](https://syncthing.net/) to keep
 notes synced across devices. With this setup, `nomadic` becomes a decentralized,
@@ -39,8 +37,7 @@ that way as well.
 * Supports **MathJax** syntax
 * Supports **references to images** and other files, and will automatically update those references if the files are moved
 * **Full-text search** (across txt, markdown, and even pdf files)
-* A **rich text editor** (in-browser) for dumping in web clippings (external images are automatically saved locally)
-* The rich text editor can **convert and save HTML notes into markdown**
+* A tool for **saving copied html as markdown** (external images are automatically saved locally)
 * Serves **a browsable site of all your notes**
 * Complete **command-line interface**
 * Export notes as portable **presentations** or as standalone html documents
@@ -51,41 +48,45 @@ that way as well.
 
 ### Installation
 
-```bash
-$ git clone https://github.com/ftzeng/nomadic.git
-$ cd nomadic
-$ pip install .
+    $ git clone https://github.com/ftzeng/nomadic.git
+    $ cd nomadic
+    $ pip install .
 
-# install front-end packages
-$ cd nomadic/server/assets/
-$ bower install
+    # install front-end packages
+    $ cd nomadic/server/assets/
+    $ bower install
 
-# build the highlight.js library
-$ cd static/vendor/highlight.js
-$ npm install
-# ...with all languages
-$ node tools/build.js
-# ...or with only specific languages
-$ node tools/build.js python ruby javascript scala java bash http sql cs cpp css json objectivec xml markdown apache nginx
+    # build the highlight.js library
+    $ cd static/vendor/highlight.js
+    $ npm install
+    # ...with all languages
+    $ node tools/build.js
+    # ...or with only specific languages
+    $ node tools/build.js python ruby javascript scala java bash http sql cs cpp css json objectivec xml markdown apache nginx
 
-# install search dependencies
-# ubuntu:
-sudo apt-get install silversearcher-ag
-# osx:
-brew install the_silver_searcher
+    # install search dependencies
+    # ubuntu:
+    $ sudo apt-get install silversearcher-ag
+    # osx:
+    $ brew install the_silver_searcher
 
-# pdf search support is optional
-# ubuntu (package manager's version may be out of date, must be >= 1.4):
-sudo apt-get install libpoppler-cpp-dev
-git clone https://gitlab.com/pdfgrep/pdfgrep.git /tmp/pdfgrep
-cd /tmp/pdfgrep
-bash autogen.sh
-./configure
-make
-sudo make install
-# osx
-brew install pdfgrep
-```
+If you wish to use `nomadic clip` (to convert clipboard HTML into markdown notes) on OSX, you also need the following:
+
+    $ pip install pyobjc
+
+If you wish to be able to search through PDFs, you also need the following:
+
+    # ubuntu (package manager's version may be out of date, must be >= 1.4):
+    $ sudo apt-get install libpoppler-cpp-dev
+    $ git clone https://gitlab.com/pdfgrep/pdfgrep.git /tmp/pdfgrep
+    $ cd /tmp/pdfgrep
+    $ bash autogen.sh
+    $ ./configure
+    $ make
+    $ sudo make install
+
+    # osx
+    $ brew install pdfgrep
 
 ### Configuration
 Create a config file (optional) at `~/.nomadic` in YAML format. See [Configuration](#configuration) for more details.
@@ -105,28 +106,20 @@ of previewing notes as you work on them.
 ##### Linux (Upstart)
 If you're on a Linux distro that uses Upstart, you can do:
 
-```bash
-$ sudo cp scripts/nomadic.conf /etc/init/nomadic.conf
-```
+    $ sudo cp scripts/nomadic.conf /etc/init/nomadic.conf
 
 Then to start the daemon right away:
 
-```bash
-$ sudo start nomadic
-```
+    $ sudo start nomadic
 
 ##### OSX
 If you're on OSX, you can do:
 
-```bash
-$ cp scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
-```
+    $ cp scripts/com.nomadic.plist ~/Library/LaunchAgents/com.nomadic.plist
 
 Then you can start the daemon right away:
 
-```bash
-$ launchctl load ~/Library/LaunchAgents/com.nomadic.plist
-```
+    $ launchctl load ~/Library/LaunchAgents/com.nomadic.plist
 
 ---
 
@@ -142,13 +135,11 @@ root: ~/notes
 
 Whenever you change this file, you must restart the `nomadic` daemon:
 
-```bash
-# Linux (Upstart)
-$ sudo restart nomadic
+    # Linux (Upstart)
+    $ sudo restart nomadic
 
-# OSX (there might be a better way)
-$ pkill -f nomadic-d; launchctl start com.nomadic
-```
+    # OSX (there might be a better way)
+    $ pkill -f nomadic-d; launchctl start com.nomadic
 
 ### Custom CSS
 You can specify a custom stylesheet to override the default one.
@@ -160,50 +151,41 @@ override_stylesheet: ~/path/to/my/styles.css
 ...
 ```
 
-
 ---
 
 ## Usage
 Run the `nomadic` daemon if it isn't running already.
 
-```bash
-$ nomadic-d
-```
-
+    $ nomadic-d
 
 Primary interaction with `nomadic` is through
 the command line.
 
-```bash
-$ nomadic --help
+    $ nomadic --help
 
-Usage: nomadic [OPTIONS] COMMAND [ARGS]...
+    Usage: nomadic [OPTIONS] COMMAND [ARGS]...
 
-Options:
-  --help  Show this message and exit.
+    Options:
+    --help  Show this message and exit.
 
-Commands:
-  browse   browse notes via the web interface
-  clean    remove unreferenced asset folders
-  export   export a note to html
-  new      create a new note
-  search   search through notes
-```
+    Commands:
+    browse   browse notes via the web interface
+    clean    remove unreferenced asset folders
+    clip     convert html in the clipboard to markdown
+    export   export a note to html
+    new      create a new note
+    search   search through notes
 
 ### Browsing notes
 You can browse this notes site by running:
 
-```bash
-$ nomadic browse
-```
+    $ nomadic browse
 
 which opens up the root directory ('notebook') in your default web browser.
 
 You can immediately jump to a specific notebook by passing its name in:
 
-```bash
-$ nomadic browse economics
-```
+    $ nomadic browse economics
 
 If the specified name matches multiple notebooks,
 you'll be given the option to select the right one.
@@ -211,9 +193,7 @@ you'll be given the option to select the right one.
 ### Searching notes
 You can search through your notes by running:
 
-```bash
-$ nomadic search <query>
-```
+    $ nomadic search <query>
 
 This will present a list of results, along with snippets where the
 keyword was found, for you to choose from.
@@ -231,9 +211,7 @@ You can export a note to a standalone html document pretty easily.
 
 For example:
 
-```bash
-$ nomadic export path/to/some_note.md path/to/export/to
-```
+    $ nomadic export path/to/some_note.md path/to/export/to
 
 This compiles the note to the specified folder, copying over images.
 
@@ -243,9 +221,7 @@ If you will be making changes to the note, you can specify `--watch` to recompil
 
 Similarly, you can export a note as a standalone html presentation:
 
-```bash
-$ nomadic export --presentation path/to/some_note.md path/to/export/to
-```
+    $ nomadic export --presentation path/to/some_note.md path/to/export/to
 
 The compiled HTML includes a script which breaks the note into slides according
 to `<hr>` tags (specified in markdown as `---`, `***`, or `___`). Slides resize to take
@@ -259,19 +235,17 @@ You can use the up/down arrow keys to navigate.
 ---
 
 ## Development
-```bash
-$ git clone https://github.com/ftzeng/nomadic.git
-$ cd nomadic
-$ pip install --editable .
-```
+
+    $ git clone https://github.com/ftzeng/nomadic.git
+    $ cd nomadic
+    $ pip install --editable .
 
 This installs the package locally, allowing you to work on it and test it easily.
 
 To run the included tests:
-```bash
-$ pip install nose
-$ nosetests test
-```
+
+    $ pip install nose
+    $ nosetests test
 
 ## Screenshots
 

@@ -1,7 +1,7 @@
 import sys
 import logging
 from flask import Flask
-from nomadic.server.routes import routes, editor
+from nomadic.server.routes import routes
 
 
 class Server():
@@ -14,7 +14,6 @@ class Server():
                 static_url_path='/static',
                 template_folder='assets/templates')
         self.app.register_blueprint(routes)
-        self.app.register_blueprint(editor)
         self.port = port
 
         # log to stdout
