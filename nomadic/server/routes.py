@@ -25,8 +25,7 @@ def breadcrumbs(path):
 @routes.route('/override.css')
 def stylesheet():
     """a stylesheet the user can specify in their config
-    which will be loaded after the default one.
-    """
+    which will be loaded after the default one."""
     stylesheet = ''
     if conf.OVERRIDE_STYLESHEET:
         try:
@@ -69,7 +68,7 @@ def view_notebooks():
 
 
 def view_notebook(path):
-    """returns a notebook at the specified path"""
+    """returns the notebook at the specified path"""
     # The `recent` path is a special case.
     if path == 'recent/':
         name = 'most recently modified'
@@ -99,6 +98,7 @@ def view_notebook(path):
 
 
 def view_note(path):
+    """returns the note at the specified path"""
     path = parse.unquote(path)
     note = Note(path)
 
@@ -121,7 +121,6 @@ def view_note(path):
 @routes.route('/search')
 def search():
     q = request.args.get('query', None)
-
 
     if q is not None:
         name = 'search results'

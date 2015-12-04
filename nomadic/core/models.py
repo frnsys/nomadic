@@ -133,18 +133,14 @@ class Notebook():
     @property
     def notebooks(self):
         """sub-notebooks of this notebook"""
-        # Recursive
         for root, notebooks, notes in self.walk():
-            for notebook in notebooks:
-                yield notebook
+            yield from notebooks
 
     @property
     def notes(self):
         """all notes, recursively, for this notebook"""
-        # Recursive
         for root, notebooks, notes in self.walk():
-            for note in notes:
-                yield note
+            yield from notes
 
     @property
     def recent_notes(self):
@@ -189,10 +185,10 @@ class Notebook():
         for name in os.listdir(self.path.abs):
             p = os.path.join(self.path.abs, name)
             if os.path.isfile(p) and valid_note(p):
-                notes.append( Note(p) )
+                notes.append(Note(p))
             else:
                 if valid_notebook(p):
-                    notebooks.append( Notebook(p) )
+                    notebooks.append(Notebook(p))
         return notebooks, notes
 
     def clean_assets(self, delete=False):
@@ -226,10 +222,10 @@ class Notebook():
                 for dir in dirs:
                     path = os.path.join(root, dir)
                     if valid_notebook(path):
-                        notebooks.append( Notebook(path) )
+                        notebooks.append(Notebook(path))
                 for file in files:
                     if valid_note(file):
                         path = os.path.join(root, file)
-                        notes.append( Note(path) )
+                        notes.append(Note(path))
 
                 yield root, notebooks, notes

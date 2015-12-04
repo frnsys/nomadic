@@ -34,6 +34,7 @@ class Handler(PatternMatchingEventHandler):
             src_note = Note(src)
             dest_note = Note(dest)
 
+            # move this note's assets
             if os.path.exists(src_note.assets):
                 shutil.move(src_note.assets, dest_note.assets)
 
