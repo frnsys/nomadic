@@ -33,4 +33,4 @@ def compile_note(note, outdir, templ):
 
     # save it
     with open(os.path.join(outdir, note.title) + '.html', 'w') as out:
-        out.write(content.encode('utf-8'))
+        out.write(content)

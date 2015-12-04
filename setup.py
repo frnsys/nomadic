@@ -26,7 +26,7 @@ setup(
     entry_points='''
         [console_scripts]
         nomadic=nomadic.cli:cli
-        nomadic-d=nomadic.daemon:daemon
+        nomadic-d=nomadic:daemon
     ''',
 
     # At the moment, gevent must be installed from git for python 3

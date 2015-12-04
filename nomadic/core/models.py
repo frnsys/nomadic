@@ -75,7 +75,7 @@ class Note():
 
     def write(self, content):
         with open(self.path.abs, 'w') as note:
-            note.write(content.decode('utf-8'))
+            note.write(content)
 
     def move(self, dest):
         """move the note and its assets"""

@@ -1,28 +1,25 @@
 import os
 import shutil
 from urllib.parse import quote
-from watchdog.events import PatternMatchingEventHandler
-from nomadic.util import valid_note, parsers, logger
 from nomadic.core.models import Note
+from nomadic.util import valid_note, parsers, logger
+from watchdog.events import PatternMatchingEventHandler
 
 
 class Handler(PatternMatchingEventHandler):
     """watches the notes directory for any file system changes
-    and responds appropriately."""
+    and responds appropriately"""
 
     # match everything b/c we want to match directories as well.
     patterns = ['*']
     ignore_patterns = ['*.build*']
 
-    def __init__(self, nomadic, server):
+    def __init__(self, nomadic):
         super().__init__(ignore_directories=False)
         self.n = nomadic
-        self.server = server
 
     def dispatch(self, event):
-        """
-        Only dispatch an event if it satisfies our requirements.
-        """
+        """only dispatch an event if it satisfies our requirements"""
         if event.is_directory \
         or valid_note(event.src_path) \
         and (not hasattr(event, 'dest_path') or valid_note(event.dest_path)):
@@ -49,10 +46,8 @@ class Handler(PatternMatchingEventHandler):
     # since a file of any type, not just md/txt/pdf,
     # could be referenced and moved.
     def update_references(self, src, dest):
-        """
-        Update at all references to the
-        `src` path with the `dest` path.
-        """
+        """update at all references to the
+        `src` path with the `dest` path."""
         src_abs = os.path.abspath(src)
         dest_abs = os.path.abspath(dest)
         _, src_filename = os.path.split(src)
@@ -70,8 +65,7 @@ class Handler(PatternMatchingEventHandler):
                             link_ = update_func_(link)
                             if link != link_:
                                 content = content.replace(link, link_)
-
-                    note.write(content.encode('utf-8'))
+                    note.write(content)
 
     def update_reference(self, src_filename, src_abs, dest_abs):
         def wrapper(current_dir):

@@ -1,8 +1,8 @@
 import time
-from watchdog.observers import Observer
 from nomadic.util import logger
 from nomadic.server import Server
 from nomadic.demon.handler import Handler
+from watchdog.observers import Observer
 
 
 def start(nomadic, port):
@@ -11,13 +11,12 @@ def start(nomadic, port):
     logger.log.debug('nomadic daemon started.')
     try:
         ob = Observer()
-        srvr = Server(port)
-        hndlr = Handler(nomadic, srvr)
-
+        hndlr = Handler(nomadic)
         ob.schedule(hndlr, nomadic.notes_path, recursive=True)
-
         ob.start()
-        srvr.start()
+
+        server = Server(port)
+        server.start()
 
         try:
             while True:
