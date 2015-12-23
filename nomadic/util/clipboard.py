@@ -25,7 +25,7 @@ def get_clipboard_html():
             raise Exception('Could not import GTK, is it installed on this system?')
         cb = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         html_target = Gdk.Atom.intern('text/html', False)
-        targets = cb.wait_for_targets()
+        targets = cb.wait_for_targets()[1]
         if html_target not in targets:
             return None
         return cb.wait_for_contents(html_target).get_data()
