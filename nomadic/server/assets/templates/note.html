@@ -14,8 +14,12 @@
   <script type="text/javascript" charset="utf-8">
     MathJax.Hub.Config({
         tex2jax: {
-            inlineMath: [["\\(","\\)"], ["$","$"]],
-            processEscapes: true
+          inlineMath: [["\\(","\\)"], ["$","$"]],
+          processEscapes: true
+        },
+        "HTML-CSS": {
+          webFont: "STIX-Web",
+          scale: 60 // font scale
         }
     });
     MathJax.Hub.Startup.onload();
