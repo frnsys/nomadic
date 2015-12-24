@@ -1,5 +1,7 @@
 import os
 import re
+import requests
+from hashlib import md5
 from markdown import markdown
 from html.parser import HTMLParser
 from urllib.request import urlretrieve
@@ -66,12 +68,12 @@ def rewrite_external_images(raw_html, note):
 
     def rewriter(link):
         link = link.split('?')[0] # split off ? params
-        if link.startswith('http') and link.endswith(('.jpg', '.jpeg', '.gif', '.png')):
+        is_image, ext = _is_remote_image_link(link)
+        if is_image:
             if not os.path.exists(rsp):
                 os.makedirs(rsp)
 
-            ext = link.split('/')[-1].split('.')[-1]
-            filename = str(hash(link)) + '.' + ext
+            filename = md5(link.encode('utf-8')).hexdigest() + '.' + ext
 
             save_path = os.path.join(rsp, filename)
 
@@ -81,3 +83,24 @@ def rewrite_external_images(raw_html, note):
             return os.path.relpath(save_path, nbp)
         return link
     return rewrite_links(raw_html, rewriter)
+
+
+def _is_remote_image_link(link):
+    if not link.startswith('http'):
+        return False, None
+
+    ext = link.split('/')[-1].split('.')[-1]
+    # if it looks an image, assume it is an image
+    if ext in ['jpg', 'jpeg', 'gif', 'png']:
+        return True, ext
+
+    # otherwise, probe to check
+    # this is b/c, for instance, squarespace image urls
+    # don't actually end with file extensions
+    else:
+        res = requests.head(link)
+        ctype, ext = res.headers['Content-Type'].split('/')
+        if ctype == 'image':
+            return True, ext
+
+    return False, None
