@@ -4,7 +4,7 @@ setup(
     name='nomadic',
     version='0.7.1',
     description='a lightweight note management system.',
-    url='https://github.com/ftzeng/nomadic',
+    url='https://github.com/frnsys/nomadic',
     author='Francis Tseng',
     author_email='f@frnsys.com',
     license='GPLv3',

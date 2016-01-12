@@ -3,19 +3,17 @@
 ![](screenshots/01.png)
 (more screenshots at the end)
 
-`nomadic` is a simple daemon/web service that makes managing notes nicer.
+`nomadic`...
 
-`nomadic` supports a simple directory structure of markdown, txt, and
-pdf notes and any other files which are referenced from them. `nomadic`
-provides an easier way of searching through and browsing those files
-through either the command line or a simple web interface.
+- is a simple daemon/web service that makes managing notes nicer.
+- supports a simple directory structure of markdown, txt, and pdf notes and any other files which are referenced from them.
+- provides an easier way of searching through and browsing those files through either the command line or a simple web interface.
 
-For example:
+For example, you might have a folder like this:
 
     notes
-    ├── economics
-    │   ├── more economics notes.pdf
-    │   ├── my economics notes.md
+    ├── math
+    │   ├── my math notes.md
     │   └── assets
     │       └── some image.png
     ├── programming
@@ -26,21 +24,20 @@ I recommend using `nomadic` with [SyncThing](https://syncthing.net/) to keep
 notes synced across devices. With this setup, `nomadic` becomes a decentralized,
 simplified alternative to Evernote and other note-taking services.
 
-Since `nomadic` runs a small server for browsing files, you can access your notes remotely
-that way as well.
+Since `nomadic` runs a small server for browsing files, you can access your notes remotely that way as well.
 
 ---
 
 ## Features
 
-* Supports **GitHub-Flavored** markdown
-* Supports **MathJax** syntax
-* Supports **references to images** and other files, and will automatically update those references if the files are moved
-* **Full-text search** (across txt, markdown, and even pdf files)
-* A tool for **saving copied html as markdown** (external images are automatically saved locally)
-* Serves **a browsable site of all your notes**
-* Complete **command-line interface**
-* Export notes as portable **presentations** or as standalone html documents
+- Supports __GitHub-Flavored__ markdown
+- Supports __MathJax__ syntax
+- Supports __references to images__ and other files, and will automatically update those references if the files are moved
+- __Full-text search__ (across txt, markdown, and even pdf files)
+- A tool for __saving copied html as markdown__ (external images are automatically saved locally)
+- Serves __a browsable site of all your notes__
+- Complete __command-line interface__
+- Export notes as portable __presentations__ or as standalone html documents
 
 ---
 
@@ -48,7 +45,7 @@ that way as well.
 
 ### Installation
 
-    $ git clone https://github.com/ftzeng/nomadic.git
+    $ git clone https://github.com/frnsys/nomadic.git
     $ cd nomadic
     $ pip install .
 
@@ -236,7 +233,7 @@ You can use the up/down arrow keys to navigate.
 
 ## Development
 
-    $ git clone https://github.com/ftzeng/nomadic.git
+    $ git clone https://github.com/frnsys/nomadic.git
     $ cd nomadic
     $ pip install --editable .
 
