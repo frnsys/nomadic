@@ -111,8 +111,11 @@ def _is_remote_image_link(link):
     # don't actually end with file extensions
     else:
         res = requests.head(link)
-        ctype, ext = res.headers['Content-Type'].split('/')
-        if ctype == 'image':
-            return True, ext
+        try:
+            ctype, ext = res.headers['Content-Type'].split('/')
+            if ctype == 'image':
+                return True, ext
+        except KeyError:
+            pass
 
     return False, None
