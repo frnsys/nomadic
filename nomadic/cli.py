@@ -5,7 +5,8 @@ from functools import partial
 from colorama import Fore, Back
 from nomadic import conf, nomadic
 from nomadic.core import Note
-from nomadic.util import html2md, parsers, clipboard, compile, watch
+from nomadic.util import html2md, parsers, clipboard, compile
+from nomadic.util.watch import watch_note
 
 
 @click.group()
@@ -92,14 +93,16 @@ def new(notebook, note):
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 @click.option('-p', '--presentation', is_flag=True, help='export as a presentation')
-def export(note, outdir, wtch, presentation):
+def export(note, outdir, watch, presentation):
     """export a note to html"""
+    # convert to abs path; don't assume we're in the notes folder
+    note = os.path.join(os.getcwd(), note)
     n = Note(note)
     if presentation:
         f = partial(compile.compile_note, outdir=outdir, templ='presentation')
     else:
         f = partial(compile.compile_note, outdir=outdir, templ='default')
-    watch.watch_note(n, f) if wtch else f(n)
+    watch_note(n, f) if watch else f(n)
 
 
 @cli.command()

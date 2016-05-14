@@ -24,7 +24,11 @@ class Note():
         _, self.filename = os.path.split(self.path.rel)
         self.title, self.ext = os.path.splitext(self.filename)
 
-        notebook_path = os.path.dirname(self.path.rel)
+        # only assume absolute path if the path is relative
+        if not os.path.isabs(path):
+            notebook_path = os.path.dirname(self.path.rel)
+        else:
+            notebook_path = os.path.dirname(path)
         self.notebook = Notebook(notebook_path)
 
     @property
