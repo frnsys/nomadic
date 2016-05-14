@@ -16,8 +16,8 @@
   color: #333; }
 
 body {
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif;
-  font-size: 14px;
+  font-family: "ttyp0", "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif;
+  font-size: 16px;
   line-height: 1.6;
   padding: 0;
   margin: 0;
@@ -25,7 +25,7 @@ body {
   color: #333; }
 
 h1, h2, h3, h4, h5, h6, .notes span, .notebooks, .breadcrumbs, input {
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif; }
+  font-family: "ttyp0", "Source Sans Pro", "Helvetica Neue", Helvetica, "Liberation Sans", Calibri, Arial, sans-serif; }
 
 body > *:first-child {
   margin-top: 0 !important; }
@@ -381,19 +381,17 @@ button {
   max-width: 720px;
   padding: 1em 3em;
   margin: 0 auto; }
-  .viewer > div {
-    display: none; }
 
-.note .content,
-.plaintext-editor {
+.note .content {
   margin: 0 auto;
   word-break: break-word; }
 
-.plaintext-editor {
-  display: none;
-  width: 100%;
-  max-width: 100%;
-  min-height: 480px; }
+.note-path {
+  margin: 3em 0 2em 0;
+  padding: 1.5em 0 0 0;
+  color: #b0b0b0;
+  border-top: 1px solid #c0c0c0;
+  font-weight: normal; }
 
 .notes ul,
 .notebooks ul {
@@ -413,7 +411,7 @@ button {
   .notebooks ul ul {
     padding-left: 1em; }
   .notebooks li {
-    margin: 0.8em 0; }
+    margin: 0.2em 0; }
     .notebooks li a {
       -webkit-transition: all 0.2s ease-in-out;
       -ms-transition: all 0.2s ease-in-out;
@@ -443,11 +441,11 @@ button {
     color: #fff;
     padding: 0.5em; }
   .notes span {
-    font-size: 1.2em; }
+    font-size: 1.2em;
+    font-weight: bold; }
   .notes p {
     margin-top: 0;
     color: #aaa;
-    font-style: italic;
     font-size: 0.9em;
     word-wrap: break-word; }
 
@@ -460,24 +458,6 @@ button {
     display: inline;
     max-height: 28px;
     vertical-align: middle; }
-
-.protips {
-  opacity: 0.5;
-  position: fixed;
-  right: 2em;
-  bottom: 2em;
-  width: 20em;
-  height: 12em;
-  font-size: 0.8em;
-  list-style-type: none;
-  text-align: center; }
-  .protips ul, .protips h6 {
-    padding: 0;
-    margin: 0; }
-  .protips li {
-    display: inline-block;
-    margin: 0.5em 0;
-    width: 5.5em; }
 
 .key {
   display: inline-block;
@@ -497,7 +477,6 @@ button {
 nav {
   max-width: 720px;
   margin: 0 auto;
-  display: none;
   padding: 0.5em 3em 1em 3em;
   overflow: hidden; }
   nav ul {
@@ -505,20 +484,17 @@ nav {
     margin: 0;
     list-style-type: none; }
   nav li {
-    width: 33.33%;
-    background: #f1f1f1;
-    padding: 0.5em;
+    width: 50%;
     float: left;
     text-align: center;
-    cursor: pointer; }
+    cursor: pointer;
+    border: 2px solid #f1f1f1; }
+    nav li a {
+      display: block;
+      padding: 0.5em; }
     nav li:hover {
-      background: #eaeaea; }
-
-@media screen and (max-width: 620px) {
-  .protips {
-    display: none; }
-
-  nav {
-    display: block; } }
+      background: #fcfcfc; }
+    nav li:last-child {
+      border-left: none; }
 
 /*# sourceMappingURL=index.css.map */

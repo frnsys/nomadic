@@ -2,11 +2,6 @@
   "name": "nomadic",
   "dependencies": {
     "requirejs": "latest",
-    "lodash": "latest",
-    "backbone": "latest",
-    "layoutmanager": "latest",
-    "socket.io": "latest",
-    "lodash-template-loader": "latest",
     "highlight.js": "git://github.com/isagalaev/highlight.js.git#master"
   }
 }

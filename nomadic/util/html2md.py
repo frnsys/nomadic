@@ -1,11 +1,11 @@
 import re
-
 import html2text
 from lxml.html import builder, fromstring, tostring, clean
 
 
 h2t = html2text.HTML2Text()
 h2t.body_width = 0 # don't wrap lines
+h2t.ul_item_mark = '-'
 to_md = h2t.handle
 
 
@@ -24,7 +24,7 @@ def html_to_markdown(html):
     for span in h.findall('.//span') + h.findall('.//font'):
         convert_span(span)
 
-    html = tostring(h)
+    html = tostring(h).decode('utf-8')
 
     # Not ideal but works in a pinch
     html = html.replace('<mark>', '==')
@@ -59,8 +59,6 @@ def convert_span(span):
     a bold or italic style into
     strong and em tags, respectively
     (nesting them if both are specified).
-
-    Can also handle Evernote highlighting.
     """
     p = span.getparent()
 
@@ -73,27 +71,7 @@ def convert_span(span):
         builders.append(builder.STRONG)
     if 'italic' in style:
         builders.append(builder.EM)
-    # The latter background color rules are based on how I used to do highlighting in Evernote...
-    if '-evernote-highlight:true' in style \
-            or 'background-color: rgb(255, 252, 229);' in style \
-            or 'background-color: rgb(242, 250, 111);' in style \
-            or 'background-color: rgb(247, 252, 124);' in style \
-            or 'background-color: rgb(203, 242, 254);' in style \
-            or 'background-color: rgb(253, 246, 184);' in style \
-            or 'background-color: rgb(242, 251, 100);' in style \
-            or 'background-color: rgb(255, 248, 177);' in style \
-            or 'background-color: rgb(246, 245, 154);'  in style \
-            or 'background-color: rgb(255, 249, 177);' in style \
-            or 'background-color: rgb(247, 250, 132);' in style \
-            or 'background-color: rgb(255, 249, 173);' in style \
-            or 'background-color: rgb(246, 245, 154);' in style \
-            or 'background-color: rgb(255, 211, 227);' in style \
-            or 'background-color:rgb(255, 250, 165);' in style \
-            or 'background-color: rgb(255, 255, 204);' in style:
 
-        builders.append(highlighter)
-
-    tail = span.tail
     if builders:
         children = []
         if span.text is not None:
@@ -112,10 +90,3 @@ def convert_span(span):
 
         # Replace the old element with the new one.
         p.replace(span, el)
-
-        # Insert other text.
-        if tail is not None and tail.strip():
-            p.insert(p.index(el) + 1, builder.SPAN(tail))
-
-def highlighter(*children):
-    return builder.E('mark', *children)

@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <div class="note">
+    <div class="content">
+      <h1>{{ note.title }}</h1>
+      <div class="note-content">{{ note.html|safe }}</div>
+      <h6 class="note-path">{{ note.path }}</h6>
+    </div>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script type="text/javascript" charset="utf-8">
+    MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [["\\(","\\)"], ["$","$"]],
+          processEscapes: true
+        },
+        "HTML-CSS": {
+          webFont: "STIX-Web",
+          scale: 100 // font scale
+        }
+    });
+    MathJax.Hub.Startup.onload();
+
+    $('pre code').each(function(i, block) {
+      hljs.highlightBlock(block);
+    });
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+  </script>
+{% endblock %}

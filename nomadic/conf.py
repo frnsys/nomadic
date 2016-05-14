@@ -4,14 +4,13 @@ import yaml
 
 # Defaults
 config = {
-    'root': '~/nomadic',
+    'root': '~/notes',
     'port': 9137,
-    'default_notebook': '',
     'override_stylesheet': ''
 }
 
 # Create default config if necessary.
-cfg_path = os.path.expanduser(u'~/.nomadic')
+cfg_path = os.path.expanduser('~/.nomadic')
 if not os.path.exists(cfg_path):
     with open(cfg_path, 'w') as cfg_file:
         yaml.dump(config, cfg_file)

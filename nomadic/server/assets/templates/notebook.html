@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% macro render_notebook(notebook) -%}
+  <h6>{{ notebook.name }}</h6>
+  <ul>
+    {% for note in notebook.notes %}
+      <a href="/{{ note.url }}">
+        <li>
+          <span>{{ note.title }}</span>
+          <p>{{ note.excerpt|safe }}</p>
+          {% if note.images %}
+            <ul class="thumbs">
+              {% for img in note.images %}
+                {% if img.endswith('.pdf') %}
+                  <span>PDF</span>
+                {% else %}
+                  <img src="{{ img }}">
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      </a>
+    {% endfor %}
+  </ul>
+{%- endmacro %}
+
+{% block content %}
+  <div class="notes">
+    <form action="/search" method="GET" name="search">
+      <input type="text" name="query" placeholder="search all notes" autofocus/>
+    </form>
+    <div class="notes--list">{{ render_notebook(notebook) }}</div>
+  </div>
+{% endblock %}
