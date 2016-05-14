@@ -247,25 +247,25 @@ To run the included tests:
 ## Screenshots
 
 #### blockquotes and images
-![](screenshots/01.png)
+![](scrots/01.png)
 
 #### embedded pdfs
-![](screenshots/02.png)
+![](scrots/02.png)
 
 #### you can copy and paste articles easily through the web editor
-![](screenshots/03.png)
+![](scrots/03.png)
 
 #### highlighting support
-![](screenshots/04.png)
+![](scrots/04.png)
 
 #### nice images
-![](screenshots/05.png)
+![](scrots/05.png)
 
 #### code and mathjax galore
-![](screenshots/06.png)
+![](scrots/06.png)
 
 #### list and filter your notebooks
-![](screenshots/07.png)
+![](scrots/07.png)
 
 #### search your notes
-![](screenshots/08.png)
+![](scrots/08.png)
