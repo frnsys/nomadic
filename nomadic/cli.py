@@ -92,16 +92,12 @@ def new(notebook, note):
 @click.argument('note')
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
-@click.option('-p', '--presentation', is_flag=True, help='export as a presentation')
-def export(note, outdir, watch, presentation):
+def export(note, outdir, watch):
     """export a note to html"""
     # convert to abs path; don't assume we're in the notes folder
     note = os.path.join(os.getcwd(), note)
     n = Note(note)
-    if presentation:
-        f = partial(compile.compile_note, outdir=outdir, templ='presentation')
-    else:
-        f = partial(compile.compile_note, outdir=outdir, templ='default')
+    f = partial(compile.compile_note, outdir=outdir, templ='default')
     watch_note(n, f) if watch else f(n)
 
 
