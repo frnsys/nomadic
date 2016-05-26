@@ -90,6 +90,20 @@ def new(notebook, note):
 
 @cli.command()
 @click.argument('note')
+def view(note):
+    """view a note in the browser, recompiling when changed"""
+    # convert to abs path; don't assume we're in the notes folder
+    outdir = '/tmp'
+    note = os.path.join(os.getcwd(), note)
+    n = Note(note)
+    compile.compile_note(n, outdir=outdir, templ='default')
+    click.launch('/tmp/{title}/{title}.html'.format(title=n.title))
+    f = partial(compile.compile_note, outdir=outdir, templ='default')
+    watch_note(n, f)
+
+
+@cli.command()
+@click.argument('note')
 @click.argument('outdir')
 @click.option('-w', '--watch', is_flag=True, help='watch the note for changes')
 def export(note, outdir, watch):
