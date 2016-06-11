@@ -110,12 +110,14 @@ def _is_remote_image_link(link):
     # this is b/c, for instance, squarespace image urls
     # don't actually end with file extensions
     else:
-        res = requests.head(link)
         try:
+            res = requests.head(link, timeout=5)
             ctype, ext = res.headers['Content-Type'].split('/')
             if ctype == 'image':
                 return True, ext
-        except KeyError:
+        except (KeyError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.ConnectTimeout):
             pass
 
     return False, None
