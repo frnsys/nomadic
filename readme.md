@@ -1,5 +1,11 @@
 # nomadic
 
+---
+
+9/1/2016: I'm no longer maintaining `nomadic`. The tool I use now for managing my Markdown notes is [`nom`](https://github.com/frnsys/nom), which is basically `nomadic` without the web interface (I didn't use it much).
+
+---
+
 ![](screenshots/01.png)
 (more screenshots at the end)
 
