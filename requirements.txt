@@ -14,7 +14,7 @@ html2text==2015.11.4
 itsdangerous==0.24
 linecache2==1.0.0
 lockfile==0.12.2
-lxml==3.5.0
+lxml==4.9.1
 pathtools==0.1.2
 py-gfm==0.1.1
 python-daemon==2.1.0
